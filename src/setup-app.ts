@@ -3,21 +3,22 @@ import {db} from "./db/db";
 import VideoModel from "./core/types/video-model-type";
 import {UpdateVideoInputModel} from "./core/videos/dto/video-input-dto";
 import {HttpStatus} from "./core/enums/http-status";
+import {RouterList} from "./core/constants/router-list";
 
 export const setupApp = (app: Express) => {
     app.use(express.json()); // middleware для парсинга JSON в теле запроса
 
     // base route
-    app.get("/", (req: Request, res: Response) => {
+    app.get(RouterList.SLASH_ROUTE, (req: Request, res: Response) => {
         res.status(HttpStatus.Ok).send("Welcome to Video Hosting Service API!");
     });
 
     // videos crud routes
-    app.get("/videos", (req: Request, res: Response) => {
+    app.get(RouterList.ALL_VIDEOS, (req: Request, res: Response) => {
         res.status(HttpStatus.Ok).send(db.videos);
     });
 
-    app.get("/videos/:id", (req: Request, res: Response) => {
+    app.get(RouterList.SINGLE_VIDEO, (req: Request, res: Response) => {
         if (isNaN(parseInt(req.params.id))) {
             return res.status(HttpStatus.BadRequest).send(`Invalid video id format: ${req.params.id}.`);
         }
@@ -29,7 +30,7 @@ export const setupApp = (app: Express) => {
         res.status(HttpStatus.Ok).send(video);
     });
 
-    app.post("/videos", (req: Request, res: Response) => {
+    app.post(RouterList.ALL_VIDEOS, (req: Request, res: Response) => {
         // validate request body to be added
         const newVideo: VideoModel = {
             id: db.videos.length > 0 ? db.videos[db.videos.length - 1].id + 1 : 1,
@@ -43,7 +44,7 @@ export const setupApp = (app: Express) => {
         res.status(HttpStatus.Created).send(newVideo);
     });
 
-    app.put("/videos/:id", (req: Request, res: Response) => {
+    app.put(RouterList.SINGLE_VIDEO, (req: Request, res: Response) => {
         if (isNaN(parseInt(req.params.id))) {
             return res.status(HttpStatus.BadRequest).send(`Invalid video id format: ${req.params.id}.`);
         }
@@ -59,7 +60,7 @@ export const setupApp = (app: Express) => {
         res.status(HttpStatus.Ok).send(newVideo);
     });
 
-    app.delete("/videos/:id", (req: Request, res: Response) => {
+    app.delete(RouterList.SINGLE_VIDEO, (req: Request, res: Response) => {
         if (isNaN(parseInt(req.params.id))) {
             return res.status(HttpStatus.BadRequest).send(`Invalid video id format: ${req.params.id}.`);
         }
@@ -72,9 +73,9 @@ export const setupApp = (app: Express) => {
         res.status(HttpStatus.Ok).send(`Video with id: ${id} was deleted successfully.`);
     });
 
-    app.delete('/testing/all-data', (req: Request, res: Response) => {
+    app.delete(RouterList.TEST_DELETE_ALL_VIDEOS, (req: Request, res: Response) => {
         db.videos = [];
-        res.status(HttpStatus.NoContent).send('All data deleted successfully.');
+        res.status(HttpStatus.NoContent).send(db.videos);
     });
 };
 
