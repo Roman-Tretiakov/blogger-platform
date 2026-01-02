@@ -1,10 +1,9 @@
 import express, {Express, Request, Response} from "express";
 import {db} from "./db/db";
 import VideoModel from "./core/types/video-model-type";
-import {UpdateVideoInputModel} from "./core/videos/dto/video-input-dto";
 import {HttpStatus} from "./core/enums/http-status";
 import {RouterList} from "./core/constants/router-list";
-import {createVideoInputDtoValidation} from "./core/videos/dto/video-input-dto-validation";
+import {createVideoInputDtoValidation, updateVideoInputDtoValidation} from "./core/videos/dto/video-input-dto-validation";
 import {createErrorMessages} from "./core/utils/error.utils";
 
 export const setupApp = (app: Express) => {
@@ -40,21 +39,29 @@ export const setupApp = (app: Express) => {
 
     app.post(RouterList.ALL_VIDEOS, (req: Request, res: Response) => {
         // validate request body:
-        const errors = createVideoInputDtoValidation(req.body);
-        if (errors.length > 0) {
-            return res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
+        if (!req.body) {
+            return res.status(HttpStatus.BadRequest).send(createErrorMessages([{
+                field: "body",
+                message: "Request body is missing."
+            }]));
         }
+        else {
+            const errors = createVideoInputDtoValidation(req.body);
+            if (errors.length > 0) {
+                return res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
+            }
 
-        const newVideo: VideoModel = {
-            id: db.videos.length > 0 ? db.videos[db.videos.length - 1].id + 1 : 1,
-            canBeDownloaded: false,
-            minAgeRestriction: null,
-            createdAt: new Date().toISOString(),
-            publicationDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(), // current date + 1 day
-            ...req.body
-        };
-        db.videos.push(newVideo);
-        res.status(HttpStatus.Created).send(newVideo);
+            const newVideo: VideoModel = {
+                id: db.videos.length > 0 ? db.videos[db.videos.length - 1].id + 1 : 1,
+                canBeDownloaded: false,
+                minAgeRestriction: null,
+                createdAt: new Date().toISOString(),
+                publicationDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(), // current date + 1 day
+                ...req.body
+            };
+            db.videos.push(newVideo);
+            res.status(HttpStatus.Created).send(newVideo);
+        }
     });
 
     app.put(RouterList.SINGLE_VIDEO, (req: Request, res: Response) => {
@@ -65,19 +72,27 @@ export const setupApp = (app: Express) => {
             }]));
         }
         // validate request body:
-        const errors = createVideoInputDtoValidation(req.body);
-        if (errors.length > 0) {
-            return res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
+        if (!req.body) {
+            return res.status(HttpStatus.BadRequest).send(createErrorMessages([{
+                field: "body",
+                message: "Request body is missing."
+            }]));
         }
+        else {
+            const errors = updateVideoInputDtoValidation(req.body);
+            if (errors.length > 0) {
+                return res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
+            }
 
-        const id: number = parseInt(req.params.id);
-        const video: VideoModel | undefined = db.videos.find((video) => video.id === id);
-        if (!video) {
-            return res.status(HttpStatus.NotFound).send(`No video found by id: ${id}.`);
+            const id: number = parseInt(req.params.id);
+            const video: VideoModel | undefined = db.videos.find((video) => video.id === id);
+            if (!video) {
+                return res.status(HttpStatus.NotFound).send(`No video found by id: ${id}.`);
+            }
+            const newVideo = Object.assign(video, req.body);
+            db.videos[id - 1] = newVideo;
+            res.status(HttpStatus.Ok).send(newVideo);
         }
-        const newVideo = Object.assign(video, req.body);
-        db.videos[id - 1] = newVideo;
-        res.status(HttpStatus.Ok).send(newVideo);
     });
 
     app.delete(RouterList.SINGLE_VIDEO, (req: Request, res: Response) => {
