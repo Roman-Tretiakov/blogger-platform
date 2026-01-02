@@ -1,7 +1,7 @@
 import express from "express";
 import request from "supertest";
 import {setupApp} from "../../src/setup-app";
-import {RouterList} from "../../src/core/constants/router-list";
+import {EndpointList} from "../../src/core/constants/endpoint-list";
 import {HttpStatus} from "../../src/core/enums/http-status";
 import {AvailableResolutions} from "../../src/core/enums/available-resolutions";
 import {CreateVideoInputModel, UpdateVideoInputModel} from "../../src/core/videos/dto/video-input-dto";
@@ -26,7 +26,7 @@ describe('Video API body validation test', () => {
     }
 
     beforeAll(async () => {
-        const res = await request(app).delete(RouterList.TEST_DELETE_ALL_VIDEOS);
+        const res = await request(app).delete("/testing" + EndpointList.TEST_DELETE_ALL_VIDEOS);
         expect(res.status).toBe(HttpStatus.NoContent)
         expect(res.body).toEqual({});
     });
@@ -34,7 +34,7 @@ describe('Video API body validation test', () => {
     //Valid data set validation test for Create Video
     test("Create Video has no errors; POST /videos", async () => {
         const createResponse = await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({...validCreateDataSet})
             .expect(HttpStatus.Created);
         expect(createResponse.body.errorMessages).toBeUndefined();
@@ -43,11 +43,11 @@ describe('Video API body validation test', () => {
     //Valid data set validation test for Update Video
     test("Update Video has no errors; PUT /video/:id", async () => {
         const createResponse = await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({...validCreateDataSet})
             .expect(HttpStatus.Created);
         const updateResponse = await request(app)
-            .put(RouterList.ALL_VIDEOS + "/" + createResponse.body.id)
+            .put(EndpointList.ALL_VIDEOS + "/" + createResponse.body.id)
             .send({...validUpdateDataSet})
             .expect(HttpStatus.Ok);
         expect(updateResponse.body.errorMessages).toBeUndefined();
@@ -56,7 +56,7 @@ describe('Video API body validation test', () => {
     //Invalid data set validation test 1 for Create Video
     test("Create Video without title; POST /videos", async () => {
         const createResponse = await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({
                 ...validCreateDataSet,
                 title: undefined,
@@ -71,7 +71,7 @@ describe('Video API body validation test', () => {
     //Invalid data set validation test 1-1 for Create Video
     test("Create Video with invalid title length; POST /videos", async () => {
         const createResponse = await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({
                 ...validCreateDataSet,
                 title: "a",
@@ -86,7 +86,7 @@ describe('Video API body validation test', () => {
     //Invalid data set validation test 2 for Create Video
     test("Create Video with invalid param; POST /videos", async () => {
         const createResponse = await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({
                 ...validCreateDataSet,
                 author: 1,
@@ -101,7 +101,7 @@ describe('Video API body validation test', () => {
     //Invalid data set validation test 2-1 for Create Video
     test("Create Video with invalid length; POST /videos", async () => {
         const createResponse = await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({
                 ...validCreateDataSet,
                 author: "ABCDEFGHIJKLMNOPQRST1",
@@ -116,7 +116,7 @@ describe('Video API body validation test', () => {
     //Invalid data set validation test 2-2 for Create Video
     test("Create Video with valid length; POST /videos", async () => {
         const createResponse = await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({
                 ...validCreateDataSet,
                 author: "AB",
@@ -130,7 +130,7 @@ describe('Video API body validation test', () => {
     //Invalid data set validation test 3 for Create Video
     test("Create Video with invalid availableResolutions length & values; POST /videos", async () => {
         const createResponse = await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({
                 ...validCreateDataSet,
                 availableResolutions: ["P144", "P240", "P360", "P481", "P720", "P1080", "P1440", "P2160", "P2860"],
@@ -146,7 +146,7 @@ describe('Video API body validation test', () => {
     //Invalid data set validation test 3-1 for Create Video
     test("Create Video with not array availableResolutions values; POST /videos", async () => {
         const createResponse = await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({
                 ...validCreateDataSet,
                 availableResolutions: "P144",
@@ -161,11 +161,11 @@ describe('Video API body validation test', () => {
     //Invalid data set validation test 4 for Update Video
     test("Invalid publicationDate format; PUT /video/:id", async () => {
         const createResponse = await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({...validCreateDataSet})
             .expect(HttpStatus.Created);
         const updateResponse = await request(app)
-            .put(RouterList.ALL_VIDEOS + "/" + createResponse.body.id)
+            .put(EndpointList.ALL_VIDEOS + "/" + createResponse.body.id)
             .send({
                 ...validUpdateDataSet,
                 publicationDate: "01/2024",

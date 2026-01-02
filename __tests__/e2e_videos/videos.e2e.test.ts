@@ -3,7 +3,7 @@ import express from 'express';
 import {setupApp} from '../../src/setup-app';
 import {CreateVideoInputModel, UpdateVideoInputModel} from '../../src/core/videos/dto/video-input-dto';
 import {HttpStatus} from "../../src/core/enums/http-status";
-import {RouterList} from "../../src/core/constants/router-list";
+import {EndpointList} from "../../src/core/constants/endpoint-list";
 
 describe('Video API tests', () => {
     const app = express();
@@ -24,7 +24,7 @@ describe('Video API tests', () => {
     };
 
     beforeAll(async () => {
-        const res = await request(app).delete(RouterList.TEST_DELETE_ALL_VIDEOS);
+        const res = await request(app).delete("/testing" + EndpointList.TEST_DELETE_ALL_VIDEOS);
         expect(res.status).toBe(HttpStatus.NoContent)
         expect(res.body).toEqual({});
     });
@@ -34,7 +34,7 @@ describe('Video API tests', () => {
             ...createdVideo
         };
         await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send(newVideo)
             .expect(HttpStatus.Created);
     });
@@ -53,17 +53,17 @@ describe('Video API tests', () => {
         };
 
         await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({...createdVideo2})
             .expect(HttpStatus.Created);
 
         await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({...createdVideo3})
             .expect(HttpStatus.Created);
 
         const videoListResponse = await request(app)
-            .get(RouterList.ALL_VIDEOS)
+            .get(EndpointList.ALL_VIDEOS)
             .expect(HttpStatus.Ok);
 
         expect(videoListResponse.body).toBeInstanceOf(Array);
@@ -78,12 +78,12 @@ describe('Video API tests', () => {
         };
 
         const createResponse = await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({...createdVideo4})
             .expect(HttpStatus.Created);
 
         const getResponse = await request(app)
-            .get(RouterList.ALL_VIDEOS + "/" + createResponse.body.id)
+            .get(EndpointList.ALL_VIDEOS + "/" + createResponse.body.id)
             .expect(HttpStatus.Ok);
 
         expect(getResponse.body).toEqual({
@@ -101,7 +101,7 @@ describe('Video API tests', () => {
         };
 
         const createResponse = await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({...createdVideo5})
             .expect(HttpStatus.Created);
 
@@ -110,7 +110,7 @@ describe('Video API tests', () => {
         };
 
         const updateResponse = await request(app)
-            .put(RouterList.ALL_VIDEOS + "/" + createResponse.body.id)
+            .put(EndpointList.ALL_VIDEOS + "/" + createResponse.body.id)
             .send({...newData})
             .expect(HttpStatus.Ok);
 
@@ -127,17 +127,17 @@ describe('Video API tests', () => {
             availableResolutions: ["P144", "P1440", "P2160"]
         };
         const createResponse = await request(app)
-            .post(RouterList.ALL_VIDEOS)
+            .post(EndpointList.ALL_VIDEOS)
             .send({...createdVideo6})
             .expect(HttpStatus.Created);
         const id: number = createResponse.body.id;
 
         await request(app)
-            .delete(RouterList.ALL_VIDEOS + "/" + id)
+            .delete(EndpointList.ALL_VIDEOS + "/" + id)
             .expect(HttpStatus.Ok);
 
         await request(app)
-            .get(RouterList.ALL_VIDEOS + "/" + id)
+            .get(EndpointList.ALL_VIDEOS + "/" + id)
             .expect(HttpStatus.NotFound);
     })
 });
