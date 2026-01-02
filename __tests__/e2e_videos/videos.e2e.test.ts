@@ -106,12 +106,7 @@ describe('Video API tests', () => {
             .expect(HttpStatus.Created);
 
         const newData: UpdateVideoInputModel = {
-            title: "Updated Test Video 5",
-            author: "Updated Test Author 5",
-            availableResolutions: ["P360", "P480"],
-            canBeDownloaded: true,
-            minAgeRestriction: 6,
-            publicationDate: new Date().toISOString()
+            ...updatedVideo
         };
 
         const updateResponse = await request(app)

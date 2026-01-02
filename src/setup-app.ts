@@ -4,6 +4,8 @@ import VideoModel from "./core/types/video-model-type";
 import {UpdateVideoInputModel} from "./core/videos/dto/video-input-dto";
 import {HttpStatus} from "./core/enums/http-status";
 import {RouterList} from "./core/constants/router-list";
+import {createVideoInputDtoValidation} from "./core/videos/dto/video-input-dto-validation";
+import {createErrorMessages} from "./core/utils/error.utils";
 
 export const setupApp = (app: Express) => {
     app.use(express.json()); // middleware для парсинга JSON в теле запроса
@@ -13,25 +15,36 @@ export const setupApp = (app: Express) => {
         res.status(HttpStatus.Ok).send("Welcome to Video Hosting Service API!");
     });
 
-    // videos crud routes
+    // videos crud routes:
     app.get(RouterList.ALL_VIDEOS, (req: Request, res: Response) => {
         res.status(HttpStatus.Ok).send(db.videos);
     });
 
     app.get(RouterList.SINGLE_VIDEO, (req: Request, res: Response) => {
         if (isNaN(parseInt(req.params.id))) {
-            return res.status(HttpStatus.BadRequest).send(`Invalid video id format: ${req.params.id}.`);
+            return res.status(HttpStatus.BadRequest).send(createErrorMessages([{
+                field: "id",
+                message: `Invalid video id format: ${req.params.id}.`
+            }]));
         }
         const id: number = parseInt(req.params.id);
         const video: VideoModel | undefined = db.videos.find((video) => video.id === id);
         if (!video) {
-            return res.status(HttpStatus.NotFound).send(`No video found by id: ${id}.`);
+            return res.status(HttpStatus.NotFound).send(createErrorMessages([{
+                field: "id",
+                message: `No video found by id: ${id}.`
+            }]));
         }
         res.status(HttpStatus.Ok).send(video);
     });
 
     app.post(RouterList.ALL_VIDEOS, (req: Request, res: Response) => {
-        // validate request body to be added
+        // validate request body:
+        const errors = createVideoInputDtoValidation(req.body);
+        if (errors.length > 0) {
+            return res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
+        }
+
         const newVideo: VideoModel = {
             id: db.videos.length > 0 ? db.videos[db.videos.length - 1].id + 1 : 1,
             canBeDownloaded: false,
@@ -46,9 +59,16 @@ export const setupApp = (app: Express) => {
 
     app.put(RouterList.SINGLE_VIDEO, (req: Request, res: Response) => {
         if (isNaN(parseInt(req.params.id))) {
-            return res.status(HttpStatus.BadRequest).send(`Invalid video id format: ${req.params.id}.`);
+            return res.status(HttpStatus.BadRequest).send(createErrorMessages([{
+                field: "id",
+                message: `Invalid video id format: ${req.params.id}.`
+            }]));
         }
-        // validate request body to be updated
+        // validate request body:
+        const errors = createVideoInputDtoValidation(req.body);
+        if (errors.length > 0) {
+            return res.status(HttpStatus.BadRequest).send(createErrorMessages(errors));
+        }
 
         const id: number = parseInt(req.params.id);
         const video: VideoModel | undefined = db.videos.find((video) => video.id === id);
@@ -62,17 +82,24 @@ export const setupApp = (app: Express) => {
 
     app.delete(RouterList.SINGLE_VIDEO, (req: Request, res: Response) => {
         if (isNaN(parseInt(req.params.id))) {
-            return res.status(HttpStatus.BadRequest).send(`Invalid video id format: ${req.params.id}.`);
+            return res.status(HttpStatus.BadRequest).send(createErrorMessages([{
+                field: "id",
+                message: `Invalid video id format: ${req.params.id}.`
+            }]));
         }
         const id: number = parseInt(req.params.id);
         const video: VideoModel | undefined = db.videos.find((video) => video.id === id);
         if (!video) {
-            return res.status(HttpStatus.NotFound).send(`No video found by id: ${id}.`);
+            return res.status(HttpStatus.NotFound).send(createErrorMessages([{
+                field: "id",
+                message: `No video found by id: ${id}.`
+            }]));
         }
         db.videos.splice(id - 1, 1);
         res.status(HttpStatus.Ok).send(`Video with id: ${id} was deleted successfully.`);
     });
 
+    // testing route to delete all videos
     app.delete(RouterList.TEST_DELETE_ALL_VIDEOS, (req: Request, res: Response) => {
         db.videos = [];
         res.status(HttpStatus.NoContent).send(db.videos);
