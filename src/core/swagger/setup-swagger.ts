@@ -10,8 +10,14 @@ const swaggerOptions = {
             version: '1.0.0',
             description: 'video API',
         },
+        // servers: [
+        //     {
+        //         url: 'https://first-express-app-two.vercel.app',
+        //         description: 'Production server',
+        //     },
+        // ],
     },
-    apis: ['./src/**/*.swagger.yml'],
+    apis: ['./src/core/videos/docs/*.swagger.yml', './src/**/*.swagger.yml'],
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
