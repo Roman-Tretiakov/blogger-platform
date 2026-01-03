@@ -17,7 +17,8 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 export const setupSwagger = (app: Express) => {
-    app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    app.use('/api', swaggerUi.serve);
+    app.get('/api', swaggerUi.setup(swaggerSpec, {
         customJs: "/api/swagger-ui-bundle.js",
         customCssUrl: "/api/swagger-ui.css",
     }));
