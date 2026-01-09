@@ -9,10 +9,11 @@ import {inputValidationResultMiddleware} from "../../middlewares/input-validatio
 import {createVideoBodyValidationMiddleware} from "../middlewares/create-video-body-validation-middleware";
 import {paramIdValidationMiddleware} from "../../middlewares/params-id-validation.middleware";
 import {updateVideoBodyValidationMiddleware} from "../middlewares/update-video-body-validation-middleware";
+import {superAdminGuardMiddleware} from "../../../auth/middlewares/super-admin.guard-middleware";
 
 export const videosRouter = Router({});
 
-videosRouter
+videosRouter.use(superAdminGuardMiddleware)
 // videos crud routes:
 .get(EndpointList.EMPTY_PATH, getVideoListHandler)
 .get(EndpointList.SINGLE_VIDEO, paramIdValidationMiddleware, inputValidationResultMiddleware, getVideoHandler) // сюда добавляем мидлвэры на валидацию перед обработчиками
