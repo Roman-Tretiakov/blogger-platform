@@ -1,5 +1,6 @@
 export const EndpointList = {
-    SLASH_ROUTE: "/",
+    EMPTY_PATH: "",
+    SLASH_PATH: "/",
     VIDEOS_PATH: "/api/videos",
     TESTING_PATH: "/api/testing",
     SINGLE_VIDEO: "/:id",

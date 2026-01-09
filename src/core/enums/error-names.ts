@@ -17,4 +17,9 @@ export enum ErrorNames {
     PUBLICATION_DATE_MISSING_ERROR = "publicationDate is required",
     PUBLICATION_DATE_TYPE_ERROR = "publicationDate must be a string",
     PUBLICATION_DATE_FORMAT_ERROR = "publicationDate must be in ISO format",
+    BODY_MISSING_ERROR = "Request body is missing",
+    ID_MISSING_ERROR = "ID is required",
+    ID_TYPE_ERROR = "ID must be a string",
+    ID_EMPTY_ERROR = "ID must be not empty",
+    ID_FORMAT_ERROR = "ID must be in numeric format",
 }

@@ -9,7 +9,7 @@ export const setupApp = (app: Express) => {
     app.use(express.json()); // middleware для парсинга JSON в теле запроса
 
     // base route
-    app.get(EndpointList.SLASH_ROUTE, (req: Request, res: Response) => {
+    app.get(EndpointList.SLASH_PATH, (req: Request, res: Response) => {
         res.status(HttpStatus.Ok).send("Welcome to Video Hosting Service API!");
     });
 

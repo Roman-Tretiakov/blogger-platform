@@ -9,7 +9,7 @@ describe("GET /", () => {
     setupApp(app);
 
     test("GET / should return 'Welcome to Video Hosting Service API!'", async () => {
-        const res = await request(app).get(EndpointList.SLASH_ROUTE);
+        const res = await request(app).get(EndpointList.SLASH_PATH);
         expect(res.status).toBe(HttpStatus.Ok);
         expect(res.text).toBe("Welcome to Video Hosting Service API!");
     });
