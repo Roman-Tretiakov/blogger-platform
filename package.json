@@ -1,5 +1,5 @@
 {
-  "name": "first-express-app",
+  "name": "blogger-platform-backend",
   "version": "1.0.0",
   "description": "1 sprint",
   "main": "dist/index.js",
