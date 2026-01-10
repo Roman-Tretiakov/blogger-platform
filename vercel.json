@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "video-hosting-app",
+  "name": "blogger-platform-backend",
   "builds": [
     {
       "src": "src/index.ts",
