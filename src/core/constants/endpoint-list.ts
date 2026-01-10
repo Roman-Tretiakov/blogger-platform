@@ -5,4 +5,8 @@ export const EndpointList = {
     TESTING_PATH: "/api/testing",
     SINGLE_VIDEO: "/:id",
     TEST_DELETE_ALL_VIDEOS: "/all-data",
+    BLOGS_PATH: "/api/blogs",
+    SINGLE_BLOG: "/:id",
+    POSTS_PATH: "/api/posts",
+    SINGLE_POST: "/:id",
 }
