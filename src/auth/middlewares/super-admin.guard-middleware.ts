@@ -12,12 +12,12 @@ export const superAdminGuardMiddleware = (req: Request, res: Response, next: Nex
     }
 
     const [authType, token] = auth.split(' ');
-    if (authType.toLowerCase() !== 'basic') {
+    if (authType.trim() !== 'Basic') {
         res.sendStatus(HttpStatus.Unauthorized);
         return;
     }
 
-    const credentials = Buffer.from(token, 'base64').toString('utf-8');
+    const credentials = Buffer.from(token.trim(), 'base64').toString('utf-8');
     const [username, password] = credentials.split(':');
 
     if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {

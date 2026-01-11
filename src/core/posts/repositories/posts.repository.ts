@@ -30,7 +30,7 @@ export const postsRepository = {
 
   update(id: string, updateModel: PostInputModel): void {
     const post: PostViewModel | undefined = db.posts.find(
-      (post: PostViewModel) => post.id === id,
+      (p: PostViewModel) => p.id === id,
     );
 
     if (!post) {

@@ -1,42 +1,53 @@
-import {db} from "../../../db/db";
-import VideoModel from "../../types/video-model-type";
-import {BlogInputModel} from "../dto/blog-input-dto";
-
+import { db } from "../../../db/db";
+import { BlogInputModel } from "../dto/blog-input-dto";
+import { BlogViewModel } from "../../types/blog-view-model-type";
 
 export const blogsRepository = {
-    findAll(): VideoModel[] {
-        return db.videos;
-    },
+  findAll(): BlogViewModel[] {
+    return db.blogs;
+  },
 
-    findById(id: number): VideoModel | null {
-        return db.videos.find((video:VideoModel) => video.id === id) ?? null;
-    },
+  findById(id: string): BlogViewModel | null {
+    return db.blogs.find((blog: BlogViewModel) => blog.id === id) ?? null;
+  },
 
-    create(video: VideoModel): VideoModel {
-        db.videos.push(video);
-        return video;
-    },
+  create(blog: BlogInputModel): BlogViewModel {
+    const newBlog: BlogViewModel = {
+      id:
+        db.posts.length > 0
+          ? (parseInt(db.blogs[db.blogs.length - 1].id) + 1).toString()
+          : "1",
+      ...blog,
+    };
+    db.blogs.push(newBlog);
+    return newBlog;
+  },
 
-    update(id: number, updateModel: BlogInputModel): void {
-        const video: VideoModel | undefined = db.videos.find((video:VideoModel) => video.id === id);
+  update(id: string, updateModel: BlogInputModel): void {
+    const blog: BlogViewModel | undefined = db.blogs.find(
+      (b: BlogViewModel) => b.id === id,
+    );
 
-        if (!video) {
-            throw new Error(`Video with id ${id} not found`);
-        }
-
-        db.videos[id] = Object.assign(video, updateModel);
-    },
-
-    delete(id: number): void {
-        const index = db.videos.findIndex((video:VideoModel) => video.id === id);
-
-        if (index === -1) {
-            throw new Error(`Video with id ${id} not found`);
-        }
-
-        db.videos.splice(index, 1);
-    },
-    clear(): void {
-        db.blogs = [];
+    if (!blog) {
+      throw new Error(`Blog with id ${id} not found`);
     }
+
+    db.blogs[+id] = Object.assign(blog, updateModel);
+  },
+
+  delete(id: string): void {
+    const index = db.blogs.findIndex(
+      (blog: BlogViewModel) => blog.id === id,
+    );
+
+    if (index === -1) {
+      throw new Error(`blog with id ${id} not found`);
+    }
+
+    db.blogs.splice(index, 1);
+  },
+
+  clear(): void {
+    db.blogs = [];
+  },
 };
