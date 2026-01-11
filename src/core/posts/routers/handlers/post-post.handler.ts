@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../enums/http-status";
 import { postsRepository } from "../../repositories/posts.repository";
-import { PostViewModel } from "../../../types/post-model-type";
+import { PostViewModel } from "../../../types/post-view-model-type";
 import { PostInputModel } from "../../dto/post-input-dto";
 import { createErrorMessages } from "../../../utils/error.utils";
 

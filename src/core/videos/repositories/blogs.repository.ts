@@ -1,6 +1,6 @@
 import {db} from "../../../db/db";
 import VideoModel from "../../types/video-model-type";
-import {UpdateVideoInputModel} from "../dto/video-input-dto";
+import {BlogInputModel} from "../dto/blog-input-dto";
 
 
 export const blogsRepository = {
@@ -17,7 +17,7 @@ export const blogsRepository = {
         return video;
     },
 
-    update(id: number, updateModel: UpdateVideoInputModel): void {
+    update(id: number, updateModel: BlogInputModel): void {
         const video: VideoModel | undefined = db.videos.find((video:VideoModel) => video.id === id);
 
         if (!video) {

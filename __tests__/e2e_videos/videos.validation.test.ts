@@ -4,7 +4,7 @@ import {setupApp} from "../../src/setup-app";
 import {EndpointList} from "../../src/core/constants/endpoint-list";
 import {HttpStatus} from "../../src/core/enums/http-status";
 import {AvailableResolutions} from "../../src/core/enums/available-resolutions";
-import {CreateVideoInputModel, UpdateVideoInputModel} from "../../src/core/videos/dto/video-input-dto";
+import {CreateVideoInputModel, BlogInputModel} from "../../src/core/videos/dto/blog-input-dto";
 import {ErrorNames} from "../../src/core/enums/error-names";
 
 describe('Video API body validation test', () => {
@@ -16,7 +16,7 @@ describe('Video API body validation test', () => {
         author: "Agata Kristi",
         availableResolutions: [AvailableResolutions.P144, AvailableResolutions.P240],
     }
-    const validUpdateDataSet: UpdateVideoInputModel = {
+    const validUpdateDataSet: BlogInputModel = {
         title: "Video_1",
         author: "Agata Kristi",
         canBeDownloaded: true,

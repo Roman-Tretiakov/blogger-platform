@@ -1,6 +1,6 @@
 import VideoModel from "../core/types/video-model-type";
-import { BlogModel } from "../core/types/blog-model-type";
-import { PostViewModel } from "../core/types/post-model-type";
+import { BlogViewModel } from "../core/types/blog-view-model-type";
+import { PostViewModel } from "../core/types/post-view-model-type";
 
 export const db = {
     videos: <VideoModel[]>[
@@ -35,7 +35,7 @@ export const db = {
             availableResolutions: ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"],
         }
     ],
-    blogs: <BlogModel[]>[
+    blogs: <BlogViewModel[]>[
       {
         id: "1",
         name: "Research blog",

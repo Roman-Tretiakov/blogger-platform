@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { HttpStatus } from "../../../enums/http-status";
 import { createErrorMessages } from "../../../utils/error.utils";
 import { postsRepository } from "../../repositories/posts.repository";
-import { PostViewModel } from "../../../types/post-model-type";
+import { PostViewModel } from "../../../types/post-view-model-type";
 
 export const getPostHandler = (req: Request, res: Response) => {
   const id: string = req.params.id;

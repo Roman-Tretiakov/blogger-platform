@@ -1,7 +1,7 @@
 import request from 'supertest';
 import express from 'express';
 import {setupApp} from '../../src/setup-app';
-import {CreateVideoInputModel, UpdateVideoInputModel} from '../../src/core/videos/dto/video-input-dto';
+import {CreateVideoInputModel, BlogInputModel} from '../../src/core/videos/dto/blog-input-dto';
 import {HttpStatus} from "../../src/core/enums/http-status";
 import {EndpointList} from "../../src/core/constants/endpoint-list";
 
@@ -14,7 +14,7 @@ describe('Video API tests', () => {
         author: "Test Author",
         availableResolutions: ["P144", "P240"]
     };
-    const updatedVideo: UpdateVideoInputModel = {
+    const updatedVideo: BlogInputModel = {
         title: "Updated Test Video",
         author: "Updated Test Author",
         availableResolutions: ["P360", "P480"],
@@ -105,7 +105,7 @@ describe('Video API tests', () => {
             .send({...createdVideo5})
             .expect(HttpStatus.Created);
 
-        const newData: UpdateVideoInputModel = {
+        const newData: BlogInputModel = {
             ...updatedVideo
         };
 

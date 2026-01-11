@@ -1,6 +1,6 @@
 import { db } from "../../../db/db";
 import { PostInputModel } from "../dto/post-input-dto";
-import { PostViewModel } from "../../types/post-model-type";
+import { PostViewModel } from "../../types/post-view-model-type";
 
 export const postsRepository = {
   findAll(): PostViewModel[] {
