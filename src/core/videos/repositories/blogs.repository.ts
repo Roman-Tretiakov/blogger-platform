@@ -14,7 +14,7 @@ export const blogsRepository = {
   create(blog: BlogInputModel): BlogViewModel {
     const newBlog: BlogViewModel = {
       id:
-        db.posts.length > 0
+        db.blogs.length > 0
           ? (parseInt(db.blogs[db.blogs.length - 1].id) + 1).toString()
           : "1",
       ...blog,

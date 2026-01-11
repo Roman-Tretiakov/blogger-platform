@@ -1,8 +1,6 @@
 export const EndpointList = {
   EMPTY_PATH: "",
   SLASH_PATH: "/",
-  VIDEOS_PATH: "/api/videos",
-  SINGLE_VIDEO: "/:id",
   BLOGS_TESTING_PATH: "/api/blogs/testing",
   POSTS_TESTING_PATH: "/api/posts/testing",
   TEST_DELETE_ALL_VIDEOS: "/all-data",

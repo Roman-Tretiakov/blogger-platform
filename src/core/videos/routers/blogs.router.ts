@@ -16,10 +16,10 @@ export const blogsRouter = Router({});
 blogsRouter.use(superAdminGuardMiddleware)
 // videos crud routes:
 .get(EndpointList.EMPTY_PATH, getBlogListHandler)
-.get(EndpointList.SINGLE_VIDEO, paramIdValidationMiddleware, inputValidationResultMiddleware, getBlogHandler) // сюда добавляем мидлвэры на валидацию перед обработчиками
+.get(EndpointList.SINGLE_BLOG, paramIdValidationMiddleware, inputValidationResultMiddleware, getBlogHandler) // сюда добавляем мидлвэры на валидацию перед обработчиками
 .post(EndpointList.EMPTY_PATH, createVideoBodyValidationMiddleware, inputValidationResultMiddleware, postBlogHandler) // сюда добавляем мидлвэры на валидацию перед обработчиками
-.put(EndpointList.SINGLE_VIDEO, paramIdValidationMiddleware, createVideoBodyValidationMiddleware, updateVideoBodyValidationMiddleware, inputValidationResultMiddleware, putBlogHandler) // сюда добавляем мидлвэры на валидацию перед обработчиками
-.delete(EndpointList.SINGLE_VIDEO, paramIdValidationMiddleware, inputValidationResultMiddleware, deleteBlogHandler); // сюда добавляем мидлвэры на валидацию перед обработчиками
+.put(EndpointList.SINGLE_BLOG, paramIdValidationMiddleware, createVideoBodyValidationMiddleware, updateVideoBodyValidationMiddleware, inputValidationResultMiddleware, putBlogHandler) // сюда добавляем мидлвэры на валидацию перед обработчиками
+.delete(EndpointList.SINGLE_BLOG, paramIdValidationMiddleware, inputValidationResultMiddleware, deleteBlogHandler); // сюда добавляем мидлвэры на валидацию перед обработчиками
 
 
 // Что такое middleware?
