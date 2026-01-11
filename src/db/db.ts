@@ -1,6 +1,6 @@
 import VideoModel from "../core/types/video-model-type";
 import { BlogModel } from "../core/types/blog-model-type";
-import { PostModel } from "../core/types/post-model-type";
+import { PostViewModel } from "../core/types/post-model-type";
 
 export const db = {
     videos: <VideoModel[]>[
@@ -55,7 +55,7 @@ export const db = {
         websiteUrl: "https://computerblog.com",
       }
     ],
-    posts: <PostModel[]>[
+    posts: <PostViewModel[]>[
       {
         id: "1",
         title: "First Post",

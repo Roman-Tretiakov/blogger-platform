@@ -18,5 +18,5 @@ postsRouter.use(superAdminGuardMiddleware)
   .get(EndpointList.EMPTY_PATH, getPostListHandler)
   .get(EndpointList.SINGLE_POST, paramIdValidationMiddleware, inputValidationResultMiddleware, getPostHandler) // сюда добавляем мидлвэры на валидацию перед обработчиками
   .post(EndpointList.EMPTY_PATH, createVideoBodyValidationMiddleware, inputValidationResultMiddleware, postPostHandler) // сюда добавляем мидлвэры на валидацию перед обработчиками
-  .put(EndpointList.SINGLE_VIDEO, paramIdValidationMiddleware, createVideoBodyValidationMiddleware, updateVideoBodyValidationMiddleware, inputValidationResultMiddleware, putPostHandler) // сюда добавляем мидлвэры на валидацию перед обработчиками
-  .delete(EndpointList.SINGLE_VIDEO, paramIdValidationMiddleware, inputValidationResultMiddleware, deletePostHandler); // сюда добавляем мидлвэры на валидацию перед обработчиками
+  .put(EndpointList.SINGLE_POST, paramIdValidationMiddleware, createVideoBodyValidationMiddleware, updateVideoBodyValidationMiddleware, inputValidationResultMiddleware, putPostHandler) // сюда добавляем мидлвэры на валидацию перед обработчиками
+  .delete(EndpointList.SINGLE_POST, paramIdValidationMiddleware, inputValidationResultMiddleware, deletePostHandler); // сюда добавляем мидлвэры на валидацию перед обработчиками
