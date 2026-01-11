@@ -1,8 +1,8 @@
 import express, {Express, Request, Response} from "express";
 import {HttpStatus} from "./core/enums/http-status";
 import {EndpointList} from "./core/constants/endpoint-list";
-import {blogsRouter} from "./core/videos/routers/blogs.router";
-import {blogsTestingRouter} from "./core/videos/routers/blogsTesting.router";
+import {blogsRouter} from "./core/blogs/routers/blogs.router";
+import {blogsTestingRouter} from "./core/blogs/routers/blogsTesting.router";
 import { setupSwagger } from './core/swagger/setup-swagger';
 import { postsRouter } from "./core/posts/routers/posts.router";
 import { postsTestingRouter } from "./core/posts/routers/postsTesting.router";

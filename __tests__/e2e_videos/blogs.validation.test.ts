@@ -4,7 +4,7 @@ import {setupApp} from "../../src/setup-app";
 import {EndpointList} from "../../src/core/constants/endpoint-list";
 import {HttpStatus} from "../../src/core/enums/http-status";
 import {AvailableResolutions} from "../../src/core/enums/available-resolutions";
-import {CreateVideoInputModel, BlogInputModel} from "../../src/core/videos/dto/blog-input-dto";
+import {CreateVideoInputModel, BlogInputModel} from "../../src/core/blogs/dto/blog-input-dto";
 import {ErrorNames} from "../../src/core/enums/error-names";
 
 describe('Video API body validation test', () => {

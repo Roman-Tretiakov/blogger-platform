@@ -3,8 +3,8 @@ import { superAdminGuardMiddleware } from "../../../auth/middlewares/super-admin
 import { EndpointList } from "../../constants/endpoint-list";
 import { paramIdValidationMiddleware } from "../../middlewares/params-id-validation.middleware";
 import { inputValidationResultMiddleware } from "../../middlewares/input-validation-result.middleware";
-import { createVideoBodyValidationMiddleware } from "../../videos/middlewares/create-video-body-validation-middleware";
-import { updateVideoBodyValidationMiddleware } from "../../videos/middlewares/update-video-body-validation-middleware";
+import { createVideoBodyValidationMiddleware } from "../../blogs/middlewares/create-video-body-validation-middleware";
+import { updateVideoBodyValidationMiddleware } from "../../blogs/middlewares/update-video-body-validation-middleware";
 import { getPostListHandler } from "./handlers/get-post-list.handler";
 import { getPostHandler } from "./handlers/get-post.handler";
 import { postPostHandler } from "./handlers/post-post.handler";
