@@ -2,10 +2,9 @@ import express, {Express, Request, Response} from "express";
 import {HttpStatus} from "./core/enums/http-status";
 import {EndpointList} from "./core/constants/endpoint-list";
 import {blogsRouter} from "./core/blogs/routers/blogs.router";
-import {blogsTestingRouter} from "./core/blogs/routers/blogsTesting.router";
+import {testingRouter} from "./core/testing/routers/testing.router";
 import { setupSwagger } from './core/swagger/setup-swagger';
 import { postsRouter } from "./core/posts/routers/posts.router";
-import { postsTestingRouter } from "./core/posts/routers/postsTesting.router";
 
 export const setupApp = (app: Express) => {
     app.use(express.json()); // middleware для парсинга JSON в теле запроса
@@ -17,9 +16,8 @@ export const setupApp = (app: Express) => {
 
     // routers
     app.use(EndpointList.BLOGS_PATH, blogsRouter);
-    app.use(EndpointList.BLOGS_TESTING_PATH, blogsTestingRouter);
     app.use(EndpointList.POSTS_PATH, postsRouter);
-    app.use(EndpointList.POSTS_TESTING_PATH, postsTestingRouter);
+    app.use(EndpointList.TESTING_PATH, testingRouter);
 
     setupSwagger(app);
 };
