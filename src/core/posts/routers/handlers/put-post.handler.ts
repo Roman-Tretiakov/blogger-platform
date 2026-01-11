@@ -7,8 +7,8 @@ export const putPostHandler = (req: Request, res: Response) => {
     try {
         postsRepository.update(id, req.body);
         res.status(HttpStatus.NoContent);
-    } catch (e) {
-        res.status(HttpStatus.NotFound).send(`No video found by id: ${id}.`);
+    } catch (e: any) {
+        res.status(HttpStatus.NotFound).send(e.message);
     }
 }
 

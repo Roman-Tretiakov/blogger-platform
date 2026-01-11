@@ -15,8 +15,8 @@ export const postPostHandler = (req: Request, res: Response) => {
     res.status(HttpStatus.NotFound).send(
       createErrorMessages([
         {
-          field: "blogId",
           message: e.message,
+          field: "blogId",
         },
       ]),
     );
