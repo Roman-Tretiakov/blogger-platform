@@ -1,4 +1,6 @@
 import VideoModel from "../core/types/video-model-type";
+import { BlogModel } from "../core/types/blog-model-type";
+import { PostModel } from "../core/types/post-model-type";
 
 export const db = {
     videos: <VideoModel[]>[
@@ -33,6 +35,50 @@ export const db = {
             availableResolutions: ["P144", "P240", "P360", "P480", "P720", "P1080", "P1440", "P2160"],
         }
     ],
-    blogs: [],
-    posts: []
+    blogs: <BlogModel[]>[
+      {
+        id: "1",
+        name: "Research blog",
+        description: "A blog about research",
+        websiteUrl: "https://researchblog.com",
+      },
+      {
+        id: "2",
+        name: "Tech blog",
+        description: "A blog about technology",
+        websiteUrl: "https://techblog.com",
+      },
+      {
+        id: "3",
+        name: "Computer blog",
+        description: "A blog about computers",
+        websiteUrl: "https://computerblog.com",
+      }
+    ],
+    posts: <PostModel[]>[
+      {
+        id: "1",
+        title: "First Post",
+        shortDescription: "This is the first post",
+        content: "Content of the first post",
+        blogId: "1",
+        blogName: "Research blog",
+      },
+      {
+        id: "2",
+        title: "Second Post",
+        shortDescription: "This is the second post",
+        content: "Content of the second post",
+        blogId: "2",
+        blogName: "Tech blog",
+      },
+      {
+        id: "3",
+        title: "Third Post",
+        shortDescription: "This is the third post",
+        content: "Content of the third post",
+        blogId: "3",
+        blogName: "Computer blog",
+      }
+    ]
 };

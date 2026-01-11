@@ -3,7 +3,7 @@ import VideoModel from "../../types/video-model-type";
 import {UpdateVideoInputModel} from "../dto/video-input-dto";
 
 
-export const videosRepository = {
+export const blogsRepository = {
     findAll(): VideoModel[] {
         return db.videos;
     },
@@ -35,5 +35,8 @@ export const videosRepository = {
         }
 
         db.videos.splice(index, 1);
+    },
+    clear(): void {
+        db.blogs = [];
     }
 };

@@ -2,7 +2,7 @@ import {Request, Response} from 'express';
 import {HttpStatus} from "../../../enums/http-status";
 import VideoModel from "../../../types/video-model-type";
 import {db} from "../../../../db/db";
-import {videosRepository} from "../../repositories/videos.repository";
+import {videosRepository} from "../../repositories/posts.repository";
 
 export const postPostHandler = (req: Request, res: Response) => {
     const newVideo: VideoModel = {

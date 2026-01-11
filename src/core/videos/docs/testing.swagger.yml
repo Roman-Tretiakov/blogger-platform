@@ -3,7 +3,7 @@ tags:
     description: API for clearing the database
 
 paths:
-  /api/testing/all-data:
+  /api/blogs/testing/all-data:
     delete:
       summary: "Clear database: delete all data from all tables/collections"
       tags: [ Testing ]

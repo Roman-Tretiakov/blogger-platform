@@ -2,9 +2,9 @@ import {Request, Response} from 'express';
 import {HttpStatus} from "../../../enums/http-status";
 import VideoModel from "../../../types/video-model-type";
 import {db} from "../../../../db/db";
-import {videosRepository} from "../../repositories/videos.repository";
+import {blogsRepository} from "../../repositories/blogs.repository";
 
-export const postVideoHandler = (req: Request, res: Response) => {
+export const postBlogHandler = (req: Request, res: Response) => {
     const newVideo: VideoModel = {
         id: db.videos.length > 0 ? db.videos[db.videos.length - 1].id + 1 : 1,
         canBeDownloaded: false,
@@ -14,6 +14,6 @@ export const postVideoHandler = (req: Request, res: Response) => {
         ...req.body
     };
 
-    videosRepository.create(newVideo);
+    blogsRepository.create(newVideo);
     res.status(HttpStatus.Created).send(newVideo);
 }

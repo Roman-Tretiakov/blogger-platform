@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {HttpStatus} from "../../../enums/http-status";
 import {createErrorMessages} from "../../../utils/error.utils";
-import {videosRepository} from "../../repositories/videos.repository";
+import {videosRepository} from "../../repositories/posts.repository";
 import videoModelType from "../../../types/video-model-type";
 
 export const getPostHandler = (req: Request, res: Response) => {

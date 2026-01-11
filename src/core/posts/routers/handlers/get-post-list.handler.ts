@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 import {HttpStatus} from "../../../enums/http-status";
-import {videosRepository} from "../../repositories/videos.repository";
+import {videosRepository} from "../../repositories/posts.repository";
 
 export const getPostListHandler =
 (req:Request, res:Response) => {
