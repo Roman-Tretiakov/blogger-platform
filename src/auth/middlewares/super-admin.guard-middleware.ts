@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { HttpStatus } from '../../core/enums/http-status';
 
-export const LOGIN = process.env.ADMIN_USERNAME || 'admin';
+export const USERNAME = process.env.ADMIN_USERNAME || 'admin';
 export const PASSWORD = process.env.ADMIN_PASSWORD || 'qwerty';
 
 export const superAdminGuardMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -20,7 +20,7 @@ export const superAdminGuardMiddleware = (req: Request, res: Response, next: Nex
     const credentials = Buffer.from(token.trim(), 'base64').toString('utf-8');
     const [username, password] = credentials.split(':');
 
-    if (username !== LOGIN || password !== PASSWORD) {
+    if (username !== USERNAME || password !== PASSWORD) {
         res.sendStatus(HttpStatus.Unauthorized);
         return;
     }

@@ -65,7 +65,7 @@ describe('Video API body validation test', () => {
         const errorMessages: string[] = createResponse.body.errorMessages?.map((err: {field: string, message: string}) => err.message) ?? [];
 
         expect(errorMessages).toHaveLength(1);
-        expect(errorMessages).toContain(ErrorNames.TITLE_MISSING_ERROR);
+        expect(errorMessages).toContain(ErrorNames.NAME_MISSING_ERROR);
     });
 
     //Invalid data set validation test 1-1 for Create Video
@@ -80,7 +80,7 @@ describe('Video API body validation test', () => {
         const errorMessages: string[] = createResponse.body.errorMessages?.map((err: {field: string, message: string}) => err.message) ?? [];
 
         expect(errorMessages).toHaveLength(1);
-        expect(errorMessages).toContain(ErrorNames.TITLE_LENGTH_ERROR);
+        expect(errorMessages).toContain(ErrorNames.NAME_LENGTH_ERROR);
     });
 
     //Invalid data set validation test 2 for Create Video
@@ -176,6 +176,6 @@ describe('Video API body validation test', () => {
         const errorMessages: string[] = updateResponse.body.errorMessages?.map((err: {field: string, message: string}) => err.message) ?? [];
 
         expect(errorMessages).toHaveLength(3);
-        expect(errorMessages).toEqual(expect.arrayContaining([ErrorNames.PUBLICATION_DATE_FORMAT_ERROR, ErrorNames.TITLE_MISSING_ERROR, ErrorNames.CAN_BE_DOWNLOADED_TYPE_ERROR]));
+        expect(errorMessages).toEqual(expect.arrayContaining([ErrorNames.PUBLICATION_DATE_FORMAT_ERROR, ErrorNames.NAME_MISSING_ERROR, ErrorNames.CAN_BE_DOWNLOADED_TYPE_ERROR]));
     });
 });

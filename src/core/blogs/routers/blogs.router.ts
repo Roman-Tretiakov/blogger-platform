@@ -6,9 +6,9 @@ import { postBlogHandler } from "./handlers/post-blog.handler";
 import { putBlogHandler } from "./handlers/put-blog.handler";
 import { deleteBlogHandler } from "./handlers/delete-blog.handler";
 import { inputValidationResultMiddleware } from "../../middlewares/input-validation-result.middleware";
-import { createVideoBodyValidationMiddleware } from "../middlewares/create-video-body-validation-middleware";
+import { createBlogsBodyValidationMiddleware } from "../middlewares/create-blogs-body-validation-middleware";
 import { paramIdValidationMiddleware } from "../../middlewares/params-id-validation.middleware";
-import { updateVideoBodyValidationMiddleware } from "../middlewares/update-video-body-validation-middleware";
+import { updateBlogsBodyValidationMiddleware } from "../middlewares/update-blogs-body-validation-middleware";
 import { superAdminGuardMiddleware } from "../../../auth/middlewares/super-admin.guard-middleware";
 
 export const blogsRouter = Router({});
@@ -25,7 +25,7 @@ blogsRouter
   .post(
     EndpointList.EMPTY_PATH,
     superAdminGuardMiddleware,
-    createVideoBodyValidationMiddleware,
+    createBlogsBodyValidationMiddleware,
     inputValidationResultMiddleware,
     postBlogHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
@@ -33,8 +33,8 @@ blogsRouter
     EndpointList.SINGLE_BLOG,
     superAdminGuardMiddleware,
     paramIdValidationMiddleware,
-    createVideoBodyValidationMiddleware,
-    updateVideoBodyValidationMiddleware,
+    createBlogsBodyValidationMiddleware,
+    updateBlogsBodyValidationMiddleware,
     inputValidationResultMiddleware,
     putBlogHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками

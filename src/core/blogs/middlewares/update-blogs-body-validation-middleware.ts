@@ -1,7 +1,7 @@
 import {body} from 'express-validator';
 import {ErrorNames} from "../../enums/error-names";
 
-export const updateVideoBodyValidationMiddleware = [
+export const updateBlogsBodyValidationMiddleware = [
     body('canBeDownloaded')
         .exists().withMessage(ErrorNames.CAN_BE_DOWNLOADED_MISSING_ERROR)
         .isBoolean().withMessage(ErrorNames.CAN_BE_DOWNLOADED_TYPE_ERROR),
