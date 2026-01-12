@@ -3,13 +3,12 @@ import { superAdminGuardMiddleware } from "../../../auth/middlewares/super-admin
 import { EndpointList } from "../../constants/endpoint-list";
 import { paramIdValidationMiddleware } from "../../middlewares/params-id-validation.middleware";
 import { inputValidationResultMiddleware } from "../../middlewares/input-validation-result.middleware";
-import { createBlogsBodyValidationMiddleware } from "../../blogs/middlewares/create-blogs-body-validation-middleware";
-import { updateBlogsBodyValidationMiddleware } from "../../blogs/middlewares/update-blogs-body-validation-middleware";
 import { getPostListHandler } from "./handlers/get-post-list.handler";
 import { getPostHandler } from "./handlers/get-post.handler";
 import { postPostHandler } from "./handlers/post-post.handler";
 import { putPostHandler } from "./handlers/put-post.handler";
 import { deletePostHandler } from "./handlers/delete-post.handler";
+import { createPostsBodyValidationMiddleware } from "../middlewares/create-posts-body-validation-middleware";
 
 export const postsRouter = Router({});
 
@@ -25,7 +24,7 @@ postsRouter
   .post(
     EndpointList.EMPTY_PATH,
     superAdminGuardMiddleware,
-    createBlogsBodyValidationMiddleware,
+    createPostsBodyValidationMiddleware,
     inputValidationResultMiddleware,
     postPostHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
@@ -33,8 +32,7 @@ postsRouter
     EndpointList.SINGLE_POST,
     superAdminGuardMiddleware,
     paramIdValidationMiddleware,
-    createBlogsBodyValidationMiddleware,
-    updateBlogsBodyValidationMiddleware,
+    createPostsBodyValidationMiddleware,
     inputValidationResultMiddleware,
     putPostHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками

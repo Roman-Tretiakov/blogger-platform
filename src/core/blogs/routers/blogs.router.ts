@@ -8,7 +8,6 @@ import { deleteBlogHandler } from "./handlers/delete-blog.handler";
 import { inputValidationResultMiddleware } from "../../middlewares/input-validation-result.middleware";
 import { createBlogsBodyValidationMiddleware } from "../middlewares/create-blogs-body-validation-middleware";
 import { paramIdValidationMiddleware } from "../../middlewares/params-id-validation.middleware";
-import { updateBlogsBodyValidationMiddleware } from "../middlewares/update-blogs-body-validation-middleware";
 import { superAdminGuardMiddleware } from "../../../auth/middlewares/super-admin.guard-middleware";
 
 export const blogsRouter = Router({});
@@ -34,7 +33,6 @@ blogsRouter
     superAdminGuardMiddleware,
     paramIdValidationMiddleware,
     createBlogsBodyValidationMiddleware,
-    updateBlogsBodyValidationMiddleware,
     inputValidationResultMiddleware,
     putBlogHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
