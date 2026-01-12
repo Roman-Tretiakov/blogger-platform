@@ -13,10 +13,35 @@ import { deletePostHandler } from "./handlers/delete-post.handler";
 
 export const postsRouter = Router({});
 
-postsRouter.use(superAdminGuardMiddleware)
+postsRouter
   // videos crud routes:
   .get(EndpointList.EMPTY_PATH, getPostListHandler)
-  .get(EndpointList.SINGLE_POST, paramIdValidationMiddleware, inputValidationResultMiddleware, getPostHandler) // сюда добавляем мидлвэры на валидацию перед обработчиками
-  .post(EndpointList.EMPTY_PATH, createVideoBodyValidationMiddleware, inputValidationResultMiddleware, postPostHandler) // сюда добавляем мидлвэры на валидацию перед обработчиками
-  .put(EndpointList.SINGLE_POST, paramIdValidationMiddleware, createVideoBodyValidationMiddleware, updateVideoBodyValidationMiddleware, inputValidationResultMiddleware, putPostHandler) // сюда добавляем мидлвэры на валидацию перед обработчиками
-  .delete(EndpointList.SINGLE_POST, paramIdValidationMiddleware, inputValidationResultMiddleware, deletePostHandler); // сюда добавляем мидлвэры на валидацию перед обработчиками
+  .get(
+    EndpointList.SINGLE_POST,
+    paramIdValidationMiddleware,
+    inputValidationResultMiddleware,
+    getPostHandler,
+  ) // сюда добавляем мидлвэры на валидацию перед обработчиками
+  .post(
+    EndpointList.EMPTY_PATH,
+    superAdminGuardMiddleware,
+    createVideoBodyValidationMiddleware,
+    inputValidationResultMiddleware,
+    postPostHandler,
+  ) // сюда добавляем мидлвэры на валидацию перед обработчиками
+  .put(
+    EndpointList.SINGLE_POST,
+    superAdminGuardMiddleware,
+    paramIdValidationMiddleware,
+    createVideoBodyValidationMiddleware,
+    updateVideoBodyValidationMiddleware,
+    inputValidationResultMiddleware,
+    putPostHandler,
+  ) // сюда добавляем мидлвэры на валидацию перед обработчиками
+  .delete(
+    EndpointList.SINGLE_POST,
+    superAdminGuardMiddleware,
+    paramIdValidationMiddleware,
+    inputValidationResultMiddleware,
+    deletePostHandler,
+  ); // сюда добавляем мидлвэры на валидацию перед обработчиками

@@ -13,7 +13,8 @@
   "include": [
     "src/**/*",
     "src/**/*.yml",
-    "videos/docs/*.yml"
+    "blogs/docs/*.yml",
+    "posts/docs/*.yml"
   ],
   "exclude": ["__tests__", "dist", "node_modules"]
 }
