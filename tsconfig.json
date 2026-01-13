@@ -10,11 +10,6 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": [
-    "src/**/*",
-    "src/**/*.yml",
-    "blogs/docs/*.yml",
-    "posts/docs/*.yml"
-  ],
+  "include": ["src/**/*"],
   "exclude": ["__tests__", "dist", "node_modules"]
 }
