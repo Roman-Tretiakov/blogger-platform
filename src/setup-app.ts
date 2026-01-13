@@ -11,7 +11,7 @@ export const setupApp = (app: Express) => {
 
     // base route
     app.get(EndpointList.SLASH_PATH, (req: Request, res: Response) => {
-        res.status(HttpStatus.Ok).send("Welcome to Video Hosting Service API!");
+        res.status(HttpStatus.Ok).send("Welcome to Blogger platform Service API!");
     });
 
     // routers
