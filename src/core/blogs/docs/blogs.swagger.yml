@@ -1,73 +1,81 @@
 tags:
-  - name: Videos
-    description: API for managing videos
+  - name: Blogs
+    description: API for managing blogs
 
 paths:
-  /api/videos:
+  /api/blogs:
     get:
-      summary: Get a list of all videos
-      tags: [ Videos ]
+      summary: Get a list of all blogs
+      tags: [ Blogs ]
+      security: []
       responses:
         200:
-          description: List of all videos
+          description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/VideoModel'
+                  $ref: '#/components/schemas/BlogViewModel'
     post:
-      summary: Add a new video
-      tags: [ Videos ]
+      summary: Add a new blog
+      tags: [ Blogs ]
+      security:
+        - basicAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateVideoInputModel'
+              $ref: '#/components/schemas/BlogInputModel'
       responses:
         201:
-          description: The video was successfully created
+          description: The blog was successfully created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VideoModel'
+                $ref: '#/components/schemas/BlogViewModel'
         400:
           description: Validation error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
+        401:
+          description: Unauthorized
 
-  /api/videos/{id}:
+  /api/blogs/{id}:
     get:
-      summary: Get a video by ID
-      tags: [ Videos ]
+      summary: Get a blog by ID
+      tags: [ Blogs ]
+      security: []
       parameters:
         - in: path
           name: id
           required: true
-          description: "The unique identifier of the video"
+          description: "The unique identifier of the blog"
           schema:
             type: integer
             example: 2
       responses:
         200:
-          description: The requested video
+          description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VideoModel'
+                $ref: '#/components/schemas/BlogViewModel'
         404:
-          description: Video not found
+          description: Not found
     put:
-      summary: Update a video by ID
-      tags: [ Videos ]
+      summary: Update a blog by ID
+      tags: [ blogs ]
+      security:
+        - basicAuth: []
       parameters:
         - in: path
           name: id
           required: true
-          description: "The unique identifier of the video"
+          description: "The unique identifier of the blog"
           schema:
             type: integer
             example: 2
@@ -76,147 +84,83 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateVideoInputModel'
+              $ref: '#/components/schemas/BlogInputModel'
       responses:
         204:
-          description: Video updated successfully
+          description: No Content
         400:
           description: Validation error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
+        401:
+          description: Unauthorized
         404:
-          description: Video not found
+          description: Not Found
     delete:
-      summary: Delete a video by ID
-      tags: [ Videos ]
+      summary: Delete a blog by ID
+      tags: [ blogs ]
       parameters:
         - in: path
           name: id
           required: true
-          description: "The unique identifier of the video"
+          description: "The unique identifier of the blog"
           schema:
             type: integer
             example: 2
       responses:
         204:
-          description: Video deleted successfully
+          description: No Content
+        401:
+          description: Unauthorized
         404:
-          description: Video not found
+          description: Not found
 components:
   schemas:
-    VideoModel:
+    BlogViewModel:
       type: object
       required:
         - id
-        - title
-        - author
-        - canBeDownloaded
-        - minAgeRestriction
-        - createdAt
-        - publicationDate
-        - availableResolutions
+        - name
+        - description
+        - websiteUrl
       properties:
         id:
-          type: integer
-          description: "The unique identifier for the video"
-          example: 2
-        title:
           type: string
-          description: "The name of the video"
+          description: "The unique identifier for the blog"
+          example: "1"
+        name:
+          type: string
+          description: "The name of the blog"
           example: "Tom Rider"
-        author:
+        description:
           type: string
-          description: "The video's author"
-          example: "Lara Croft"
-        canBeDownloaded:
-          type: boolean
-          description: "Indicates if the video can be downloaded"
-          example: true
-        minAgeRestriction:
-          type: integer
-          nullable: true
-          description: "The mini and max age required to view the video"
-          example: 18
-        createdAt:
+          description: "The blog's description"
+          example: "New life"
+        websiteUrl:
           type: string
-          format: date-time
-          description: "The date and time when the video was created"
-          example: "2023-03-05T12:00:00Z"
-        publicationDate:
-          type: string
-          format: date-time
-          description: "The date and time when the video was published"
-          example: "2023-03-05T12:00:00Z"
-        availableResolutions:
-          type: array
-          items:
-                type: string
-                enum: [ P144, P240, P360, P480, P720, P1080, P1440, P2160 ]
-          description: "List of available video resolutions"
-          example: [ "P144", "P240", "P360" ]
-    CreateVideoInputModel:
+          description: "Link to blog's web site"
+          example: "https://samurai.it-incubator.io"
+    BlogInputModel:
       type: object
       required:
-        - title
-        - author
-        - availableResolutions
+        - name
+        - description
+        - websiteUrl
       properties:
-        title:
+        name:
           type: string
-          description: "The name of the video"
+          description: "The name of the blog"
           example: "Tom Rider"
-        author:
+        description:
           type: string
-          description: "The video's author"
-          example: "Lara Croft"
-        availableResolutions:
-          type: array
-          items:
-                type: string
-                enum: [ P144, P240, P360, P480, P720, P1080, P1440, P2160 ]
-          description: "List of available video resolutions"
-          example: [ "P144", "P240", "P360" ]
-    UpdateVideoInputModel:
-      type: object
-      required:
-        - title
-        - author
-        - availableResolutions
-        - canBeDownloaded
-        - minAgeRestriction
-        - publicationDate
-      properties:
-        title:
+          description: "The blog's description"
+          example: "New life"
+        websiteUrl:
           type: string
-          description: "The name of the video"
-          example: "Tom Rider"
-        author:
-          type: string
-          description: "The video's author"
-          example: "Lara Croft"
-        availableResolutions:
-          type: array
-          items:
-                type: string
-                enum: [ P144, P240, P360, P480, P720, P1080, P1440, P2160 ]
-          description: "List of available video resolutions"
-          example: [ "P144", "P240", "P360" ]
-        canBeDownloaded:
-          type: boolean
-          description: "Indicates if the video can be downloaded"
-          example: true
-        minAgeRestriction:
-          type: integer
-          nullable: true
-          description: "The min and max age required to view the video"
-          example: 18
-        publicationDate:
-          type: string
-          format: date-time
-          description: "The date and time when the video was published"
-          example: "2023-03-05T12:00:00Z"
+          description: "Link to blog's web site"
+          example: "https://samurai.it-incubator.io"
     ValidationError:
       type: object
       properties:
@@ -229,13 +173,7 @@ components:
     ValidationErrorResponse:
       type: object
       properties:
-        errorMessages:
+        errorsMessages:
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
-    Resolutions:
-      type: array
-      items:
-            type: string
-            enum: [ P144, P240, P360, P480, P720, P1080, P1440, P2160 ]
-      description: "Available video resolutions"

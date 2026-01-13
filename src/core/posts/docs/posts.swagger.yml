@@ -1,0 +1,194 @@
+tags:
+  - name: Posts
+    description: API for managing Posts
+
+paths:
+  /api/Posts:
+    get:
+      summary: Get a list of all Posts
+      tags: [ Posts ]
+      security: []
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostViewModel'
+    post:
+      summary: Add a new post
+      tags: [ Posts ]
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostInputModel'
+      responses:
+        201:
+          description: The post was successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostViewModel'
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        401:
+          description: Unauthorized
+
+  /api/Posts/{id}:
+    get:
+      summary: Get a post by ID
+      tags: [ Posts ]
+      security: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: "The unique identifier of the post"
+          schema:
+            type: integer
+            example: 2
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostViewModel'
+        404:
+          description: Not found
+    put:
+      summary: Update a post by ID
+      tags: [ Posts ]
+      security:
+        - basicAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: "The unique identifier of the Post"
+          schema:
+            type: integer
+            example: 2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostInputModel'
+      responses:
+        204:
+          description: No Content
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        401:
+          description: Unauthorized
+        404:
+          description: Not Found
+    delete:
+      summary: Delete a post by ID
+      tags: [ Posts ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: "The unique identifier of the post"
+          schema:
+            type: integer
+            example: 2
+      responses:
+        204:
+          description: No Content
+        401:
+          description: Unauthorized
+        404:
+          description: Not found
+components:
+  schemas:
+    PostViewModel:
+      type: object
+      required:
+        - id
+        - title
+        - shortDescription
+        - content
+        - blogId
+        - blogName
+      properties:
+        id:
+          type: string
+          description: "The unique identifier for the post"
+          example: "1"
+        title:
+          type: string
+          description: "The name of the Post"
+          example: "Tom Rider"
+        shortDescription:
+          type: string
+          description: "The Post's short description"
+          example: "About post"
+        content:
+          type: string
+          description: "The Post's content"
+          example: "Content of the post"
+        blogId:
+          type: string
+          description: "Blog id the post relates to"
+          example: "123"
+        blogName:
+          type: string
+          description: "Blog name the post relates to"
+          example: "New life"
+    PostInputModel:
+      type: object
+      required:
+        - title
+        - shortDescription
+        - content
+        - blogId
+      properties:
+        title:
+          type: string
+          description: "The name of the Post"
+          example: "Tom Rider"
+        shortDescription:
+          type: string
+          description: "The Post's short description"
+          example: "About post"
+        content:
+          type: string
+          description: "The Post's content"
+          example: "Content of the post"
+        blogId:
+          type: string
+          description: "Blog id the post relates to"
+          example: "123"
+    ValidationError:
+      type: object
+      properties:
+        field:
+          type: string
+          example: "name"
+        message:
+          type: string
+          example: "Invalid name"
+    ValidationErrorResponse:
+      type: object
+      properties:
+        errorsMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
