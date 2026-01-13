@@ -21,7 +21,7 @@ paths:
       summary: Add a new blog
       tags: [ Blogs ]
       security:
-        - basicAuth: []
+        - basicAuth: [ ]
       requestBody:
         required: true
         content:
@@ -48,7 +48,7 @@ paths:
     get:
       summary: Get a blog by ID
       tags: [ Blogs ]
-      security: []
+      security: [ ]
       parameters:
         - in: path
           name: id
@@ -68,9 +68,9 @@ paths:
           description: Not found
     put:
       summary: Update a blog by ID
-      tags: [ blogs ]
+      tags: [ Blogs ]
       security:
-        - basicAuth: []
+        - basicAuth: [ ]
       parameters:
         - in: path
           name: id
@@ -100,7 +100,7 @@ paths:
           description: Not Found
     delete:
       summary: Delete a blog by ID
-      tags: [ blogs ]
+      tags: [ Blogs ]
       parameters:
         - in: path
           name: id
@@ -141,7 +141,7 @@ components:
         websiteUrl:
           type: string
           description: "Link to blog's web site"
-          example: "https://samurai.it-incubator.io"
+          example: "https://samurai.io"
     BlogInputModel:
       type: object
       required:

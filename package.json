@@ -4,7 +4,8 @@
   "description": "1 sprint",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run copy:docs",
+    "copy:docs": "copyfiles -u 1 \"src/**/docs/**/*.yml\" dist/",
     "watch": "tsc -w",
     "dev": "nodemon --inspect dist/index.js",
     "test": "jest -i",
@@ -31,6 +32,7 @@
     "@types/swagger-ui-express": "^4.1.8",
     "@typescript-eslint/eslint-plugin": "^8.51.0",
     "@typescript-eslint/parser": "^8.51.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
