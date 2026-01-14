@@ -1,8 +1,8 @@
 import request from "supertest";
-import {HttpStatus} from "../../src/core/enums/http-status";
-import {EndpointList} from "../../src/core/constants/endpoint-list";
+import {HttpStatus} from "../src/core/enums/http-status";
+import {EndpointList} from "../src/core/constants/endpoint-list";
 import express from "express";
-import {setupApp} from "../../src/setup-app";
+import {setupApp} from "../src/setup-app";
 
 describe("GET /", () => {
     const app = express();

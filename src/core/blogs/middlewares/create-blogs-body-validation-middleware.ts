@@ -31,5 +31,5 @@ export const createBlogsBodyValidationMiddleware = [
     .custom((str: string) => {
       return isStringUrl(str);
     })
-    .withMessage(ErrorNames.WEBSITEURL_PATTERN_ERROR),
+    .withMessage(ErrorNames.WEBSITEURL_FORMAT_ERROR),
 ];

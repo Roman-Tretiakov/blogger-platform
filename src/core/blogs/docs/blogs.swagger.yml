@@ -132,15 +132,15 @@ components:
           example: "1"
         name:
           type: string
-          description: "The name of the blog"
+          description: "maxLength: 15"
           example: "Tom Rider"
         description:
           type: string
-          description: "The blog's description"
+          description: "maxLength: 300"
           example: "New life"
         websiteUrl:
           type: string
-          description: "Link to blog's web site"
+          description: "maxLength: 100"
           example: "https://samurai.io"
     BlogInputModel:
       type: object
@@ -151,15 +151,15 @@ components:
       properties:
         name:
           type: string
-          description: "The name of the blog"
+          description: "maxLength: 15"
           example: "Tom Rider"
         description:
           type: string
-          description: "The blog's description"
+          description: "maxLength: 300"
           example: "New life"
         websiteUrl:
           type: string
-          description: "Link to blog's web site"
+          description: "maxLength: 100"
           example: "https://samurai.it-incubator.io"
     ValidationError:
       type: object

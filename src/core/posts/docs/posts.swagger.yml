@@ -162,15 +162,15 @@ components:
       properties:
         title:
           type: string
-          description: "The name of the Post"
+          description: "maxLength: 30"
           example: "Tom Rider"
         shortDescription:
           type: string
-          description: "The Post's short description"
+          description: "maxLength: 100"
           example: "About post"
         content:
           type: string
-          description: "The Post's content"
+          description: "maxLength: 1000"
           example: "Content of the post"
         blogId:
           type: string

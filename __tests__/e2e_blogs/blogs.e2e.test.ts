@@ -10,8 +10,8 @@ describe("Blogs API tests", () => {
   const app = express();
   setupApp(app);
 
-  const username = process.env.ADMIN_USERNAME;
-  const password = process.env.ADMIN_PASSWORD;
+  const username = "admin";
+  const password = "qwerty";
   const authString = `${username}:${password}`;
   const authValue: string = `Basic ${Buffer.from(authString).toString("base64")}`;
 
@@ -35,7 +35,7 @@ describe("Blogs API tests", () => {
     };
     await request(app)
       .post(EndpointList.BLOGS_PATH)
-      .set("authorization", authValue)
+      .set("Authorization", authValue)
       .send(newBlog)
       .expect(HttpStatus.Created);
   });
@@ -47,7 +47,7 @@ describe("Blogs API tests", () => {
     };
     await request(app)
       .post(EndpointList.BLOGS_PATH)
-      .set("authorization", authValue)
+      .set("Authorization", authValue)
       .send(newBlog)
       .expect(HttpStatus.BadRequest);
   });
@@ -64,6 +64,9 @@ describe("Blogs API tests", () => {
   });
 
   test("should return blogs list; GET /blogs", async () => {
+    await request(app).delete(
+      "/api/testing" + EndpointList.TEST_DELETE_ALL,
+    );
     const newBlog1: BlogInputModel = {
       ...createdBlog,
     };
@@ -78,17 +81,17 @@ describe("Blogs API tests", () => {
 
     await request(app)
       .post(EndpointList.BLOGS_PATH)
-      .set("authorization", authValue)
+      .set("Authorization", authValue)
       .send({ ...newBlog1 })
       .expect(HttpStatus.Created);
     await request(app)
       .post(EndpointList.BLOGS_PATH)
-      .set("authorization", authValue)
+      .set("Authorization", authValue)
       .send({ ...newBlog2 })
       .expect(HttpStatus.Created);
     await request(app)
       .post(EndpointList.BLOGS_PATH)
-      .set("authorization", authValue)
+      .set("Authorization", authValue)
       .send({ ...newBlog3 })
       .expect(HttpStatus.Created);
 
@@ -111,12 +114,12 @@ describe("Blogs API tests", () => {
 
     await request(app)
       .post(EndpointList.BLOGS_PATH)
-      .set("authorization", authValue)
+      .set("Authorization", authValue)
       .send({ ...newBlog1 })
       .expect(HttpStatus.Created);
     const response = await request(app)
       .post(EndpointList.BLOGS_PATH)
-      .set("authorization", authValue)
+      .set("Authorization", authValue)
       .send({ ...newBlog2 })
       .expect(HttpStatus.Created);
 
@@ -147,18 +150,18 @@ describe("Blogs API tests", () => {
 
     const response = await request(app)
       .post(EndpointList.BLOGS_PATH)
-      .set("authorization", authValue)
+      .set("Authorization", authValue)
       .send({ ...newBlog })
       .expect(HttpStatus.Created);
 
     await request(app)
       .put(EndpointList.BLOGS_PATH + "/" + response.body.id)
-      .set("authorization", authValue)
+      .set("Authorization", authValue)
       .send({ ...updatedValidBlog })
       .expect(HttpStatus.NoContent);
     await request(app)
       .put(EndpointList.BLOGS_PATH + "/" + response.body.id)
-      .set("authorization", authValue)
+      .set("Authorization", authValue)
       .send({ ...updatedInvalidBlog })
       .expect(HttpStatus.BadRequest);
     await request(app)
@@ -167,7 +170,7 @@ describe("Blogs API tests", () => {
       .expect(HttpStatus.Unauthorized);
     await request(app)
       .put(EndpointList.BLOGS_PATH + "/" + "5")
-      .set("authorization", authValue)
+      .set("Authorization", authValue)
       .send({ ...updatedValidBlog })
       .expect(HttpStatus.NotFound);
 
@@ -179,20 +182,20 @@ describe("Blogs API tests", () => {
     };
     const response = await request(app)
       .post(EndpointList.BLOGS_PATH)
-      .set("authorization", authValue)
+      .set("Authorization", authValue)
       .send({ ...newBlog })
       .expect(HttpStatus.Created);
 
     await request(app)
       .delete(EndpointList.BLOGS_PATH + "/" + response.body.id)
-      .set("authorization", authValue)
+      .set("Authorization", authValue)
       .expect(HttpStatus.NoContent);
     await request(app)
       .delete(EndpointList.BLOGS_PATH + "/" + response.body.id)
       .expect(HttpStatus.Unauthorized);
     await request(app)
-      .delete(EndpointList.BLOGS_PATH + "/" + "2")
-      .set("authorization", authValue)
+      .delete(EndpointList.BLOGS_PATH + "/" + "102")
+      .set("Authorization", authValue)
       .expect(HttpStatus.NotFound);
   });
 });

@@ -4,7 +4,6 @@ import {HttpStatus} from '../enums/http-status';
 import {ValidationErrorType} from '../types/validation-error-type';
 
 const formatErrors = (error: ValidationError): ValidationErrorType => {
-
     return {
         field: error.type,  // Поле с ошибкой
         message: error.msg,  // Сообщение ошибки
@@ -18,7 +17,7 @@ export const inputValidationResultMiddleware = (
     const errors = validationResult(req).formatWith(formatErrors).array({ onlyFirstError: true });
 
     if (errors.length) {
-        res.status(HttpStatus.BadRequest).json({errorMessage: errors})
+        res.status(HttpStatus.BadRequest).json({errorMessages: errors})
         return;
     }
 
