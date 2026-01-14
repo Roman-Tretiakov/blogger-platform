@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "blogger-platform-backend",
+  "name": "blogger-platform-be",
   "builds": [
     {
       "src": "src/index.ts",
