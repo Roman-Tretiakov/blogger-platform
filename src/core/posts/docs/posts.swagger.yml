@@ -3,7 +3,7 @@ tags:
     description: API for managing Posts
 
 paths:
-  /api/Posts:
+  /api/posts:
     get:
       summary: Get a list of all Posts
       tags: [ Posts ]
@@ -44,7 +44,7 @@ paths:
         401:
           description: Unauthorized
 
-  /api/Posts/{id}:
+  /api/posts/{id}:
     get:
       summary: Get a post by ID
       tags: [ Posts ]

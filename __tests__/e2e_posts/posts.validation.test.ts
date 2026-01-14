@@ -6,7 +6,7 @@ import { HttpStatus } from "../../src/core/enums/http-status";
 import { ErrorNames } from "../../src/core/enums/error-names";
 import { PostInputModel } from "../../src/core/posts/dto/post-input-dto";
 
-describe("Blog body validation tests", () => {
+describe("Post body validation tests", () => {
   const app = express();
   setupApp(app);
 
