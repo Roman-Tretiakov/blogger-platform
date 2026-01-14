@@ -6,9 +6,9 @@ export const putPostHandler = (req: Request, res: Response) => {
     const id: string = req.params.id;
     try {
         postsRepository.update(id, req.body);
-        res.status(HttpStatus.NoContent);
-    } catch (e: any) {
-        res.status(HttpStatus.NotFound).send(e.message);
+        res.status(HttpStatus.NoContent).send();
+    } catch (e) {
+        res.status(HttpStatus.NotFound).send();
     }
 }
 

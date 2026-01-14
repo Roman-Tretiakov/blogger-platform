@@ -9,6 +9,8 @@ export const createPostsBodyValidationMiddleware = [
     .withMessage(ErrorNames.TITLE_MISSING_ERROR)
     .isString()
     .withMessage(ErrorNames.TITLE_TYPE_ERROR)
+    .isEmpty()
+    .withMessage(ErrorNames.TITLE_MISSING_ERROR)
     .isLength({ min: 1, max: 30 })
     .withMessage(ErrorNames.TITLE_LENGTH_ERROR),
 
@@ -17,6 +19,8 @@ export const createPostsBodyValidationMiddleware = [
     .withMessage(ErrorNames.DESCRIPTION_MISSING_ERROR)
     .isString()
     .withMessage(ErrorNames.DESCRIPTION_TYPE_ERROR)
+    .isEmpty()
+    .withMessage(ErrorNames.DESCRIPTION_MISSING_ERROR)
     .isLength({ max: 100 })
     .withMessage(ErrorNames.DESCRIPTION_LENGTH_ERROR),
 
@@ -25,6 +29,8 @@ export const createPostsBodyValidationMiddleware = [
     .withMessage(ErrorNames.CONTENT_MISSING_ERROR)
     .isString()
     .withMessage(ErrorNames.CONTENT_TYPE_ERROR)
+    .isEmpty()
+    .withMessage(ErrorNames.CONTENT_MISSING_ERROR)
     .isLength({ max: 1000 })
     .withMessage(ErrorNames.CONTENT_LENGTH_ERROR),
 
@@ -32,5 +38,7 @@ export const createPostsBodyValidationMiddleware = [
     .exists()
     .withMessage(ErrorNames.BLOGID_MISSING_ERROR)
     .isString()
-    .withMessage(ErrorNames.BLOGID_TYPE_ERROR),
+    .withMessage(ErrorNames.BLOGID_TYPE_ERROR)
+    .isEmpty()
+    .withMessage(ErrorNames.BLOGID_MISSING_ERROR),
 ];

@@ -10,6 +10,8 @@ export const createBlogsBodyValidationMiddleware = [
     .withMessage(ErrorNames.NAME_MISSING_ERROR)
     .isString()
     .withMessage(ErrorNames.NAME_TYPE_ERROR)
+    .isEmpty()
+    .withMessage(ErrorNames.NAME_MISSING_ERROR)
     .isLength({ min: 1, max: 15 })
     .withMessage(ErrorNames.NAME_LENGTH_ERROR),
 
@@ -18,6 +20,8 @@ export const createBlogsBodyValidationMiddleware = [
     .withMessage(ErrorNames.DESCRIPTION_MISSING_ERROR)
     .isString()
     .withMessage(ErrorNames.DESCRIPTION_TYPE_ERROR)
+    .isEmpty()
+    .withMessage(ErrorNames.DESCRIPTION_MISSING_ERROR)
     .isLength({ max: 500 })
     .withMessage(ErrorNames.DESCRIPTION_LENGTH_ERROR),
 
@@ -26,6 +30,8 @@ export const createBlogsBodyValidationMiddleware = [
     .withMessage(ErrorNames.WEBSITEURL_MISSING_ERROR)
     .isString()
     .withMessage(ErrorNames.WEBSITEURL_TYPE_ERROR)
+    .isEmpty()
+    .withMessage(ErrorNames.WEBSITEURL_MISSING_ERROR)
     .isLength({ max: 100 })
     .withMessage(ErrorNames.WEBSITEURL_LENGTH_ERROR)
     .custom((str: string) => {
