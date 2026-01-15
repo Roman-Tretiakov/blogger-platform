@@ -1,56 +1,53 @@
-import { db } from "../../../db/db";
 import { PostInputModel } from "../dto/post-input-dto";
 import { PostViewModel } from "../../types/post-view-model-type";
+import { blogsCollection, postsCollection } from "../../../db/mongo.db";
+import { InsertOneResult, ObjectId, UpdateResult, WithId } from "mongodb";
 
 export const postsRepository = {
-  findAll(): PostViewModel[] {
-    return db.posts;
+  async findAll(): Promise<WithId<PostViewModel>[]> {
+    return postsCollection.find().toArray();
   },
 
-  findById(id: string): PostViewModel | null {
-    return db.posts.find((post: PostViewModel) => post.id === id) ?? null;
+  async findById(id: string): Promise<WithId<PostViewModel> | null> {
+    return (await postsCollection.findOne({ _id: new ObjectId(id) })) ?? null;
   },
 
-  create(post: PostInputModel): PostViewModel | any {
-    const index: number = db.blogs.findIndex((b) => b.id === post.blogId);
-    if (index === -1) {
+  async create(post: PostInputModel): Promise<WithId<PostViewModel>> {
+    const blog = await blogsCollection.findOne({
+      _id: new ObjectId(post.blogId),
+    });
+    if (!blog) {
       throw new Error(`No blog by blogId: ${post.blogId} found for post.`);
     }
-    const newPost: PostViewModel = {
-      id:
-        db.posts.length > 0
-          ? (parseInt(db.posts[db.posts.length - 1].id) + 1).toString()
-          : "1",
-      blogName: db.blogs[index].name,
-      ...post,
-    };
-    db.posts.push(newPost);
-    return newPost;
+    const name = blog.name;
+    const newPost: InsertOneResult<PostViewModel> =
+      await postsCollection.insertOne(post);
+    return { ...post, blogName: name, _id: newPost.insertedId };
   },
 
-  update(id: string, updateModel: PostInputModel): void {
-    const post: PostViewModel | undefined = db.posts.find(
-      (p: PostViewModel) => p.id === id,
-    );
+  async update(id: string, updateModel: PostInputModel): Promise<void> {
+    const post: UpdateResult<PostViewModel> | undefined =
+      await postsCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updateModel },
+      );
 
-    if (!post) {
+    if (post.matchedCount < 1) {
       throw new Error(`Post with id ${id} not found`);
     }
-
-    db.posts[+id] = Object.assign(post, updateModel);
+    return;
   },
 
-  delete(id: string): void {
-    const index = db.posts.findIndex((post: PostViewModel) => post.id === id);
+  async delete(id: string): Promise<void> {
+    const result = await postsCollection.deleteOne({ _id: new ObjectId(id) });
 
-    if (index === -1) {
+    if (result.deletedCount < 1) {
       throw new Error(`Post with id ${id} not found`);
     }
-
-    db.posts.splice(index, 1);
+    return;
   },
 
-  clear(): void {
-    db.posts = [];
-  },
+  async clear(): Promise<void> {
+    await  postsCollection.drop();
+  }
 };

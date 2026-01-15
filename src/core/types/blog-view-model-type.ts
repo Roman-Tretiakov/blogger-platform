@@ -1,5 +1,5 @@
 export type BlogViewModel = {
-    id: string;
+    id?: string;
     name: string;
     description: string;
     websiteUrl: string;
