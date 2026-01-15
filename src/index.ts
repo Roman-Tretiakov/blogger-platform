@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { setupApp } from "./setup-app";
 import { runDB } from "./db/mongo.db";
+import { initDB } from "./db/init-db-with-data";
 
 const bootstrap = async () => {
   dotenv.config();
@@ -15,6 +16,7 @@ const bootstrap = async () => {
   const DB_URL: string = process.env.MONGODB_URI || "mongodb://0.0.0.0:27017";
 
   await runDB(DB_URL);
+  //await initDB();
 
   // запуск приложения
   app.listen(PORT, () => {
