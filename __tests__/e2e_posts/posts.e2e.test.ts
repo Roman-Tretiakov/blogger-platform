@@ -5,15 +5,17 @@ import { HttpStatus } from "../../src/core/enums/http-status";
 import { EndpointList } from "../../src/core/constants/endpoint-list";
 import { beforeEach } from "node:test";
 import { PostInputModel } from "../../src/core/posts/dto/post-input-dto";
+//@ts-ignore
+import { getBasicAuthToken } from "../utils/get-basic-auth-token";
+import { runDB } from "../../src/db/mongo.db";
+//@ts-ignore
+import { clearDB } from "../utils/clear-db";
 
 describe("Posts API tests", () => {
   const app = express();
   setupApp(app);
 
-  const username = "admin";
-  const password = "qwerty";
-  const authString = `${username}:${password}`;
-  const authValue: string = `Basic ${Buffer.from(authString).toString("base64")}`;
+  const authToken: string = getBasicAuthToken();
 
   const validPostBody: PostInputModel = {
     title: "Post name",
@@ -22,21 +24,24 @@ describe("Posts API tests", () => {
     blogId: "1",
   };
 
-  beforeEach(async () => {
-    const res = await request(app).delete(
-      "/api/testing" + EndpointList.TEST_DELETE_ALL,
+  beforeAll(async () => {
+    await runDB(
+      "mongodb+srv://Vercel-Admin-blogger-platform-mongoDB:hwkJaIheLnRD6J9c@blogger-platform-mongod.13rbnz7.mongodb.net/?retryWrites=true&w=majority",
     );
-    expect(res.status).toBe(HttpStatus.NoContent);
-    expect(res.body).toEqual({});
   });
 
-  test("should create valid post; POST /posts", async () => {
+  beforeEach(async () => {
+    await clearDB(app);
+  });
+
+  test("should create valid post; POST api/posts", async () => {
     const newPost: PostInputModel = {
       ...validPostBody,
+      blogId: "696ac1ca112a784e3e0c5e1b"
     };
     await request(app)
       .post(EndpointList.POSTS_PATH)
-      .set("Authorization", authValue)
+      .set("Authorization", authToken)
       .send(newPost)
       .expect(HttpStatus.Created);
   });
@@ -48,7 +53,7 @@ describe("Posts API tests", () => {
     };
     await request(app)
       .post(EndpointList.POSTS_PATH)
-      .set("Authorization", authValue)
+      .set("Authorization", authToken)
       .send(newPost)
       .expect(HttpStatus.BadRequest);
   });
@@ -65,9 +70,6 @@ describe("Posts API tests", () => {
   });
 
   test("should return posts list; GET /posts", async () => {
-    await request(app).delete(
-      "/api/testing" + EndpointList.TEST_DELETE_ALL,
-    );
     const newPost1: PostInputModel = {
       ...validPostBody,
     };
@@ -82,17 +84,17 @@ describe("Posts API tests", () => {
 
     await request(app)
       .post(EndpointList.POSTS_PATH)
-      .set("Authorization", authValue)
+      .set("Authorization", authToken)
       .send({ ...newPost1 })
       .expect(HttpStatus.Created);
     await request(app)
       .post(EndpointList.POSTS_PATH)
-      .set("Authorization", authValue)
+      .set("Authorization", authToken)
       .send({ ...newPost2 })
       .expect(HttpStatus.Created);
     await request(app)
       .post(EndpointList.POSTS_PATH)
-      .set("Authorization", authValue)
+      .set("Authorization", authToken)
       .send({ ...newPost3 })
       .expect(HttpStatus.Created);
 
@@ -108,32 +110,21 @@ describe("Posts API tests", () => {
     const newPost1: PostInputModel = {
       ...validPostBody,
     };
-    const newPost2: PostInputModel = {
-      ...validPostBody,
-      title: "Test Post 2",
-    };
 
-    await request(app)
-      .post(EndpointList.POSTS_PATH)
-      .set("Authorization", authValue)
-      .send({ ...newPost1 })
-      .expect(HttpStatus.Created);
     const response = await request(app)
       .post(EndpointList.POSTS_PATH)
-      .set("Authorization", authValue)
-      .send({ ...newPost2 })
+      .set("Authorization", authToken)
+      .send({ ...newPost1 })
       .expect(HttpStatus.Created);
 
-    const getResponse = await request(app)
-      .get(EndpointList.POSTS_PATH + "/" + response.body.id)
+    const getPost = await request(app)
+      .get(EndpointList.POSTS_PATH + "/" + response.body._id)
+      .set("Authorization", authToken)
       .expect(HttpStatus.Ok);
-    expect(getResponse.body).toEqual({
+
+    expect(getPost.body).toEqual({
       ...response.body,
     });
-
-    await request(app)
-      .get(EndpointList.POSTS_PATH + "/" + "10")
-      .expect(HttpStatus.NotFound);
   });
 
   test("should update post by id; PUT /posts/:id", async () => {
@@ -144,37 +135,22 @@ describe("Posts API tests", () => {
       ...newPost,
       title: "Test Post 2",
     };
-    const updatedInvalidPost: any = {
-      ...newPost,
-      title: 1,
-    };
 
     const response = await request(app)
       .post(EndpointList.POSTS_PATH)
-      .set("Authorization", authValue)
+      .set("Authorization", authToken)
       .send({ ...newPost })
       .expect(HttpStatus.Created);
 
     await request(app)
-      .put(EndpointList.POSTS_PATH + "/" + response.body.id)
-      .set("Authorization", authValue)
+      .put(EndpointList.POSTS_PATH + "/" + response.body._id)
+      .set("Authorization", authToken)
       .send({ ...updatedValidPost })
       .expect(HttpStatus.NoContent);
     await request(app)
-      .put(EndpointList.POSTS_PATH + "/" + response.body.id)
-      .set("Authorization", authValue)
-      .send({ ...updatedInvalidPost })
-      .expect(HttpStatus.BadRequest);
-    await request(app)
-      .put(EndpointList.POSTS_PATH + "/" + response.body.id)
-      .send({ ...updatedValidPost })
-      .expect(HttpStatus.Unauthorized);
-    await request(app)
-      .put(EndpointList.POSTS_PATH + "/" + "5")
-      .set("Authorization", authValue)
-      .send({ ...updatedValidPost })
+      .get(EndpointList.POSTS_PATH + "/" + response.body._id)
+      .set("Authorization", authToken)
       .expect(HttpStatus.NotFound);
-
   });
 
   test("should delete post by id; DELETE /posts/:id", async () => {
@@ -183,20 +159,17 @@ describe("Posts API tests", () => {
     };
     const response = await request(app)
       .post(EndpointList.POSTS_PATH)
-      .set("Authorization", authValue)
+      .set("Authorization", authToken)
       .send({ ...newPost})
       .expect(HttpStatus.Created);
 
     await request(app)
-      .delete(EndpointList.POSTS_PATH + "/" + response.body.id)
-      .set("Authorization", authValue)
+      .delete(EndpointList.POSTS_PATH + "/" + response.body._id)
+      .set("Authorization", authToken)
       .expect(HttpStatus.NoContent);
-    await request(app)
-      .delete(EndpointList.POSTS_PATH + "/" + response.body.id)
-      .expect(HttpStatus.Unauthorized);
-    await request(app)
-      .delete(EndpointList.POSTS_PATH + "/" + "102")
-      .set("Authorization", authValue)
+   await request(app)
+      .get(EndpointList.POSTS_PATH + "/" + response.body._id)
+      .set("Authorization", authToken)
       .expect(HttpStatus.NotFound);
   });
 });

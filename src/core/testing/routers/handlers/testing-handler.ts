@@ -4,7 +4,7 @@ import { blogsRepository } from "../../../blogs/repositories/blogs.repository";
 import { postsRepository } from "../../../posts/repositories/posts.repository";
 
 export const testingHandler = (req: Request, res: Response) => {
-  postsRepository.clear();
-  blogsRepository.clear();
+  postsRepository.clear().then();
+  blogsRepository.clear().then();
   res.status(HttpStatus.NoContent).send("All data is deleted");
 };

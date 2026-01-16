@@ -13,7 +13,6 @@ import { superAdminGuardMiddleware } from "../../../auth/middlewares/super-admin
 export const blogsRouter = Router({});
 
 blogsRouter
-  // videos crud routes:
   .get(EndpointList.EMPTY_PATH, getBlogListHandler)
   .get(
     EndpointList.BY_ID,
