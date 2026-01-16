@@ -1,5 +1,8 @@
 export type BlogViewModel = {
-    name: string;
-    description: string;
-    websiteUrl: string;
+  id: string;
+  name: string;
+  description: string;
+  websiteUrl: string;
+  createdAt: string;
+  isMembership: boolean;
 };

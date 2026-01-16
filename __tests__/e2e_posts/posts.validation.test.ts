@@ -4,7 +4,7 @@ import { setupApp } from "../../src/setup-app";
 import { EndpointList } from "../../src/core/constants/endpoint-list";
 import { HttpStatus } from "../../src/core/enums/http-status";
 import { ErrorNames } from "../../src/core/enums/error-names";
-import { PostInputModel } from "../../src/core/posts/dto/post-input-dto";
+import { PostInputModel } from "../../src/posts/dto/post-input-dto";
 
 describe("Post body validation tests", () => {
   const app = express();

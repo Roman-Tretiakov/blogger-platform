@@ -4,7 +4,7 @@ import { setupApp } from "../../src/setup-app";
 import { EndpointList } from "../../src/core/constants/endpoint-list";
 import { HttpStatus } from "../../src/core/enums/http-status";
 import { ErrorNames } from "../../src/core/enums/error-names";
-import { BlogInputModel } from "../../src/core/blogs/dto/blog-input-dto";
+import { BlogInputModel } from "../../src/blogs/dto/blog-input-dto";
 
 describe("Blog body validation tests", () => {
   const app = express();

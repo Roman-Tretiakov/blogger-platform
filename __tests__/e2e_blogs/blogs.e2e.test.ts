@@ -1,7 +1,7 @@
 import request from "supertest";
 import express from "express";
 import { setupApp } from "../../src/setup-app";
-import { BlogInputModel } from "../../src/core/blogs/dto/blog-input-dto";
+import { BlogInputModel } from "../../src/blogs/dto/blog-input-dto";
 import { HttpStatus } from "../../src/core/enums/http-status";
 import { EndpointList } from "../../src/core/constants/endpoint-list";
 import { beforeEach } from "node:test";
