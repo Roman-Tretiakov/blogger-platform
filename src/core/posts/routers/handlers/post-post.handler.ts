@@ -5,9 +5,9 @@ import { PostViewModel } from "../../../types/post-view-model-type";
 import { PostInputModel } from "../../dto/post-input-dto";
 import { createErrorMessages } from "../../../utils/error.utils";
 
-export const postPostHandler = (req: Request, res: Response) => {
+export const postPostHandler = async (req: Request, res: Response) => {
   try {
-    const newPost: PostViewModel | any = postsRepository.create(
+    const newPost: PostViewModel = await postsRepository.create(
       req.body as PostInputModel,
     );
     res.status(HttpStatus.Created).send(newPost);

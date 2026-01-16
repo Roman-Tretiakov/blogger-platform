@@ -21,5 +21,5 @@ export enum ErrorNames {
     ID_MISSING_ERROR = "ID is required",
     ID_TYPE_ERROR = "ID must be a string",
     ID_EMPTY_ERROR = "ID must not be empty",
-    ID_FORMAT_ERROR = "ID must be in numeric string",
+    ID_FORMAT_ERROR = "Incorrect format of Mongo ID",
 }

@@ -6,7 +6,5 @@ export const paramIdValidationMiddleware = param('id')
     .withMessage(ErrorNames.ID_MISSING_ERROR)
     .isString()
     .withMessage(ErrorNames.ID_TYPE_ERROR)
-    .isLength({min: 1})
-    .withMessage(ErrorNames.ID_EMPTY_ERROR)
-    .isNumeric()
-    .withMessage(ErrorNames.ID_FORMAT_ERROR);
+  .isMongoId()
+.withMessage(ErrorNames.ID_FORMAT_ERROR);

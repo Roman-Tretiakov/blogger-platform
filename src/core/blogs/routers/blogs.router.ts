@@ -16,7 +16,7 @@ blogsRouter
   // videos crud routes:
   .get(EndpointList.EMPTY_PATH, getBlogListHandler)
   .get(
-    EndpointList.SINGLE_BLOG,
+    EndpointList.BY_ID,
     paramIdValidationMiddleware,
     inputValidationResultMiddleware,
     getBlogHandler,
@@ -29,7 +29,7 @@ blogsRouter
     postBlogHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
   .put(
-    EndpointList.SINGLE_BLOG,
+    EndpointList.BY_ID,
     superAdminGuardMiddleware,
     paramIdValidationMiddleware,
     createBlogsBodyValidationMiddleware,
@@ -37,7 +37,7 @@ blogsRouter
     putBlogHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
   .delete(
-    EndpointList.SINGLE_BLOG,
+    EndpointList.BY_ID,
     superAdminGuardMiddleware,
     paramIdValidationMiddleware,
     inputValidationResultMiddleware,

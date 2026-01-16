@@ -16,7 +16,7 @@ postsRouter
   // videos crud routes:
   .get(EndpointList.EMPTY_PATH, getPostListHandler)
   .get(
-    EndpointList.SINGLE_POST,
+    EndpointList.BY_ID,
     paramIdValidationMiddleware,
     inputValidationResultMiddleware,
     getPostHandler,
@@ -29,7 +29,7 @@ postsRouter
     postPostHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
   .put(
-    EndpointList.SINGLE_POST,
+    EndpointList.BY_ID,
     superAdminGuardMiddleware,
     paramIdValidationMiddleware,
     createPostsBodyValidationMiddleware,
@@ -37,7 +37,7 @@ postsRouter
     putPostHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
   .delete(
-    EndpointList.SINGLE_POST,
+    EndpointList.BY_ID,
     superAdminGuardMiddleware,
     paramIdValidationMiddleware,
     inputValidationResultMiddleware,

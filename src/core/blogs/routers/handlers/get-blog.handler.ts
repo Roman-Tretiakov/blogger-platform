@@ -3,9 +3,9 @@ import { HttpStatus } from "../../../enums/http-status";
 import { blogsRepository } from "../../repositories/blogs.repository";
 import { BlogViewModel } from "../../../types/blog-view-model-type";
 
-export const getBlogHandler = (req: Request, res: Response) => {
+export const getBlogHandler = async (req: Request, res: Response) => {
   const id: string = req.params.id;
-  const blog: BlogViewModel | null = blogsRepository.findById(id);
+  const blog: BlogViewModel | null = await blogsRepository.findById(id);
   if (!blog) {
     return res.status(HttpStatus.NotFound).send(`No blog found by id: ${id}.`);
   }
