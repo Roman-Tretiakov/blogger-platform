@@ -55,8 +55,8 @@ paths:
           required: true
           description: "The unique identifier of the post"
           schema:
-            type: integer
-            example: 2
+            type: string
+            example: "2"
       responses:
         200:
           description: Success
@@ -77,8 +77,8 @@ paths:
           required: true
           description: "The unique identifier of the Post"
           schema:
-            type: integer
-            example: 2
+            type: string
+            example: "2"
       requestBody:
         required: true
         content:
@@ -107,8 +107,8 @@ paths:
           required: true
           description: "The unique identifier of the post"
           schema:
-            type: integer
-            example: 2
+            type: string
+            example: "2"
       responses:
         204:
           description: No Content
