@@ -28,9 +28,9 @@ const swaggerOptions = {
     security: [{ basicAuth: [] }],
   },
   apis: [
-    join(__dirname, "../blogs/docs/blogs.swagger.yml"),
-    join(__dirname, "../posts/docs/posts.swagger.yml"),
-    join(__dirname, "../testing/docs/testing.swagger.yml"),
+    join(__dirname, "../../blogs/docs/blogs.swagger.yml"),
+    join(__dirname, "../../posts/docs/posts.swagger.yml"),
+    join(__dirname, "../../testing/docs/testing.swagger.yml"),
   ],
 };
 

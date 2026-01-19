@@ -1,11 +1,11 @@
 import { Collection, Db, MongoClient } from "mongodb";
-import { BlogViewModel } from "../core/types/blog-view-model-type";
-import { PostViewModel } from "../core/types/post-view-model-type";
 import { DBCollectionNames, DBName } from "./db-collection-names";
+import { BlogMongoModel } from "../blogs/dto/blog-mongo-model";
+import { PostMongoModel } from "../posts/dto/post-mongo-model";
 
 export let client: MongoClient;
-export let blogsCollection: Collection<BlogViewModel>;
-export let postsCollection: Collection<PostViewModel>;
+export let blogsCollection: Collection<BlogMongoModel>;
+export let postsCollection: Collection<PostMongoModel>;
 
 // Подключения к бд
 export async function runDB(url: string): Promise<void> {
@@ -13,8 +13,8 @@ export async function runDB(url: string): Promise<void> {
   const db: Db = client.db(DBName);
 
   //Инициализация коллекций
-  blogsCollection = db.collection<BlogViewModel>(DBCollectionNames.BLOGS);
-  postsCollection = db.collection<PostViewModel>(DBCollectionNames.POSTS);
+  blogsCollection = db.collection<BlogMongoModel>(DBCollectionNames.BLOGS);
+  postsCollection = db.collection<PostMongoModel>(DBCollectionNames.POSTS);
 
   try {
     await client.connect();

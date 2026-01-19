@@ -125,6 +125,8 @@ components:
         - name
         - description
         - websiteUrl
+        - createdAt
+        - isMembership
       properties:
         id:
           type: string
@@ -142,6 +144,14 @@ components:
           type: string
           description: "maxLength: 100"
           example: "https://samurai.io"
+        createdAt:
+          type: string
+          description: "The date and time when the blog was created"
+          example: "2023-10-05T14:48:00.000Z"
+        isMembership:
+          type: boolean
+          description: "Indicates if the blog has a membership option"
+          example: false
     BlogInputModel:
       type: object
       required:

@@ -1,19 +1,20 @@
-import { PostInputModel } from "../dto/post-input-dto";
 import { PostViewModel } from "../../core/types/post-view-model-type";
 import { blogsCollection, postsCollection } from "../../db/mongo.db";
 import { InsertOneResult, ObjectId, UpdateResult, WithId } from "mongodb";
+import { PostMongoModel } from "../dto/post-mongo-model";
+import { BlogMongoModel } from "../../blogs/dto/blog-mongo-model";
 
 export const postsRepository = {
-  async findAll(): Promise<WithId<PostViewModel>[]> {
+  async findAll(): Promise<WithId<PostMongoModel>[]> {
     return postsCollection.find().toArray();
   },
 
-  async findById(id: string): Promise<WithId<PostViewModel> | null> {
+  async findById(id: string): Promise<WithId<PostMongoModel> | null> {
     return (await postsCollection.findOne({ _id: new ObjectId(id) })) ?? null;
   },
 
-  async create(post: PostInputModel): Promise<WithId<PostViewModel>> {
-    const blog = await blogsCollection.findOne({
+  async create(post: PostMongoModel): Promise<WithId<PostMongoModel>> {
+    const blog: WithId<BlogMongoModel> | null = await blogsCollection.findOne({
       _id: new ObjectId(post.blogId),
     });
     if (!blog) {
@@ -25,7 +26,7 @@ export const postsRepository = {
     return { ...post, blogName: name, _id: newPost.insertedId };
   },
 
-  async update(id: string, updateModel: PostInputModel): Promise<void> {
+  async update(id: string, updateModel: PostMongoModel): Promise<void> {
     const post: UpdateResult<PostViewModel> | undefined =
       await postsCollection.updateOne(
         { _id: new ObjectId(id) },

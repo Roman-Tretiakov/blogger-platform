@@ -5,8 +5,8 @@ import { paramIdValidationMiddleware } from "../../core/middlewares/params-id-va
 import { inputValidationResultMiddleware } from "../../core/middlewares/input-validation-result.middleware";
 import { getPostListHandler } from "./handlers/get-post-list.handler";
 import { getPostHandler } from "./handlers/get-post.handler";
-import { postPostHandler } from "./handlers/post-post.handler";
-import { putPostHandler } from "./handlers/put-post.handler";
+import { createPostHandler } from "./handlers/create-post.handler";
+import { updatePostHandler } from "./handlers/update-post.handler";
 import { deletePostHandler } from "./handlers/delete-post.handler";
 import { createPostsBodyValidationMiddleware } from "../middlewares/create-posts-body-validation-middleware";
 
@@ -26,7 +26,7 @@ postsRouter
     superAdminGuardMiddleware,
     createPostsBodyValidationMiddleware,
     inputValidationResultMiddleware,
-    postPostHandler,
+    createPostHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
   .put(
     EndpointList.BY_ID,
@@ -34,7 +34,7 @@ postsRouter
     paramIdValidationMiddleware,
     createPostsBodyValidationMiddleware,
     inputValidationResultMiddleware,
-    putPostHandler,
+    updatePostHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
   .delete(
     EndpointList.BY_ID,

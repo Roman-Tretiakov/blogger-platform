@@ -2,10 +2,15 @@ import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { blogsRepository } from "../../repositories/blogs.repository";
 import { createErrorMessages } from "../../../core/utils/error.utils";
+import { BlogInputModel } from "../../dto/blog-input-dto";
 import { WithId } from "mongodb";
 import { BlogMongoModel } from "../../dto/blog-mongo-model";
+import { mapToBlogMongoModel } from "../mappers/map-to-blog-mongo-model";
 
-export async function deleteBlogHandler(req: Request, res: Response) {
+export async function updateBlogHandler (
+  req: Request<{ id: string }, {}, BlogInputModel>,
+  res: Response,
+) {
   const id: string = req.params.id;
   try {
     const blog: WithId<BlogMongoModel> | null =
@@ -18,11 +23,8 @@ export async function deleteBlogHandler(req: Request, res: Response) {
         );
       return;
     }
-
-    await blogsRepository.delete(id);
-    res
-      .status(HttpStatus.NoContent)
-      .send(`Blog with id: ${id} was deleted successfully.`);
+    await blogsRepository.update(id, mapToBlogMongoModel(req.body));
+    res.status(HttpStatus.NoContent).send();
   } catch (e: unknown) {
     res.sendStatus(HttpStatus.InternalServerError);
   }

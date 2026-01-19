@@ -127,6 +127,7 @@ components:
         - content
         - blogId
         - blogName
+        - createdAt
       properties:
         id:
           type: string
@@ -152,6 +153,10 @@ components:
           type: string
           description: "Blog name the post relates to"
           example: "New life"
+        createdAt:
+          type: string
+          description: "The date and time when the post was created"
+          example: "2023-10-05T14:48:00.000Z"
     PostInputModel:
       type: object
       required:
