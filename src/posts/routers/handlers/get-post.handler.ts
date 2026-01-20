@@ -4,6 +4,7 @@ import { postsRepository } from "../../repositories/posts.repository";
 import { WithId } from "mongodb";
 import { PostMongoModel } from "../../dto/post-mongo-model";
 import { createErrorMessages } from "../../../core/utils/error.utils";
+import { mapToPostViewModel } from "../mappers/map-to-post-view-model";
 
 export async function getPostHandler(req: Request, res: Response) {
   const id: string = req.params.id;
@@ -18,7 +19,7 @@ export async function getPostHandler(req: Request, res: Response) {
         );
       return;
     }
-    res.status(HttpStatus.Ok).send(post);
+    res.status(HttpStatus.Ok).send(mapToPostViewModel(post));
   } catch (e: unknown) {
     res.sendStatus(HttpStatus.InternalServerError);
   }

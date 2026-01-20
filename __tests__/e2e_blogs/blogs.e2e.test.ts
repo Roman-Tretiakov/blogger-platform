@@ -27,6 +27,7 @@ describe("Blogs API tests", () => {
     await runDB(
       "mongodb+srv://Vercel-Admin-blogger-platform-mongoDB:hwkJaIheLnRD6J9c@blogger-platform-mongod.13rbnz7.mongodb.net/?retryWrites=true&w=majority",
     );
+    await clearDB(app);
   });
 
   beforeEach(async () => {

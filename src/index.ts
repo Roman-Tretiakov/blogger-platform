@@ -2,7 +2,6 @@ import express from "express";
 import dotenv from "dotenv";
 import { setupApp } from "./setup-app";
 import { runDB } from "./db/mongo.db";
-import { initDB } from "./db/init-db-with-data";
 
 const bootstrap = async () => {
   dotenv.config();

@@ -5,7 +5,7 @@ import { Express } from "express";
 
 export async function clearDB(app: Express) {
   await request(app)
-    .delete(EndpointList.TESTING_PATH + EndpointList.TEST_DELETE_ALL)
+    .delete(EndpointList.TEST_DELETE_ALL)
     .expect(HttpStatus.NoContent);
   return;
 }

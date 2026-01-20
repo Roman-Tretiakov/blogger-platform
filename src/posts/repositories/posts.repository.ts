@@ -27,7 +27,7 @@ export const postsRepository = {
   },
 
   async update(id: string, updateModel: PostMongoModel): Promise<void> {
-    const post: UpdateResult<PostViewModel> | undefined =
+    const post: UpdateResult<PostViewModel> =
       await postsCollection.updateOne(
         { _id: new ObjectId(id) },
         { $set: updateModel },
