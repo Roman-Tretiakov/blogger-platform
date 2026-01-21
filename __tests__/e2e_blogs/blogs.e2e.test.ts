@@ -116,11 +116,9 @@ describe("Blogs API tests", () => {
       .expect(HttpStatus.Created);
 
     const getBlog = await request(app)
-      .get(EndpointList.BLOGS_PATH + "/" + response.body._id)
+      .get(EndpointList.BLOGS_PATH + "/" + response.body.id)
       .expect(HttpStatus.Ok);
-    expect(getBlog.body).toEqual({
-      ...response.body,
-    });
+    expect(getBlog.body).toEqual(response.body);
   });
 
   test("should update blog by id; PUT /blogs/:id", async () => {
@@ -138,12 +136,12 @@ describe("Blogs API tests", () => {
       .send({ ...newBlog })
       .expect(HttpStatus.Created);
     await request(app)
-      .put(EndpointList.BLOGS_PATH + "/" + response.body._id)
+      .put(EndpointList.BLOGS_PATH + "/" + response.body.id)
       .set("Authorization", authToken)
       .send({ ...updatedValidBlog })
       .expect(HttpStatus.NoContent);
     const result = await request(app)
-      .get(EndpointList.BLOGS_PATH + "/" + response.body._id)
+      .get(EndpointList.BLOGS_PATH + "/" + response.body.id)
       .set("Authorization", authToken)
       .expect(HttpStatus.Ok);
     expect(result.body.name).toEqual(updatedValidBlog.name);
@@ -160,12 +158,12 @@ describe("Blogs API tests", () => {
       .expect(HttpStatus.Created);
 
     await request(app)
-      .delete(EndpointList.BLOGS_PATH + "/" + response.body._id)
+      .delete(EndpointList.BLOGS_PATH + "/" + response.body.id)
       .set("Authorization", authToken)
       .expect(HttpStatus.NoContent);
 
     await request(app)
-      .get(EndpointList.BLOGS_PATH + "/" + response.body._id)
+      .get(EndpointList.BLOGS_PATH + "/" + response.body.id)
       .set("Authorization", authToken)
       .expect(HttpStatus.NotFound);
   });

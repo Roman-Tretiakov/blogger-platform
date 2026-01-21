@@ -1,8 +1,7 @@
 import { PostViewModel } from "../../core/types/post-view-model-type";
-import { blogsCollection, postsCollection } from "../../db/mongo.db";
+import { postsCollection } from "../../db/mongo.db";
 import { InsertOneResult, ObjectId, UpdateResult, WithId } from "mongodb";
 import { PostMongoModel } from "../dto/post-mongo-model";
-import { BlogMongoModel } from "../../blogs/dto/blog-mongo-model";
 
 export const postsRepository = {
   async findAll(): Promise<WithId<PostMongoModel>[]> {
@@ -14,24 +13,19 @@ export const postsRepository = {
   },
 
   async create(post: PostMongoModel): Promise<WithId<PostMongoModel>> {
-    const blog: WithId<BlogMongoModel> | null = await blogsCollection.findOne({
-      _id: new ObjectId(post.blogId),
-    });
-    if (!blog) {
-      throw new Error(`No blog by blogId: ${post.blogId} found for post.`);
-    }
-    const name = blog.name;
     const newPost: InsertOneResult<PostViewModel> =
       await postsCollection.insertOne(post);
-    return { ...post, blogName: name, _id: newPost.insertedId };
+    if (!newPost) {
+      throw new Error("Failed to insert post");
+    }
+    return { ...post, _id: newPost.insertedId };
   },
 
   async update(id: string, updateModel: PostMongoModel): Promise<void> {
-    const post: UpdateResult<PostViewModel> =
-      await postsCollection.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: updateModel },
-      );
+    const post: UpdateResult<PostViewModel> = await postsCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updateModel },
+    );
 
     if (post.matchedCount < 1) {
       throw new Error(`Post with id ${id} not found`);
@@ -49,6 +43,6 @@ export const postsRepository = {
   },
 
   async clear(): Promise<void> {
-    await  postsCollection.drop();
-  }
+    await postsCollection.drop();
+  },
 };

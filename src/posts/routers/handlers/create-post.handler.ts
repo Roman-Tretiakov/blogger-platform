@@ -30,7 +30,8 @@ export async function createPostHandler(
     }
 
     const newPost: WithId<PostMongoModel> = await postsRepository.create(
-      mapToPostMongoModel(req.body, blog.name));
+      mapToPostMongoModel(req.body, blog),
+    );
     res.status(HttpStatus.Created).send(mapToPostViewModel(newPost));
   } catch (e: unknown) {
     res.sendStatus(HttpStatus.InternalServerError);
