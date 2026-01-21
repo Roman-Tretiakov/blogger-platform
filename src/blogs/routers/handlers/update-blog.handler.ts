@@ -5,7 +5,6 @@ import { createErrorMessages } from "../../../core/utils/error.utils";
 import { BlogInputModel } from "../../dto/blog-input-dto";
 import { WithId } from "mongodb";
 import { BlogMongoModel } from "../../dto/blog-mongo-model";
-import { mapToBlogMongoModel } from "../mappers/map-to-blog-mongo-model";
 
 export async function updateBlogHandler (
   req: Request<{ id: string }, {}, BlogInputModel>,
@@ -23,7 +22,12 @@ export async function updateBlogHandler (
         );
       return;
     }
-    await blogsRepository.update(id, mapToBlogMongoModel(req.body));
+    const updatedBlog: BlogMongoModel = {
+      ...blog,
+      ...req.body
+    }
+
+    await blogsRepository.update(id, updatedBlog);
     res.status(HttpStatus.NoContent).send();
   } catch (e: unknown) {
     res.sendStatus(HttpStatus.InternalServerError);

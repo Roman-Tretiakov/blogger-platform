@@ -29,9 +29,8 @@ export async function createPostHandler(
       return;
     }
 
-
     const newPost: WithId<PostMongoModel> = await postsRepository.create(
-      mapToPostMongoModel(req.body));
+      mapToPostMongoModel(req.body, blog.name));
     res.status(HttpStatus.Created).send(mapToPostViewModel(newPost));
   } catch (e: unknown) {
     res.sendStatus(HttpStatus.InternalServerError);
