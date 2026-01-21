@@ -12,10 +12,7 @@ export async function createBlogHandler (
   res: Response): Promise<void> {
   try {
     const newBlog: WithId<BlogMongoModel> = await blogsRepository.create(mapToBlogMongoModel(req.body));
-    res.status(HttpStatus.Created).send({
-      ...mapToBlogViewModel(newBlog),
-      _id: newBlog._id
-    });
+    res.status(HttpStatus.Created).send(mapToBlogViewModel(newBlog));
   } catch (e: unknown) {
     res.sendStatus(HttpStatus.InternalServerError);
   }
