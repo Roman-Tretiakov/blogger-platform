@@ -25,3 +25,7 @@ export async function runDB(url: string): Promise<void> {
     throw new Error(`❌ Database not connected: ${e}`);
   }
 }
+
+export async function closeDBConnection(client: MongoClient): Promise<void> {
+  await client.close();
+}

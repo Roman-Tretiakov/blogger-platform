@@ -7,7 +7,7 @@ import { EndpointList } from "../../src/core/constants/endpoint-list";
 import { beforeEach } from "node:test";
 //@ts-ignore
 import { getBasicAuthToken } from "../utils/get-basic-auth-token";
-import { runDB } from "../../src/db/mongo.db";
+import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
 //@ts-ignore
 import { clearDB } from "../utils/clear-db";
 
@@ -32,6 +32,15 @@ describe("Blogs API tests", () => {
 
   beforeEach(async () => {
     await clearDB(app);
+  });
+
+  afterAll(async () => {
+    try {
+      await closeDBConnection(client);
+    } catch (error) {
+      console.error("Error closing DB connection:", error);
+      // Можно не бросать ошибку дальше, чтобы не влиять на результат тестов
+    }
   });
 
   test("should create valid blog; POST /blogs", async () => {
