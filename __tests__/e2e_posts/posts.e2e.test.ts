@@ -7,7 +7,7 @@ import { beforeEach } from "node:test";
 import { PostInputModel } from "../../src/posts/dto/post-input-dto";
 //@ts-ignore
 import { getBasicAuthToken } from "../utils/get-basic-auth-token";
-import { runDB } from "../../src/db/mongo.db";
+import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
 //@ts-ignore
 import { clearDB } from "../utils/clear-db";
 import { BlogInputModel } from "../../src/blogs/dto/blog-input-dto";
@@ -35,6 +35,7 @@ describe("Posts API tests", () => {
     await runDB(
       "mongodb+srv://Vercel-Admin-blogger-platform-mongoDB:hwkJaIheLnRD6J9c@blogger-platform-mongod.13rbnz7.mongodb.net/?retryWrites=true&w=majority",
     );
+
     const blog = await request(app)
       .post(EndpointList.BLOGS_PATH)
       .set("Authorization", authToken)
@@ -46,6 +47,15 @@ describe("Posts API tests", () => {
 
   beforeEach(async () => {
     await clearDB(app);
+  });
+
+  afterAll(async () => {
+    try {
+      await closeDBConnection(client);
+    } catch (error) {
+      console.error("Error closing DB connection:", error);
+      // Можно не бросать ошибку дальше, чтобы не влиять на результат тестов
+    }
   });
 
   test("should create valid post; POST api/posts", async () => {
