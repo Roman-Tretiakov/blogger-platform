@@ -1,4 +1,4 @@
-import { PostViewModel } from "../../core/types/post-view-model-type";
+import { PostViewModel } from "../domainType/post-view-model-type";
 import { postsCollection } from "../../db/mongo.db";
 import { InsertOneResult, ObjectId, UpdateResult, WithId } from "mongodb";
 import { PostMongoModel } from "../dto/post-mongo-model";

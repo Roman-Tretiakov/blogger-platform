@@ -1,6 +1,6 @@
-import { BlogViewModel } from "../../../core/types/blog-view-model-type";
+import { BlogViewModel } from "../domainType/blog-view-model-type";
 import { WithId } from "mongodb";
-import { BlogMongoModel } from "../../dto/blog-mongo-model";
+import { BlogMongoModel } from "../dto/blog-mongo-model";
 
 export function mapToBlogViewModel(blog: WithId<BlogMongoModel>): BlogViewModel {
   return {

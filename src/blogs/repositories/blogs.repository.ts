@@ -1,7 +1,8 @@
-import { BlogViewModel } from "../../core/types/blog-view-model-type";
+import { BlogViewModel } from "../domainType/blog-view-model-type";
 import { InsertOneResult, ObjectId, UpdateResult, WithId } from "mongodb";
 import { blogsCollection } from "../../db/mongo.db";
 import { BlogMongoModel } from "../dto/blog-mongo-model";
+import { BlogInputModel } from "../dto/blog-input-dto";
 
 export const blogsRepository = {
   async findAll(): Promise<WithId<BlogMongoModel>[]> {
@@ -9,7 +10,7 @@ export const blogsRepository = {
   },
 
   async findById(id: string): Promise<WithId<BlogMongoModel> | null> {
-    return (await blogsCollection.findOne({ _id: new ObjectId(id) })) ?? null;
+    return blogsCollection.findOne({ _id: new ObjectId(id) });
   },
 
   async create(blog: BlogMongoModel): Promise<WithId<BlogMongoModel>> {
@@ -18,14 +19,14 @@ export const blogsRepository = {
     return { ...blog, _id: newBlog.insertedId };
   },
 
-  async update(id: string, updateModel: BlogMongoModel): Promise<void> {
+  async update(id: string, updateModel: BlogInputModel): Promise<void> {
     const updateResult: UpdateResult<BlogViewModel> =
       await blogsCollection.updateOne(
         { _id: new ObjectId(id) },
         { $set: updateModel },
       );
     if (updateResult.matchedCount < 1) {
-      throw new Error("Blog not exist");
+      throw new Error(`No blog found by id: ${id}`);
     }
     return;
   },
@@ -34,9 +35,8 @@ export const blogsRepository = {
     const deleteResult = await blogsCollection.deleteOne({
       _id: new ObjectId(id),
     });
-
     if (deleteResult.deletedCount < 1) {
-      throw new Error("Blog not exist");
+      throw new Error(`No blog found by id: ${id}`);
     }
     return;
   },

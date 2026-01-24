@@ -3,7 +3,7 @@ import { HttpStatus } from "../../../core/enums/http-status";
 import { postsRepository } from "../../repositories/posts.repository";
 import { WithId } from "mongodb";
 import { PostMongoModel } from "../../dto/post-mongo-model";
-import { PostViewModel } from "../../../core/types/post-view-model-type";
+import { PostViewModel } from "../../domainType/post-view-model-type";
 import { mapToPostViewModel } from "../mappers/map-to-post-view-model";
 
 export async function getPostListHandler(req: Request, res: Response) {

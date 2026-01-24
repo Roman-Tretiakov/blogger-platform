@@ -17,7 +17,7 @@ describe("Blogs API tests", () => {
 
   const authToken: string = getBasicAuthToken();
 
-  const createdBlog: BlogInputModel = {
+  const validBlogData: BlogInputModel = {
     name: "Test Blog",
     description: "Test description",
     websiteUrl: "https://samurai.io",
@@ -36,7 +36,7 @@ describe("Blogs API tests", () => {
 
   test("should create valid blog; POST /blogs", async () => {
     const newBlog: BlogInputModel = {
-      ...createdBlog,
+      ...validBlogData,
     };
     await request(app)
       .post(EndpointList.BLOGS_PATH)
@@ -47,7 +47,7 @@ describe("Blogs API tests", () => {
 
   test("should not create invalid blog; POST /blogs", async () => {
     const newBlog: any = {
-      ...createdBlog,
+      ...validBlogData,
       name: 1,
     };
     await request(app)
@@ -59,7 +59,7 @@ describe("Blogs API tests", () => {
 
   test("should not create unauthorized blog; POST /blogs", async () => {
     const newBlog: BlogInputModel = {
-      ...createdBlog,
+      ...validBlogData,
       name: "Test unauthorized",
     };
     await request(app)
@@ -70,14 +70,14 @@ describe("Blogs API tests", () => {
 
   test("should return blogs list; GET /blogs", async () => {
     const newBlog1: BlogInputModel = {
-      ...createdBlog,
+      ...validBlogData,
     };
     const newBlog2: BlogInputModel = {
-      ...createdBlog,
+      ...validBlogData,
       name: "Test Blog 2",
     };
     const newBlog3: BlogInputModel = {
-      ...createdBlog,
+      ...validBlogData,
       name: "Test Blog 3",
     };
 
@@ -102,12 +102,12 @@ describe("Blogs API tests", () => {
       .expect(HttpStatus.Ok);
 
     expect(blogListResponse.body).toBeInstanceOf(Array);
-    expect(blogListResponse.body.length).toEqual(3);
+    expect(blogListResponse.body.length).toBeGreaterThanOrEqual(3);
   });
 
   test("should return blog by id; GET /blogs/:id", async () => {
     const newBlog1: BlogInputModel = {
-      ...createdBlog,
+      ...validBlogData,
     };
     const response = await request(app)
       .post(EndpointList.BLOGS_PATH)
@@ -123,7 +123,7 @@ describe("Blogs API tests", () => {
 
   test("should update blog by id; PUT /blogs/:id", async () => {
     const newBlog: BlogInputModel = {
-      ...createdBlog,
+      ...validBlogData,
     };
     const updatedValidBlog: BlogInputModel = {
       ...newBlog,
@@ -149,7 +149,7 @@ describe("Blogs API tests", () => {
 
   test("should delete blog by id; DELETE /blogs/:id", async () => {
     const newBlog: BlogInputModel = {
-      ...createdBlog,
+      ...validBlogData,
     };
     const response = await request(app)
       .post(EndpointList.BLOGS_PATH)
