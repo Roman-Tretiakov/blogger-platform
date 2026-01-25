@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { blogsService } from "../../BLL/blogs.service";
-import { createErrorMessages } from "../../../core/utils/error.utils";
 import { BlogInputModel } from "../../BLL/dto/blog-input-dto";
+import { errorsHandler } from "../../../core/utils/errors-hundler";
 
 export async function updateBlogHandler(
   req: Request<{ id: string }, {}, BlogInputModel>,
@@ -12,9 +12,7 @@ export async function updateBlogHandler(
   try {
     await blogsService.update(id, req.body);
     res.status(HttpStatus.NoContent).send();
-  } catch (e: any) {
-    res
-      .status(HttpStatus.NotFound)
-      .send(createErrorMessages([{ field: "id", message: `${e.message}` }]));
+  } catch (e: unknown) {
+    errorsHandler(e, res);
   }
 }

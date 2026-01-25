@@ -3,6 +3,8 @@ import { postsCollection } from "../../db/mongo.db";
 import { InsertOneResult, ObjectId, UpdateResult, WithId } from "mongodb";
 import { PostMongoModel } from "../dto/post-mongo-model";
 import { PostInputModel } from "../dto/post-input-dto";
+import { NotFoundError } from "../../core/errorClasses/NotFoundError";
+import { DomainError } from "../../core/errorClasses/DomainError";
 
 export const postsRepository = {
   async findAll(): Promise<WithId<PostMongoModel>[]> {
@@ -17,7 +19,7 @@ export const postsRepository = {
     const newPost: InsertOneResult<PostViewModel> =
       await postsCollection.insertOne(post);
     if (!newPost.acknowledged) {
-      throw new Error("Failed to insert post");
+      throw new DomainError("Failed to insert post");
     }
     return { ...post, _id: newPost.insertedId };
   },
@@ -28,7 +30,7 @@ export const postsRepository = {
       { $set: updateModel },
     );
     if (post.matchedCount < 1) {
-      throw new Error(`Post with id ${id} not found`);
+      throw new NotFoundError(`Post with id ${id} not found`, 'id');
     }
     return;
   },
@@ -37,7 +39,7 @@ export const postsRepository = {
     const result = await postsCollection.deleteOne({ _id: new ObjectId(id) });
 
     if (result.deletedCount < 1) {
-      throw new Error(`Post with id ${id} not found`);
+      throw new NotFoundError(`Post with id ${id} not found`, 'id');
     }
     return;
   },

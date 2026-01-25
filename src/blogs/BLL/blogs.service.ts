@@ -3,6 +3,7 @@ import { BlogViewModel } from "./dto/blog-view-model-type";
 import { mapToBlogMongoModel } from "../mappers/map-to-blog-mongo-model";
 import { mapToBlogViewModel } from "../mappers/map-to-blog-view-model";
 import { BlogInputModel } from "./dto/blog-input-dto";
+import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 
 export const blogsService = {
   async findAll(): Promise<BlogViewModel[]> {
@@ -12,7 +13,7 @@ export const blogsService = {
   async findById(id: string): Promise<BlogViewModel | null> {
     const blog = await blogsRepository.findById(id);
     if (blog === null) {
-      throw new Error(`No blog found by id: ${id}`);
+      throw new NotFoundError(`No blog found by id: ${id}`, 'id');
     }
     return mapToBlogViewModel(blog);
   },

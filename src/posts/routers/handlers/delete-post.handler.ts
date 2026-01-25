@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
-import { createErrorMessages } from "../../../core/utils/error.utils";
 import { postsService } from "../../BLL/posts.service";
+import { errorsHandler } from "../../../core/utils/errors-hundler";
 
 export async function deletePostHandler(req: Request, res: Response) {
   const id: string = req.params.id;
@@ -10,9 +10,7 @@ export async function deletePostHandler(req: Request, res: Response) {
     res
       .status(HttpStatus.NoContent)
       .send(`Post with id: ${id} was deleted successfully.`);
-  } catch (e: any) {
-    res
-      .status(HttpStatus.NotFound)
-      .send(createErrorMessages([{ field: "id", message: `${e.message}` }]));
+  } catch (e: unknown) {
+    errorsHandler(e, res);
   }
 }

@@ -3,6 +3,8 @@ import { InsertOneResult, ObjectId, UpdateResult, WithId } from "mongodb";
 import { blogsCollection } from "../../db/mongo.db";
 import { BlogMongoModel } from "../BLL/dto/blog-mongo-model";
 import { BlogInputModel } from "../BLL/dto/blog-input-dto";
+import { NotFoundError } from "../../core/errorClasses/NotFoundError";
+import { DomainError } from "../../core/errorClasses/DomainError";
 
 export const blogsRepository = {
   async findAll(): Promise<WithId<BlogMongoModel>[]> {
@@ -17,7 +19,7 @@ export const blogsRepository = {
     const newBlog: InsertOneResult<BlogViewModel> =
       await blogsCollection.insertOne(blog);
     if (!newBlog.acknowledged) {
-      throw new Error("Failed to insert blog");
+      throw new DomainError("Failed to insert blog");
     }
     return { ...blog, _id: newBlog.insertedId };
   },
@@ -29,7 +31,7 @@ export const blogsRepository = {
         { $set: updateModel },
       );
     if (updateResult.matchedCount < 1) {
-      throw new Error(`No blog found by id: ${id}`);
+      throw new NotFoundError(`No blog found by id: ${id}`, 'id');
     }
     return;
   },
@@ -39,7 +41,7 @@ export const blogsRepository = {
       _id: new ObjectId(id),
     });
     if (deleteResult.deletedCount < 1) {
-      throw new Error(`No blog found by id: ${id}`);
+      throw new NotFoundError(`No blog found by id: ${id}`, 'id');
     }
     return;
   },

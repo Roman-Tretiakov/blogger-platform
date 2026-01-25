@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { blogsService } from "../../BLL/blogs.service";
 import { BlogViewModel } from "../../BLL/dto/blog-view-model-type";
-import { createErrorMessages } from "../../../core/utils/error.utils";
+import { errorsHandler } from "../../../core/utils/errors-hundler";
 
 export async function getBlogHandler(
   req: Request<{ id: string }>,
@@ -12,13 +12,7 @@ export async function getBlogHandler(
   try {
     const blog: BlogViewModel | null = await blogsService.findById(id);
     res.status(HttpStatus.Ok).send(blog);
-  } catch (e: any) {
-    res
-      .status(HttpStatus.NotFound)
-      .send(
-        createErrorMessages([
-          { field: "id", message: `${e.message}` },
-        ]),
-      );
+  } catch (e: unknown) {
+    errorsHandler(e, res);
   }
 }

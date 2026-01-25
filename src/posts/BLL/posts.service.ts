@@ -14,7 +14,7 @@ export const postsService = {
   async findById(id: string): Promise<PostViewModel> {
     const post = await postsRepository.findById(id);
     if (post === null) {
-      throw new Error(`No post found by id: ${id}`);
+      throw new NotFoundError(`No post found by id: ${id}`, 'id');
     }
     return mapToPostViewModel(post);
   },

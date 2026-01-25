@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { blogsService } from "../../BLL/blogs.service";
 import { BlogInputModel } from "../../BLL/dto/blog-input-dto";
+import { errorsHandler } from "../../../core/utils/errors-hundler";
 
 export async function createBlogHandler (
   req: Request<{}, {}, BlogInputModel>,
@@ -10,6 +11,6 @@ export async function createBlogHandler (
     const newBlog = await blogsService.create(req.body);
     res.status(HttpStatus.Created).send(newBlog);
   } catch (e: unknown) {
-    res.sendStatus(HttpStatus.InternalServerError);
+    errorsHandler(e, res);
   }
 }
