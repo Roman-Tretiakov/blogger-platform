@@ -1,4 +1,4 @@
-import { BlogViewModel } from "../domainType/blog-view-model-type";
+import { BlogViewModel } from "../dto/blog-view-model-type";
 import { WithId } from "mongodb";
 import { BlogMongoModel } from "../dto/blog-mongo-model";
 

@@ -1,7 +1,8 @@
-import { PostViewModel } from "../domainType/post-view-model-type";
+import { PostViewModel } from "../dto/post-view-model-type";
 import { postsCollection } from "../../db/mongo.db";
 import { InsertOneResult, ObjectId, UpdateResult, WithId } from "mongodb";
 import { PostMongoModel } from "../dto/post-mongo-model";
+import { PostInputModel } from "../dto/post-input-dto";
 
 export const postsRepository = {
   async findAll(): Promise<WithId<PostMongoModel>[]> {
@@ -15,18 +16,17 @@ export const postsRepository = {
   async create(post: PostMongoModel): Promise<WithId<PostMongoModel>> {
     const newPost: InsertOneResult<PostViewModel> =
       await postsCollection.insertOne(post);
-    if (!newPost) {
+    if (!newPost.acknowledged) {
       throw new Error("Failed to insert post");
     }
     return { ...post, _id: newPost.insertedId };
   },
 
-  async update(id: string, updateModel: PostMongoModel): Promise<void> {
+  async update(id: string, updateModel: PostInputModel): Promise<void> {
     const post: UpdateResult<PostViewModel> = await postsCollection.updateOne(
       { _id: new ObjectId(id) },
       { $set: updateModel },
     );
-
     if (post.matchedCount < 1) {
       throw new Error(`Post with id ${id} not found`);
     }

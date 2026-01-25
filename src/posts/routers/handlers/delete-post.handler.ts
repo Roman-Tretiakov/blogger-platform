@@ -1,29 +1,18 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
-import { postsRepository } from "../../repositories/posts.repository";
-import { WithId } from "mongodb";
 import { createErrorMessages } from "../../../core/utils/error.utils";
-import { PostMongoModel } from "../../dto/post-mongo-model";
+import { postsService } from "../../BLL/posts.service";
 
 export async function deletePostHandler(req: Request, res: Response) {
   const id: string = req.params.id;
   try {
-    const post: WithId<PostMongoModel> | null =
-      await postsRepository.findById(id);
-    if (!post) {
-      res
-        .status(HttpStatus.NotFound)
-        .send(
-          createErrorMessages([{ field: "id", message: "Post not found" }]),
-        );
-      return;
-    }
-
-    await postsRepository.delete(id);
+    await postsService.delete(id);
     res
       .status(HttpStatus.NoContent)
       .send(`Post with id: ${id} was deleted successfully.`);
-  } catch (e: unknown) {
-    res.sendStatus(HttpStatus.InternalServerError);
+  } catch (e: any) {
+    res
+      .status(HttpStatus.NotFound)
+      .send(createErrorMessages([{ field: "id", message: `${e.message}` }]));
   }
 }

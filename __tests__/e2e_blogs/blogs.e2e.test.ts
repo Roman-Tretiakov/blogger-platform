@@ -10,6 +10,7 @@ import { getBasicAuthToken } from "../utils/get-basic-auth-token";
 import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
 //@ts-ignore
 import { clearDB } from "../utils/clear-db";
+import { blogsService } from "../../src/blogs/BLL/blogs.service";
 
 describe("Blogs API tests", () => {
   const app = express();
@@ -27,11 +28,11 @@ describe("Blogs API tests", () => {
     await runDB(
       "mongodb+srv://Vercel-Admin-blogger-platform-mongoDB:hwkJaIheLnRD6J9c@blogger-platform-mongod.13rbnz7.mongodb.net/?retryWrites=true&w=majority",
     );
-    await clearDB(app);
+    await blogsService.clear();
   });
 
   beforeEach(async () => {
-    await clearDB(app);
+    await blogsService.clear();
   });
 
   afterAll(async () => {
@@ -43,6 +44,7 @@ describe("Blogs API tests", () => {
     }
   });
 
+  // TESTS:
   test("should create valid blog; POST /blogs", async () => {
     const newBlog: BlogInputModel = {
       ...validBlogData,

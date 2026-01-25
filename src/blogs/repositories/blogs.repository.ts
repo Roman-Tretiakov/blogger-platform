@@ -1,4 +1,4 @@
-import { BlogViewModel } from "../domainType/blog-view-model-type";
+import { BlogViewModel } from "../dto/blog-view-model-type";
 import { InsertOneResult, ObjectId, UpdateResult, WithId } from "mongodb";
 import { blogsCollection } from "../../db/mongo.db";
 import { BlogMongoModel } from "../dto/blog-mongo-model";
@@ -16,6 +16,9 @@ export const blogsRepository = {
   async create(blog: BlogMongoModel): Promise<WithId<BlogMongoModel>> {
     const newBlog: InsertOneResult<BlogViewModel> =
       await blogsCollection.insertOne(blog);
+    if (!newBlog.acknowledged) {
+      throw new Error("Failed to insert blog");
+    }
     return { ...blog, _id: newBlog.insertedId };
   },
 

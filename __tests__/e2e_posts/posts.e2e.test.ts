@@ -11,6 +11,7 @@ import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
 //@ts-ignore
 import { clearDB } from "../utils/clear-db";
 import { BlogInputModel } from "../../src/blogs/dto/blog-input-dto";
+import { postsService } from "../../src/posts/BLL/posts.service";
 
 describe("Posts API tests", () => {
   const app = express();
@@ -43,10 +44,12 @@ describe("Posts API tests", () => {
       .expect(HttpStatus.Created);
 
     blog_id = blog.body.id;
+
+    await postsService.clear();
   });
 
   beforeEach(async () => {
-    await clearDB(app);
+    await postsService.clear();
   });
 
   afterAll(async () => {
@@ -58,6 +61,7 @@ describe("Posts API tests", () => {
     }
   });
 
+  // TESTS:
   test("should create valid post; POST api/posts", async () => {
     const newPost: PostInputModel = {
       ...validPostBody,

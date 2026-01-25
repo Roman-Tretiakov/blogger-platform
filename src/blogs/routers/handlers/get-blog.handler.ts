@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { blogsService } from "../../BLL/blogs.service";
-import { BlogViewModel } from "../../domainType/blog-view-model-type";
+import { BlogViewModel } from "../../dto/blog-view-model-type";
 import { createErrorMessages } from "../../../core/utils/error.utils";
 
 export async function getBlogHandler(
