@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { blogsService } from "../../BLL/blogs.service";
-import { BlogViewModel } from "../../dto/blog-view-model-type";
+import { BlogViewModel } from "../../BLL/dto/blog-view-model-type";
 
 export async function getBlogListHandler (req: Request, res: Response): Promise<void> {
   try {

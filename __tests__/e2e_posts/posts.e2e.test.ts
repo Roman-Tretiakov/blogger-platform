@@ -10,7 +10,7 @@ import { getBasicAuthToken } from "../utils/get-basic-auth-token";
 import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
 //@ts-ignore
 import { clearDB } from "../utils/clear-db";
-import { BlogInputModel } from "../../src/blogs/dto/blog-input-dto";
+import { BlogInputModel } from "../../src/blogs/BLL/dto/blog-input-dto";
 import { postsService } from "../../src/posts/BLL/posts.service";
 
 describe("Posts API tests", () => {

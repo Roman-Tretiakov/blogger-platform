@@ -1,5 +1,5 @@
-import { BlogMongoModel } from "../dto/blog-mongo-model";
-import { BlogInputModel } from "../dto/blog-input-dto";
+import { BlogMongoModel } from "../BLL/dto/blog-mongo-model";
+import { BlogInputModel } from "../BLL/dto/blog-input-dto";
 
 export function mapToBlogMongoModel(blog: BlogInputModel): BlogMongoModel {
   return {

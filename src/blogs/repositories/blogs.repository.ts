@@ -1,8 +1,8 @@
-import { BlogViewModel } from "../dto/blog-view-model-type";
+import { BlogViewModel } from "../BLL/dto/blog-view-model-type";
 import { InsertOneResult, ObjectId, UpdateResult, WithId } from "mongodb";
 import { blogsCollection } from "../../db/mongo.db";
-import { BlogMongoModel } from "../dto/blog-mongo-model";
-import { BlogInputModel } from "../dto/blog-input-dto";
+import { BlogMongoModel } from "../BLL/dto/blog-mongo-model";
+import { BlogInputModel } from "../BLL/dto/blog-input-dto";
 
 export const blogsRepository = {
   async findAll(): Promise<WithId<BlogMongoModel>[]> {

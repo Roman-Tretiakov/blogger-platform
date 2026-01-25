@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { blogsService } from "../../BLL/blogs.service";
 import { createErrorMessages } from "../../../core/utils/error.utils";
-import { BlogInputModel } from "../../dto/blog-input-dto";
+import { BlogInputModel } from "../../BLL/dto/blog-input-dto";
 
 export async function updateBlogHandler(
   req: Request<{ id: string }, {}, BlogInputModel>,

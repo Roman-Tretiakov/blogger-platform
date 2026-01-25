@@ -1,8 +1,8 @@
 import { blogsRepository } from "../repositories/blogs.repository";
-import { BlogViewModel } from "../dto/blog-view-model-type";
+import { BlogViewModel } from "./dto/blog-view-model-type";
 import { mapToBlogMongoModel } from "../mappers/map-to-blog-mongo-model";
 import { mapToBlogViewModel } from "../mappers/map-to-blog-view-model";
-import { BlogInputModel } from "../dto/blog-input-dto";
+import { BlogInputModel } from "./dto/blog-input-dto";
 
 export const blogsService = {
   async findAll(): Promise<BlogViewModel[]> {
