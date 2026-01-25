@@ -3,7 +3,9 @@ import { ErrorNames } from "../../core/enums/error-names";
 import { isStringUrl } from "../../core/utils/string_transforms";
 
 export const createBlogsBodyValidationMiddleware = [
-  body().notEmpty().withMessage(ErrorNames.BODY_MISSING_ERROR),
+  body()
+    .notEmpty()
+    .withMessage(ErrorNames.BODY_MISSING_ERROR),
 
   body("name")
     .exists()
