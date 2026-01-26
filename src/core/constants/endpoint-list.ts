@@ -5,5 +5,6 @@ export const EndpointList = {
   TEST_DELETE_ALL: "/all-data",
   BLOGS_PATH: "/api/blogs",
   BY_ID: "/:id",
+  POSTS_BY_BLOG_ID: "/:blogId/blogs",
   POSTS_PATH: "/api/posts",
 };

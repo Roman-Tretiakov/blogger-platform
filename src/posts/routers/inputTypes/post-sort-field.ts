@@ -1,4 +1,6 @@
 export enum PostSortField {
   CreateAt = "createdAt",
-  Title = "title"
+  Title = "title",
+  BlogId = "blogId",
+  BlogName = "blogName"
 }

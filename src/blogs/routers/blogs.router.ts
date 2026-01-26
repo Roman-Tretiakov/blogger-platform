@@ -9,17 +9,35 @@ import { inputValidationResultMiddleware } from "../../core/middlewares/input-va
 import { createBlogsBodyValidationMiddleware } from "../middlewares/create-blogs-body-validation-middleware";
 import { paramIdValidationMiddleware } from "../../core/middlewares/params-id-validation.middleware";
 import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
+import { paginationAndSortingValidation } from "../../core/middlewares/pagination-sorting-validation.middleware";
+import { BlogSortField } from "./inputTypes/blog-sort-field";
+import { createPostsBodyValidationMiddleware } from "../../posts/middlewares/create-posts-body-validation-middleware";
+import { createPostByBlogHandler } from "../../posts/routers/handlers/create-post.handler";
+import { PostSortField } from "../../posts/routers/inputTypes/post-sort-field";
+import { getPostListByBlogHandler } from "../../posts/routers/handlers/get-post-list-by-blog.handler";
 
 export const blogsRouter = Router({});
 
 blogsRouter
-  .get(EndpointList.EMPTY_PATH, getBlogListHandler)
+  .get(
+    EndpointList.EMPTY_PATH,
+    paginationAndSortingValidation(BlogSortField),
+    inputValidationResultMiddleware,
+    getBlogListHandler,
+  )
   .get(
     EndpointList.BY_ID,
     paramIdValidationMiddleware,
     inputValidationResultMiddleware,
     getBlogHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
+  .get(
+    EndpointList.POSTS_BY_BLOG_ID,
+    paramIdValidationMiddleware,
+    paginationAndSortingValidation(PostSortField),
+    inputValidationResultMiddleware,
+    getPostListByBlogHandler,
+  )
   .post(
     EndpointList.EMPTY_PATH,
     superAdminGuardMiddleware,
@@ -27,6 +45,13 @@ blogsRouter
     inputValidationResultMiddleware,
     createBlogHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
+  .post(
+    EndpointList.POSTS_BY_BLOG_ID,
+    superAdminGuardMiddleware,
+    createPostsBodyValidationMiddleware,
+    inputValidationResultMiddleware,
+    createPostByBlogHandler,
+  )
   .put(
     EndpointList.BY_ID,
     superAdminGuardMiddleware,

@@ -1,5 +1,5 @@
 import { PostViewModel } from "./dto/post-view-model-type";
-import { PostInputModel } from "./dto/post-input-dto";
+import { BlogPostInputModel, PostInputModel } from "./dto/post-input-dto";
 import { postsRepository } from "../repositories/posts.repository";
 import { mapToPostViewModel } from "../mappers/map-to-post-view-model";
 import { mapToPostMongoModel } from "../mappers/map-to-post-mongo-model";
@@ -14,7 +14,19 @@ export const postsService = {
     return (await postsRepository.findAll()).map(mapToPostViewModel);
   },
 
-  async findMany(queryInput: PostQueryInput): Promise<PostListWithPagination> {
+  async findMany(
+    queryInput: PostQueryInput,
+    blogId?: string,
+  ): Promise<PostListWithPagination> {
+    if (blogId) {
+      if ((await postsRepository.findById(blogId)) === null) {
+        throw new NotFoundError(
+          `No blog for posts found by id: ${blogId}`,
+          "blogId",
+        );
+      }
+    }
+
     const { items, totalCount } =
       await postsQueryRepository.findMany(queryInput);
 
@@ -35,15 +47,19 @@ export const postsService = {
     return mapToPostViewModel(post);
   },
 
-  async create(inputModel: PostInputModel): Promise<PostViewModel> {
-    const blog = await blogsRepository.findById(inputModel.blogId);
-    if (blog === null) {
-      throw new NotFoundError(
-        `No blog found by id: ${inputModel.blogId} for post`,
-        "blogId",
-      );
+  async create(
+    inputModel: PostInputModel | BlogPostInputModel,
+    blogId?: string
+  ): Promise<PostViewModel> {
+    if (blogId){
+      if ((await blogsRepository.findById(blogId)) === null) {
+        throw new NotFoundError(
+          `No blog found by id: ${blogId} for post`,
+          "blogId",
+        );
+      }
     }
-    const mongoMappedModel = mapToPostMongoModel(inputModel, blog);
+    const mongoMappedModel = mapToPostMongoModel(inputModel, {id: blogId});
     return mapToPostViewModel(await postsRepository.create(mongoMappedModel));
   },
 

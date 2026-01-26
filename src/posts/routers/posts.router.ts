@@ -9,12 +9,18 @@ import { createPostHandler } from "./handlers/create-post.handler";
 import { updatePostHandler } from "./handlers/update-post.handler";
 import { deletePostHandler } from "./handlers/delete-post.handler";
 import { createPostsBodyValidationMiddleware } from "../middlewares/create-posts-body-validation-middleware";
+import { paginationAndSortingValidation } from "../../core/middlewares/pagination-sorting-validation.middleware";
+import { PostSortField } from "./inputTypes/post-sort-field";
 
 export const postsRouter = Router({});
 
 postsRouter
   // videos crud routes:
-  .get(EndpointList.EMPTY_PATH, getPostListHandler)
+  .get(
+    EndpointList.EMPTY_PATH,
+    paginationAndSortingValidation(PostSortField),
+    inputValidationResultMiddleware,
+    getPostListHandler)
   .get(
     EndpointList.BY_ID,
     paramIdValidationMiddleware,
