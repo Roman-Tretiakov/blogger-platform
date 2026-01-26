@@ -1,13 +1,19 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { blogsService } from "../../BLL/blogs.service";
-import { BlogViewModel } from "../../BLL/dto/blog-view-model-type";
 import { errorsHandler } from "../../../core/utils/errors-hundler";
+import { BlogQueryInput } from "../inputTypes/blog-query-input";
+import { BlogListWithPagination } from "../outputTypes/blog-list-with-pagination";
 
-export async function getBlogListHandler (req: Request, res: Response): Promise<void> {
+export async function getBlogListHandler (
+  req: Request<{}, {}, {}, BlogQueryInput>,
+  res: Response
+): Promise<void> {
   try {
-    const blogs: BlogViewModel[] = await blogsService.findAll();
-    res.status(HttpStatus.Ok).send(blogs);
+    const queryInput = req.query;
+    const blogList: BlogListWithPagination = await blogsService.findMany(queryInput);
+
+    res.status(HttpStatus.Ok).send(blogList);
   } catch (e: unknown) {
     errorsHandler(e, res);
   }

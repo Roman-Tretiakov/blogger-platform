@@ -4,16 +4,32 @@ import { mapToBlogMongoModel } from "../mappers/map-to-blog-mongo-model";
 import { mapToBlogViewModel } from "../mappers/map-to-blog-view-model";
 import { BlogInputModel } from "./dto/blog-input-dto";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
+import { BlogQueryInput } from "../routers/inputTypes/blog-query-input";
+import { BlogListWithPagination } from "../routers/outputTypes/blog-list-with-pagination";
+import { blogsQueryRepository } from "../repositories/blogs-query.repository";
 
 export const blogsService = {
   async findAll(): Promise<BlogViewModel[]> {
     return (await blogsRepository.findAll()).map(mapToBlogViewModel);
   },
 
+  async findMany(queryInput: BlogQueryInput): Promise<BlogListWithPagination> {
+    const { items, totalCount } =
+      await blogsQueryRepository.findMany(queryInput);
+
+    return {
+      page: queryInput.pageNumber,
+      pageSize: queryInput.pageSize,
+      pagesCount: Math.ceil(totalCount / queryInput.pageSize),
+      totalCount,
+      items: items.map(mapToBlogViewModel),
+    };
+  },
+
   async findById(id: string): Promise<BlogViewModel | null> {
     const blog = await blogsRepository.findById(id);
     if (blog === null) {
-      throw new NotFoundError(`No blog found by id: ${id}`, 'id');
+      throw new NotFoundError(`No blog found by id: ${id}`, "id");
     }
     return mapToBlogViewModel(blog);
   },

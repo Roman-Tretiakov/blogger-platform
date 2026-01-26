@@ -34,6 +34,8 @@ export function paginationAndSortingValidation<T extends string>(
     query("sortDirection")
       .default(DEFAULT_SORT_DIRECTION)
       .isIn(Object.values(SortDirection))
-      .withMessage(`${ErrorNames.SORT_DIRECTION_TYPE_ERROR}${Object.values(SortDirection).join(', ')}`),
+      .withMessage(
+        `${ErrorNames.SORT_DIRECTION_TYPE_ERROR}${Object.values(SortDirection).join(", ")}`,
+      )
   ];
 }
