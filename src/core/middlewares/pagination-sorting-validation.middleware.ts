@@ -9,6 +9,9 @@ const DEFAULT_SORT_DIRECTION = SortDirection.Desc;
 export function paginationAndSortingValidation<T extends string>(
   sortByEnum: Record<string, T>,
 ) {
+  const allowedSortFields = Object.values(sortByEnum);
+  const allowedSortDirection = Object.values(SortDirection);
+
   return [
     query("pageNumber")
       .default(DEFAULT_PAGE)
@@ -25,17 +28,17 @@ export function paginationAndSortingValidation<T extends string>(
       .customSanitizer((value) => Math.floor(value)),
 
     query("sortBy")
-      .default(Object.values(sortByEnum)[0])
-      .isIn(Object.values(sortByEnum))
+      .default(allowedSortFields[0])
+      .isIn(allowedSortFields)
       .withMessage(
-        `${ErrorNames.SORT_BY_TYPE_ERROR}${Object.values(sortByEnum).join(", ")}`,
+        `${ErrorNames.SORT_BY_TYPE_ERROR}${allowedSortFields.join(", ")}`,
       ),
 
     query("sortDirection")
       .default(DEFAULT_SORT_DIRECTION)
-      .isIn(Object.values(SortDirection))
+      .isIn(allowedSortDirection)
       .withMessage(
-        `${ErrorNames.SORT_DIRECTION_TYPE_ERROR}${Object.values(SortDirection).join(", ")}`,
-      )
+        `${ErrorNames.SORT_DIRECTION_TYPE_ERROR}${allowedSortDirection.join(", ")}`,
+      ),
   ];
 }

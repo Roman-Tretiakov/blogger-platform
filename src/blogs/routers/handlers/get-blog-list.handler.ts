@@ -3,7 +3,6 @@ import { HttpStatus } from "../../../core/enums/http-status";
 import { blogsService } from "../../BLL/blogs.service";
 import { errorsHandler } from "../../../core/utils/errors-hundler";
 import { BlogQueryInput } from "../inputTypes/blog-query-input";
-import { BlogListWithPagination } from "../outputTypes/blog-list-with-pagination";
 
 export async function getBlogListHandler (
   req: Request<{}, {}, {}, BlogQueryInput>,
@@ -11,7 +10,7 @@ export async function getBlogListHandler (
 ): Promise<void> {
   try {
     const queryInput = req.query;
-    const blogList: BlogListWithPagination = await blogsService.findMany(queryInput);
+    const blogList = await blogsService.findMany(queryInput);
 
     res.status(HttpStatus.Ok).send(blogList);
   } catch (e: unknown) {

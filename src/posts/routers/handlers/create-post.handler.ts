@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
-import { PostInputModel } from "../../dto/post-input-dto";
+import { PostInputModel } from "../../BLL/dto/post-input-dto";
 import { postsService } from "../../BLL/posts.service";
-import { PostViewModel } from "../../dto/post-view-model-type";
+import { PostViewModel } from "../../BLL/dto/post-view-model-type";
 import { errorsHandler } from "../../../core/utils/errors-hundler";
 
 export async function createPostHandler(

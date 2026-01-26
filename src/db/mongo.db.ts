@@ -1,7 +1,7 @@
 import { Collection, Db, MongoClient } from "mongodb";
 import { DBCollectionNames, DBName } from "./db-collection-names";
 import { BlogMongoModel } from "../blogs/BLL/dto/blog-mongo-model";
-import { PostMongoModel } from "../posts/dto/post-mongo-model";
+import { PostMongoModel } from "../posts/BLL/dto/post-mongo-model";
 
 export let client: MongoClient;
 export let blogsCollection: Collection<BlogMongoModel>;

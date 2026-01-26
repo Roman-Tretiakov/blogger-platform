@@ -1,6 +1,6 @@
 import { WithId } from "mongodb";
-import { PostMongoModel } from "../dto/post-mongo-model";
-import { PostViewModel } from "../dto/post-view-model-type";
+import { PostMongoModel } from "../BLL/dto/post-mongo-model";
+import { PostViewModel } from "../BLL/dto/post-view-model-type";
 
 export function mapToPostViewModel(post: WithId<PostMongoModel>): PostViewModel{
   return {

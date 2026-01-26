@@ -1,8 +1,8 @@
-import { PostViewModel } from "../dto/post-view-model-type";
+import { PostViewModel } from "../BLL/dto/post-view-model-type";
 import { postsCollection } from "../../db/mongo.db";
 import { InsertOneResult, ObjectId, UpdateResult, WithId } from "mongodb";
-import { PostMongoModel } from "../dto/post-mongo-model";
-import { PostInputModel } from "../dto/post-input-dto";
+import { PostMongoModel } from "../BLL/dto/post-mongo-model";
+import { PostInputModel } from "../BLL/dto/post-input-dto";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { DomainError } from "../../core/errorClasses/DomainError";
 
