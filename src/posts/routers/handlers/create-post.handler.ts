@@ -21,11 +21,11 @@ export async function createPostHandler(
 }
 
 export async function createPostByBlogHandler(
-  req: Request<{blogId: string}, {}, BlogPostInputModel>,
+  req: Request<{id: string}, {}, BlogPostInputModel>,
   res: Response,
 ): Promise<void> {
   try {
-    const blogId = req.params.blogId;
+    const blogId = req.params.id;
     const newPost: PostViewModel = await postsService.create(req.body, blogId);
     res.status(HttpStatus.Created).send(newPost);
   } catch (e: unknown) {

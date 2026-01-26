@@ -30,7 +30,7 @@ postsRouter
   .post(
     EndpointList.EMPTY_PATH,
     superAdminGuardMiddleware,
-    createPostsBodyValidationMiddleware,
+    createPostsBodyValidationMiddleware(),
     inputValidationResultMiddleware,
     createPostHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
@@ -38,7 +38,7 @@ postsRouter
     EndpointList.BY_ID,
     superAdminGuardMiddleware,
     paramIdValidationMiddleware,
-    createPostsBodyValidationMiddleware,
+    createPostsBodyValidationMiddleware(),
     inputValidationResultMiddleware,
     updatePostHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками

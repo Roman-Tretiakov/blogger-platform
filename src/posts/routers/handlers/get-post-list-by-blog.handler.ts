@@ -7,11 +7,11 @@ import { HttpStatus } from "../../../core/enums/http-status";
 import { errorsHandler } from "../../../core/utils/errors-hundler";
 
 export async function getPostListByBlogHandler(
-  req: Request<{blogId: string}, {}, {}, PostQueryInput>,
+  req: Request<{id: string}, {}, {}, PostQueryInput>,
   res: Response,
 ): Promise<void> {
   try {
-    const blogId: string = req.params.blogId;
+    const blogId: string = req.params.id;
     const sanitizedQuery = matchedData<PostQueryInput>(req, {
       locations: ["query"],
       includeOptionals: true,

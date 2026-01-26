@@ -48,7 +48,7 @@ blogsRouter
   .post(
     EndpointList.POSTS_BY_BLOG_ID,
     superAdminGuardMiddleware,
-    createPostsBodyValidationMiddleware,
+    createPostsBodyValidationMiddleware(false),
     inputValidationResultMiddleware,
     createPostByBlogHandler,
   )
