@@ -8,6 +8,35 @@ paths:
       summary: Get a list of all Posts
       tags: [ Posts ]
       security: []
+      parameters:
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: pageNumber is number of portions that should be returned
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: pageSize is portions size that should be returned
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [ createdAt, title,  blogId, blogName ]
+            default: createdAt
+          description: Field to sort by
+        - in: query
+          name: sortDirection
+          schema:
+            type: string
+            enum: [ asc, desc ]
+            default: "desc"
+          description: Sort direction
       responses:
         200:
           description: Success
