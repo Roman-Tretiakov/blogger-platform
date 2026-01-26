@@ -8,6 +8,41 @@ paths:
       summary: Get a list of all blogs
       tags: [ Blogs ]
       security: []
+      parameters:
+        - in: query
+          name: searchNameTerm
+          schema:
+            type: string
+            default: null
+          description: "Search term for blog Name: Name should contains this term in any position"
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: pageNumber is number of portions that should be returned
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: pageSize is portions size that should be returned
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [ createdAt, title,  blogId, blogName ]
+            default: createdAt
+          description: Field to sort by
+        - in: query
+          name: sortDirection
+          schema:
+            type: string
+            enum: [ asc, desc ]
+            default: "desc"
+          description: Sort direction
       responses:
         200:
           description: Success
@@ -16,7 +51,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/BlogViewModel'
+                  $ref: '#/components/schemas/BlogListWithPagination'
     post:
       summary: Add a new blog
       tags: [ Blogs ]
@@ -56,14 +91,14 @@ paths:
           description: "The unique identifier of the blog"
           schema:
             type: string
-            example: "2"
+            example: "123"
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BlogViewModel'
+                $ref: '#/components/schemas/PostListWithPagination'
         404:
           description: Not found
     put:
@@ -130,6 +165,34 @@ paths:
           schema:
             type: string
             example: "123"
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: pageNumber is number of portions that should be returned
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: pageSize is portions size that should be returned
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [ createdAt, title,  blogId, blogName ]
+            default: createdAt
+          description: Field to sort by
+        - in: query
+          name: sortDirection
+          schema:
+            type: string
+            enum: [ asc, desc ]
+            default: "desc"
+          description: Sort direction
       responses:
         200:
           description: Success
@@ -249,7 +312,7 @@ components:
           type: string
           description: "maxLength: 1000"
           example: "Content of the post"
-    PostListWithPagination:
+    BlogListWithPagination:
       type: object
       required:
         - items
@@ -270,6 +333,27 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BlogViewModel'
+    PostListWithPagination:
+      type: object
+      required:
+        - items
+      properties:
+        pagesCount:
+          type: integer
+          example: 10
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 20
+        totalCount:
+          type: integer
+          example: 1000
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostViewModel'
     PostViewModel:
       type: object
       required:
