@@ -4,9 +4,9 @@ import { paginationAndSortingDefault } from "../middlewares/pagination-sorting-v
 export function setDefaultSortAndPaginationIfNotExist<P = string>(
   query: Partial<PaginationAndSortingType<P>>,
 ): PaginationAndSortingType<P> {
-  return {
-    ...paginationAndSortingDefault,
+   return  {
     ...query,
+    ...paginationAndSortingDefault,
     sortBy: (query.sortBy ?? paginationAndSortingDefault.sortBy) as P,
   };
 }

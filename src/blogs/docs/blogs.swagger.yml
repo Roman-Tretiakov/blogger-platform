@@ -33,7 +33,7 @@ paths:
           name: sortBy
           schema:
             type: string
-            enum: [ createdAt, title,  blogId, blogName ]
+            enum: [ createdAt, name, description ]
             default: createdAt
           description: Field to sort by
         - in: query

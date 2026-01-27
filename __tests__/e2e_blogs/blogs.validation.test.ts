@@ -5,6 +5,8 @@ import { EndpointList } from "../../src/core/constants/endpoint-list";
 import { HttpStatus } from "../../src/core/enums/http-status";
 import { ErrorNames } from "../../src/core/enums/error-names";
 import { BlogInputModel } from "../../src/blogs/BLL/dto/blog-input-dto";
+import { blogsService } from "../../src/blogs/BLL/blogs.service";
+import { client, closeDBConnection } from "../../src/db/mongo.db";
 
 describe("Blog body validation tests", () => {
   const app = express();
@@ -22,11 +24,16 @@ describe("Blog body validation tests", () => {
   };
 
   beforeEach(async () => {
-    const res = await request(app).delete(
-      "/api/testing" + EndpointList.TEST_DELETE_ALL,
-    );
-    expect(res.status).toBe(HttpStatus.NoContent);
-    expect(res.body).toEqual({});
+    await blogsService.clear();
+  });
+
+  afterAll(async () => {
+    try {
+      await closeDBConnection(client);
+    } catch (error) {
+      console.error("Error closing DB connection:", error);
+      // Можно не бросать ошибку дальше, чтобы не влиять на результат тестов
+    }
   });
 
   test("No body error; POST /blogs", async () => {

@@ -20,7 +20,6 @@ export function paginationAndSortingValidation<T extends string>(
 ) {
   const allowedSortFields = Object.values(sortByEnum);
   const allowedSortDirection = Object.values(SortDirection);
-
   return [
     query("pageNumber")
       .optional({ values: "falsy" }) //чтобы default() применялся и для ''
@@ -53,5 +52,9 @@ export function paginationAndSortingValidation<T extends string>(
       .withMessage(
         `${ErrorNames.SORT_DIRECTION_TYPE_ERROR}${allowedSortDirection.join(", ")}`,
       ),
+
+    query("searchNameTerm")
+      .optional()
+      .trim()
   ];
 }
