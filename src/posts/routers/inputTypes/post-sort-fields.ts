@@ -1,4 +1,4 @@
-export enum PostSortField {
+export enum PostSortFields {
   CreateAt = "createdAt",
   Title = "title",
   BlogId = "blogId",

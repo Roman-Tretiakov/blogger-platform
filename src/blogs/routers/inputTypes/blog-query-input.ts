@@ -1,4 +1,4 @@
 import { PaginationAndSortingType } from "../../../core/types/pagination-and-sorting-type";
-import { BlogSortField } from "./blog-sort-field";
+import { BlogSortFields } from "./blog-sort-fields";
 
-export type BlogQueryInput = PaginationAndSortingType<BlogSortField>
+export type BlogQueryInput = PaginationAndSortingType<BlogSortFields>

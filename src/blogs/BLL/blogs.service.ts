@@ -6,7 +6,7 @@ import { BlogInputModel } from "./dto/blog-input-dto";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { BlogQueryInput } from "../routers/inputTypes/blog-query-input";
 import { BlogListWithPagination } from "../routers/outputTypes/blog-list-with-pagination";
-import { blogsQueryRepository } from "../repositories/blogs-query.repository";
+import { blogsQueryRepository } from "../repositories/blogs.query-repository";
 
 export const blogsService = {
   async findAll(): Promise<BlogViewModel[]> {

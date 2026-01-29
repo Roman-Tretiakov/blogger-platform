@@ -7,4 +7,6 @@ export const EndpointList = {
   BY_ID: "/:id",
   POSTS_BY_BLOG_ID: "/:id/posts",
   POSTS_PATH: "/api/posts",
+  USERS_PATH: "/api/users",
+  AUTH_PATH: "/api/auth/login",
 };

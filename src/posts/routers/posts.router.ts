@@ -10,7 +10,7 @@ import { updatePostHandler } from "./handlers/update-post.handler";
 import { deletePostHandler } from "./handlers/delete-post.handler";
 import { createPostsBodyValidationMiddleware } from "../middlewares/create-posts-body-validation-middleware";
 import { paginationAndSortingValidation } from "../../core/middlewares/pagination-sorting-validation.middleware";
-import { PostSortField } from "./inputTypes/post-sort-field";
+import { PostSortFields } from "./inputTypes/post-sort-fields";
 
 export const postsRouter = Router({});
 
@@ -18,9 +18,10 @@ postsRouter
   // videos crud routes:
   .get(
     EndpointList.EMPTY_PATH,
-    paginationAndSortingValidation(PostSortField),
+    paginationAndSortingValidation(PostSortFields),
     inputValidationResultMiddleware,
-    getPostListHandler)
+    getPostListHandler,
+  )
   .get(
     EndpointList.BY_ID,
     paramIdValidationMiddleware,
@@ -34,6 +35,13 @@ postsRouter
     inputValidationResultMiddleware,
     createPostHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
+  .post(
+    EndpointList.EMPTY_PATH,
+    superAdminGuardMiddleware,
+    createPostsBodyValidationMiddleware(),
+    inputValidationResultMiddleware,
+    createPostHandler,
+  )
   .put(
     EndpointList.BY_ID,
     superAdminGuardMiddleware,

@@ -1,5 +1,5 @@
 import request from "supertest";
-import express from "express";
+import express, { Express } from "express";
 import { setupApp } from "../../src/setup-app";
 import { HttpStatus } from "../../src/core/enums/http-status";
 import { EndpointList } from "../../src/core/constants/endpoint-list";
@@ -9,40 +9,40 @@ import { PostInputModel } from "../../src/posts/BLL/dto/post-input-dto";
 import { getBasicAuthToken } from "../utils/get-basic-auth-token";
 import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
 //@ts-ignore
-import { clearDB } from "../utils/clear-db";
 import { BlogInputModel } from "../../src/blogs/BLL/dto/blog-input-dto";
 import { postsService } from "../../src/posts/BLL/posts.service";
 
+let app: Express;
+let blog_id: string;
+const authToken: string = getBasicAuthToken();
+let validPostBody: PostInputModel;
+let createdBlog: BlogInputModel;
+
 describe("Posts API tests", () => {
-  const app = express();
-  setupApp(app);
-
-  const authToken: string = getBasicAuthToken();
-
-  const validPostBody: PostInputModel = {
+  validPostBody = {
     title: "Post name",
     shortDescription: "Test description",
     content: "cool content",
     blogId: "",
   };
-  const createdBlog: BlogInputModel = {
+  createdBlog = {
     name: "Test Blog",
     description: "Test description",
     websiteUrl: "https://samurai.io",
   };
-  let blog_id: string;
 
   beforeAll(async () => {
     await runDB(
       "mongodb+srv://Vercel-Admin-blogger-platform-mongoDB:hwkJaIheLnRD6J9c@blogger-platform-mongod.13rbnz7.mongodb.net/?retryWrites=true&w=majority",
     );
+    app = express();
+    setupApp(app);
 
     const blog = await request(app)
       .post(EndpointList.BLOGS_PATH)
       .set("Authorization", authToken)
       .send({ ...createdBlog })
       .expect(HttpStatus.Created);
-
     blog_id = blog.body.id;
 
     await postsService.clear();
@@ -78,7 +78,7 @@ describe("Posts API tests", () => {
     const newPost: any = {
       ...validPostBody,
       title: 1,
-      blogId: blog_id
+      blogId: blog_id,
     };
     await request(app)
       .post(EndpointList.POSTS_PATH)
@@ -87,11 +87,24 @@ describe("Posts API tests", () => {
       .expect(HttpStatus.BadRequest);
   });
 
+  test("should not create invalid post; POST /blogs/:blogId/posts", async () => {
+    const newPost: any = {
+      ...validPostBody,
+      title: "title",
+      blogId: blog_id,
+    };
+    await request(app)
+      .post(`${EndpointList.BLOGS_PATH}/63189b06003380064c4193be/posts`)
+      .set("Authorization", authToken)
+      .send(newPost)
+      .expect(HttpStatus.NotFound);
+  });
+
   test("should not create unauthorized post; POST /posts", async () => {
     const newPost: PostInputModel = {
       ...validPostBody,
       title: "Test unauthorized",
-      blogId: blog_id
+      blogId: blog_id,
     };
     await request(app)
       .post(EndpointList.POSTS_PATH)
@@ -99,20 +112,39 @@ describe("Posts API tests", () => {
       .expect(HttpStatus.Unauthorized);
   });
 
+  test("Should create new post for specific blog; POST /blogs/:blogId/posts", async () => {
+    const newPost: PostInputModel = {
+      ...validPostBody,
+      blogId: blog_id,
+    };
+    const response = await request(app)
+      .post(`${EndpointList.BLOGS_PATH}/${newPost.blogId}/posts`)
+      .set("Authorization", authToken)
+      .send(newPost)
+      .expect(HttpStatus.Created);
+
+    const getPost = await request(app)
+      .get(EndpointList.POSTS_PATH + "/" + response.body.id)
+      .set("Authorization", authToken)
+      .expect(HttpStatus.Ok);
+
+    expect(getPost.body.id).toEqual(response.body.id);
+  });
+
   test("should return posts list; GET /posts", async () => {
     const newPost1: PostInputModel = {
       ...validPostBody,
-      blogId: blog_id
+      blogId: blog_id,
     };
     const newPost2: PostInputModel = {
       ...validPostBody,
       title: "Test post 2",
-      blogId: blog_id
+      blogId: blog_id,
     };
     const newPost3: PostInputModel = {
       ...validPostBody,
       title: "Test post 3",
-      blogId: blog_id
+      blogId: blog_id,
     };
 
     await request(app)
@@ -142,7 +174,7 @@ describe("Posts API tests", () => {
   test("should return post by id; GET /posts/:id", async () => {
     const newPost1: PostInputModel = {
       ...validPostBody,
-      blogId: blog_id
+      blogId: blog_id,
     };
 
     const response = await request(app)
@@ -164,12 +196,12 @@ describe("Posts API tests", () => {
   test("should update post by id; PUT /posts/:id", async () => {
     const newPost: PostInputModel = {
       ...validPostBody,
-      blogId: blog_id
+      blogId: blog_id,
     };
     const updatedValidPost: PostInputModel = {
       ...newPost,
       title: "Test Post 2",
-      blogId: blog_id
+      blogId: blog_id,
     };
 
     const response = await request(app)
@@ -193,19 +225,19 @@ describe("Posts API tests", () => {
   test("should delete post by id; DELETE /posts/:id", async () => {
     const newPost: PostInputModel = {
       ...validPostBody,
-      blogId: blog_id
+      blogId: blog_id,
     };
     const response = await request(app)
       .post(EndpointList.POSTS_PATH)
       .set("Authorization", authToken)
-      .send({ ...newPost})
+      .send({ ...newPost })
       .expect(HttpStatus.Created);
 
     await request(app)
       .delete(EndpointList.POSTS_PATH + "/" + response.body.id)
       .set("Authorization", authToken)
       .expect(HttpStatus.NoContent);
-   await request(app)
+    await request(app)
       .get(EndpointList.POSTS_PATH + "/" + response.body.id)
       .set("Authorization", authToken)
       .expect(HttpStatus.NotFound);

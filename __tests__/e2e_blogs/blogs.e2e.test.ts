@@ -4,68 +4,60 @@ import { setupApp } from "../../src/setup-app";
 import { BlogInputModel } from "../../src/blogs/BLL/dto/blog-input-dto";
 import { HttpStatus } from "../../src/core/enums/http-status";
 import { EndpointList } from "../../src/core/constants/endpoint-list";
-import { beforeEach } from "node:test";
+import { beforeEach, describe } from "node:test";
 //@ts-ignore
 import { getBasicAuthToken } from "../utils/get-basic-auth-token";
 import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
 //@ts-ignore
-import { clearDB } from "../utils/clear-db";
 import { blogsService } from "../../src/blogs/BLL/blogs.service";
 
-describe("Blogs API tests", () => {
-  const app = express();
+let app: any;
+const authToken: string = getBasicAuthToken();
+
+beforeAll(async () => {
+  await runDB(
+    "mongodb+srv://Vercel-Admin-blogger-platform-mongoDB:hwkJaIheLnRD6J9c@blogger-platform-mongod.13rbnz7.mongodb.net/?retryWrites=true&w=majority",
+  );
+  app = express();
   setupApp(app);
+});
 
-  const authToken: string = getBasicAuthToken();
+beforeEach(async () => {
+  await blogsService.clear();
+});
 
+afterAll(async () => {
+  try {
+    await closeDBConnection(client);
+  } catch (error) {
+    console.error("Error closing DB connection:", error);
+    // Можно не бросать ошибку дальше, чтобы не влиять на результат тестов
+  }
+});
+
+// TESTS:
+describe("Blogs API tests", () => {
   const validBlogData: BlogInputModel = {
     name: "Test Blog",
     description: "Test description",
     websiteUrl: "https://samurai.io",
   };
 
-  beforeAll(async () => {
-    await runDB(
-      "mongodb+srv://Vercel-Admin-blogger-platform-mongoDB:hwkJaIheLnRD6J9c@blogger-platform-mongod.13rbnz7.mongodb.net/?retryWrites=true&w=majority",
-    );
-    await blogsService.clear();
-  });
+  const inValidBlogData: any = {
+    name: 1,
+    description: "Test description",
+    websiteUrl: "https://samurai.io",
+  };
 
-  beforeEach(async () => {
-    await blogsService.clear();
-  });
-
-  afterAll(async () => {
-    try {
-      await closeDBConnection(client);
-    } catch (error) {
-      console.error("Error closing DB connection:", error);
-      // Можно не бросать ошибку дальше, чтобы не влиять на результат тестов
-    }
-  });
-
-  // TESTS:
-  test("should create valid blog; POST /blogs", async () => {
-    const newBlog: BlogInputModel = {
-      ...validBlogData,
-    };
+  test.each([
+    { data: validBlogData, exp: HttpStatus.Created },
+    { data: inValidBlogData, exp: HttpStatus.BadRequest },
+  ])("should correct response; POST /blogs", async ({ data, exp }) => {
     await request(app)
       .post(EndpointList.BLOGS_PATH)
       .set("Authorization", authToken)
-      .send(newBlog)
-      .expect(HttpStatus.Created);
-  });
-
-  test("should not create invalid blog; POST /blogs", async () => {
-    const newBlog: any = {
-      ...validBlogData,
-      name: 1,
-    };
-    await request(app)
-      .post(EndpointList.BLOGS_PATH)
-      .set("Authorization", authToken)
-      .send(newBlog)
-      .expect(HttpStatus.BadRequest);
+      .send(data)
+      .expect(exp);
   });
 
   test("should not create unauthorized blog; POST /blogs", async () => {
@@ -178,4 +170,20 @@ describe("Blogs API tests", () => {
       .set("Authorization", authToken)
       .expect(HttpStatus.NotFound);
   });
+});
+
+describe("Sorting and pagination Blogs tests", () => {
+  //test suits:
+  const blog1: BlogInputModel = {
+    name: "Test blog",
+    description: "about",
+    websiteUrl: "http://blog.com",
+  }
+
+  const searchNameTerms: any[] = [
+    { value: "tom", exp: true },
+    { value: "test" },
+    { value: "blog1" },
+    { value: " " },
+  ];
 });

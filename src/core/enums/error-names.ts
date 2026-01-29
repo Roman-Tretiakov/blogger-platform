@@ -35,4 +35,10 @@ export enum ErrorNames {
   PAGE_SIZE_ERROR = "Page size must be between 1 and 100",
   SORT_BY_TYPE_ERROR = "Allowed sort fields: ",
   SORT_DIRECTION_TYPE_ERROR = "Sort direction must be one of: ",
+
+  LOGIN_MISSING_ERROR = "Login field is required",
+  PASSWORD_MISSING_ERROR = "Password field is required",
+  FIELD_NOT_STRING = "Field must be string",
+  LOGIN_EMPTY_ERROR = "Login must not be empty",
+  PASSWORD_EMPTY_ERROR = "Password must not be empty",
 }

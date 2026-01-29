@@ -10,10 +10,10 @@ import { createBlogsBodyValidationMiddleware } from "../middlewares/create-blogs
 import { paramIdValidationMiddleware } from "../../core/middlewares/params-id-validation.middleware";
 import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
 import { paginationAndSortingValidation } from "../../core/middlewares/pagination-sorting-validation.middleware";
-import { BlogSortField } from "./inputTypes/blog-sort-field";
+import { BlogSortFields } from "./inputTypes/blog-sort-fields";
 import { createPostsBodyValidationMiddleware } from "../../posts/middlewares/create-posts-body-validation-middleware";
 import { createPostByBlogHandler } from "../../posts/routers/handlers/create-post.handler";
-import { PostSortField } from "../../posts/routers/inputTypes/post-sort-field";
+import { PostSortFields } from "../../posts/routers/inputTypes/post-sort-fields";
 import { getPostListByBlogHandler } from "../../posts/routers/handlers/get-post-list-by-blog.handler";
 
 export const blogsRouter = Router({});
@@ -21,7 +21,7 @@ export const blogsRouter = Router({});
 blogsRouter
   .get(
     EndpointList.EMPTY_PATH,
-    paginationAndSortingValidation(BlogSortField),
+    paginationAndSortingValidation(BlogSortFields),
     inputValidationResultMiddleware,
     getBlogListHandler,
   )
@@ -34,7 +34,7 @@ blogsRouter
   .get(
     EndpointList.POSTS_BY_BLOG_ID,
     paramIdValidationMiddleware,
-    paginationAndSortingValidation(PostSortField),
+    paginationAndSortingValidation(PostSortFields),
     inputValidationResultMiddleware,
     getPostListByBlogHandler,
   )
@@ -48,6 +48,7 @@ blogsRouter
   .post(
     EndpointList.POSTS_BY_BLOG_ID,
     superAdminGuardMiddleware,
+    paramIdValidationMiddleware,
     createPostsBodyValidationMiddleware(false),
     inputValidationResultMiddleware,
     createPostByBlogHandler,
