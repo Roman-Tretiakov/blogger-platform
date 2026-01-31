@@ -16,7 +16,7 @@ export const blogsRepository = {
   },
 
   async create(blog: BlogMongoModel): Promise<WithId<BlogMongoModel>> {
-    const newBlog: InsertOneResult<BlogViewModel> =
+    const newBlog: InsertOneResult<BlogMongoModel> =
       await blogsCollection.insertOne(blog);
     if (!newBlog.acknowledged) {
       throw new DomainError("Failed to insert blog");

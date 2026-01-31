@@ -53,10 +53,19 @@ export function paginationAndSortingValidation<T extends string>(
         `${ErrorNames.SORT_DIRECTION_TYPE_ERROR}${allowedSortDirection.join(", ")}`,
       ),
 
-    query("searchNameTerm").optional().trim(),
+    query("searchNameTerm")
+      .optional()
+      .trim()
+      .default(null),
 
-    query("searchLoginTerm").optional({ values: "falsy" }).trim().default(null),
+    query("searchLoginTerm")
+      .optional({ values: "falsy" })
+      .trim()
+      .default(null),
 
-    query("searchEmailTerm").optional({values: "falsy"}).default(null),
+    query("searchEmailTerm")
+      .optional({values: "falsy"})
+      .trim()
+      .default(null),
   ];
 }

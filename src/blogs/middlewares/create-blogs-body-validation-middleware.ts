@@ -36,7 +36,7 @@ export const createBlogsBodyValidationMiddleware = [
     .withMessage(ErrorNames.WEBSITEURL_MISSING_ERROR)
     .isLength({ max: 100 })
     .withMessage(ErrorNames.WEBSITEURL_LENGTH_ERROR)
-    .custom((str: string) => {
+    .custom((str: any) => {
       return isStringUrl(str);
     })
     .withMessage(ErrorNames.WEBSITEURL_FORMAT_ERROR),
