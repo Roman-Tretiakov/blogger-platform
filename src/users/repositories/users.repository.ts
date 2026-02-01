@@ -1,5 +1,5 @@
 import { UserMongoModel } from "./type/user-mongo-model";
-import { InsertOneResult, WithId } from "mongodb";
+import { DeleteResult, InsertOneResult, ObjectId, WithId } from "mongodb";
 import { usersCollection } from "../../db/mongo.db";
 import { DomainError } from "../../core/errorClasses/DomainError";
 
@@ -20,4 +20,8 @@ export const usersRepository = {
       $or: [{ login: { $in: loginOrEmail } }, { email: { $in: loginOrEmail } }],
     });
   },
+
+  async delete(userId: string): Promise<DeleteResult>{
+    return await usersCollection.deleteOne({ id: new ObjectId(userId) });
+  }
 };

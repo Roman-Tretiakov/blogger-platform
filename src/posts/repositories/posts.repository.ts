@@ -35,6 +35,7 @@ export const postsRepository = {
     return;
   },
 
+  //TODO: transfer error raise to service level:
   async delete(id: string): Promise<void> {
     const result = await postsCollection.deleteOne({ _id: new ObjectId(id) });
 

@@ -6,6 +6,10 @@ import {
 } from "../../core/utils/string_transforms";
 
 export const createUsersBodyValidation = [
+  body()
+    .exists()
+    .withMessage(ErrorNames.BODY_MISSING_ERROR),
+
   body("login")
     .exists()
     .withMessage(ErrorNames.LOGIN_MISSING_ERROR)

@@ -4,7 +4,7 @@ import { isStringUrl } from "../../core/utils/string_transforms";
 
 export const createBlogsBodyValidationMiddleware = [
   body()
-    .notEmpty()
+    .exists()
     .withMessage(ErrorNames.BODY_MISSING_ERROR),
 
   body("name")
