@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
-import { postsService } from "../../BLL/posts.service";
 import { errorsHandler } from "../../../core/utils/errors-hundler";
 import { PostQueryInput } from "../inputTypes/post-query-input";
 import { matchedData } from "express-validator";
 import { setDefaultSortAndPaginationIfNotExist } from "../../../core/utils/sort-and-pagination.utils";
+import { postsQueryRepository } from "../../repositories/posts.query-repository";
 
 export async function getPostListHandler(
   req: Request<{}, {}, {}, PostQueryInput>,
@@ -16,7 +16,7 @@ export async function getPostListHandler(
       includeOptionals: true,
     });
     const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
-    const postList = await postsService.findMany(queryInput);
+    const postList = await postsQueryRepository.findMany(queryInput);
 
     res.status(HttpStatus.Ok).send(postList);
   } catch (e: unknown) {

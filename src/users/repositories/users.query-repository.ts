@@ -1,13 +1,19 @@
-import { Filter, WithId } from "mongodb";
+import { Filter, ObjectId} from "mongodb";
 import { UserMongoModel } from "./type/user-mongo-model";
 import { UserListWithPagination } from "../routers/outputTypes/user-list-with-pagination";
 import { UserQueryInput } from "../routers/inputTypes/user-query-input";
 import { usersCollection } from "../../db/mongo.db";
 import { mapToUserViewModel } from "../mappers/map-to-user-view-model";
+import { NotFoundError } from "../../core/errorClasses/NotFoundError";
+import { UserViewModel } from "../types/outputTypes/user-view-model";
 
 export const usersQueryRepository = {
-  async getUserById(): Promise<WithId<UserMongoModel> | null> {
-    return null;
+  async getUserById(id: string): Promise<UserViewModel> {
+    const user = await usersCollection.findOne({_id: new ObjectId(id)});
+    if (user === null) {
+      throw new NotFoundError(`User with id: ${id} not found`, "id")
+    }
+    return mapToUserViewModel(user);
   },
 
   async getAllUsersWithPagination(

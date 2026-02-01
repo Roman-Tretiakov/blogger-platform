@@ -1,25 +1,26 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
-import { PostInputModel } from "../../BLL/dto/post-input-dto";
+import { BlogPostInputModel } from "../../BLL/dto/post-input-dto";
 import { postsService } from "../../BLL/posts.service";
 import { errorsHandler } from "../../../core/utils/errors-hundler";
 import { postsQueryRepository } from "../../repositories/posts.query-repository";
 
-export async function createPostHandler(
-  req: Request<{}, {}, PostInputModel>,
+export async function createPostByBlogHandler(
+  req: Request<{ id: string }, {}, BlogPostInputModel>,
   res: Response,
 ): Promise<void> {
   try {
+    const blogId = req.params.id;
     const inputData = req.body;
-    const createdPostId = await postsService.create(inputData);
+    const createdPostId = await postsService.create(inputData, blogId);
 
-    let _createdPost = null;
+    let createdPost = null;
     let attempts = 0;
     const maxAttempts = 2;
-    while (attempts < maxAttempts && _createdPost === null) {
+    while (attempts < maxAttempts && createdPost === null) {
       attempts++;
       try {
-        _createdPost = await postsQueryRepository.getPostById(createdPostId);
+        createdPost = await postsQueryRepository.getPostById(createdPostId);
       } catch (e) {
         if (attempts === maxAttempts) {
           console.log("2nd attempt to get post by id failed");
@@ -28,7 +29,7 @@ export async function createPostHandler(
       }
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
-    res.status(HttpStatus.Created).send(_createdPost);
+    res.status(HttpStatus.Created).send(createdPost);
   } catch (e: unknown) {
     errorsHandler(e, res);
   }

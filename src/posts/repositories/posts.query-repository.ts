@@ -1,9 +1,21 @@
-import { Filter, WithId } from "mongodb";
+import { Filter, ObjectId, WithId } from "mongodb";
 import { postsCollection } from "../../db/mongo.db";
 import { PostMongoModel } from "../BLL/dto/post-mongo-model";
 import { PostQueryInput } from "../routers/inputTypes/post-query-input";
+import { PostViewModel } from "../BLL/dto/post-view-model-type";
+import { NotFoundError } from "../../core/errorClasses/NotFoundError";
+import { mapToPostViewModel } from "../mappers/map-to-post-view-model";
+import { blogsQueryRepository } from "../../blogs/repositories/blogs.query-repository";
 
 export const postsQueryRepository = {
+  async getPostById(id: string): Promise<PostViewModel> {
+    const post = await postsCollection.findOne({_id: new ObjectId(id)});
+    if (post === null) {
+      throw new NotFoundError(`Post with id: ${id} not found`, "id");
+    }
+    return mapToPostViewModel(post);
+  },
+
   async findMany(
     queryInput: PostQueryInput,
     blogId?: string,
@@ -14,6 +26,12 @@ export const postsQueryRepository = {
     const filter: Filter<PostMongoModel> = {};
 
     if (blogId) {
+      if (await blogsQueryRepository.getBlogById(blogId) === null) {
+        throw new NotFoundError(
+          `No blog found by id: ${blogId} for post`,
+          "blogId",
+        );
+      }
       filter.blogId = blogId;
     }
 

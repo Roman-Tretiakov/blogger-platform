@@ -1,14 +1,12 @@
 import { UserInputModel } from "../types/inputTypes/user-input-model";
-import { UserViewModel } from "../types/outputTypes/user-view-model";
 import { usersRepository } from "../repositories/users.repository";
 import { bcryptService } from "../../auth/adapters/bcrypt.service";
 import { BadReqError } from "../../core/errorClasses/BadReqError";
-import { mapToUserViewModel } from "../mappers/map-to-user-view-model";
 import { DeleteResult } from "mongodb";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 
 export const usersService = {
-  async create(inputData: UserInputModel): Promise<UserViewModel> {
+  async create(inputData: UserInputModel): Promise<string> {
     const existedLoginOrEmail = await usersRepository.findByLoginOrEmail([
       inputData.login,
       inputData.email,
@@ -27,12 +25,11 @@ export const usersService = {
 
     const passwordHash = await bcryptService.generateHash(inputData.password);
 
-    const newUser = await usersRepository.create({
+    return await usersRepository.create({
       ...inputData,
       password: passwordHash,
       createdAt: new Date().toISOString(),
     });
-    return mapToUserViewModel(newUser);
   },
 
   async deleteById(id: string):Promise<void> {

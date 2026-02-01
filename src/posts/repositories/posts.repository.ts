@@ -1,6 +1,6 @@
 import { PostViewModel } from "../BLL/dto/post-view-model-type";
 import { postsCollection } from "../../db/mongo.db";
-import { InsertOneResult, ObjectId, UpdateResult, WithId } from "mongodb";
+import { ObjectId, UpdateResult, WithId } from "mongodb";
 import { PostMongoModel } from "../BLL/dto/post-mongo-model";
 import { PostInputModel } from "../BLL/dto/post-input-dto";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
@@ -15,13 +15,13 @@ export const postsRepository = {
     return (await postsCollection.findOne({ _id: new ObjectId(id) })) ?? null;
   },
 
-  async create(post: PostMongoModel): Promise<WithId<PostMongoModel>> {
-    const newPost: InsertOneResult<PostViewModel> =
+  async create(post: PostMongoModel): Promise<string> {
+    const newPost =
       await postsCollection.insertOne(post);
     if (!newPost.acknowledged) {
       throw new DomainError("Failed to insert post");
     }
-    return { ...post, _id: newPost.insertedId };
+    return newPost.insertedId.toString();
   },
 
   async update(id: string, updateModel: PostInputModel): Promise<void> {

@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
-import { blogsService } from "../../BLL/blogs.service";
 import { BlogViewModel } from "../../BLL/dto/blog-view-model-type";
 import { errorsHandler } from "../../../core/utils/errors-hundler";
+import { blogsQueryRepository } from "../../repositories/blogs.query-repository";
 
 export async function getBlogHandler(
   req: Request<{ id: string }>,
@@ -10,7 +10,7 @@ export async function getBlogHandler(
 ) {
   const id: string = req.params.id;
   try {
-    const blog: BlogViewModel | null = await blogsService.findById(id);
+    const blog: BlogViewModel = await blogsQueryRepository.getBlogById(id);
     res.status(HttpStatus.Ok).send(blog);
   } catch (e: unknown) {
     errorsHandler(e, res);

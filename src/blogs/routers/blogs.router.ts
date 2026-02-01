@@ -12,7 +12,7 @@ import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.gu
 import { paginationAndSortingValidation } from "../../core/middlewares/pagination-sorting-validation.middleware";
 import { BlogSortFields } from "./inputTypes/blog-sort-fields";
 import { createPostsBodyValidationMiddleware } from "../../posts/middlewares/create-posts-body-validation-middleware";
-import { createPostByBlogHandler } from "../../posts/routers/handlers/create-post.handler";
+import { createPostByBlogHandler } from "../../posts/routers/handlers/create-post-by-blog.handler";
 import { PostSortFields } from "../../posts/routers/inputTypes/post-sort-fields";
 import { getPostListByBlogHandler } from "../../posts/routers/handlers/get-post-list-by-blog.handler";
 

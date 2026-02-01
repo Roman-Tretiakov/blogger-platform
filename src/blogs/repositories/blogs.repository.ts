@@ -11,17 +11,21 @@ export const blogsRepository = {
     return blogsCollection.find().toArray();
   },
 
-  async findById(id: string): Promise<WithId<BlogMongoModel> | null> {
-    return blogsCollection.findOne({ _id: new ObjectId(id) });
+  async findById(id: string): Promise<WithId<BlogMongoModel>> {
+    const blog = await blogsCollection.findOne({ _id: new ObjectId(id) });
+    if (blog === null) {
+      throw new NotFoundError(`Blog with id: ${id} not found`, "id");
+    }
+    return blog;
   },
 
-  async create(blog: BlogMongoModel): Promise<WithId<BlogMongoModel>> {
+  async create(blog: BlogMongoModel): Promise<string> {
     const newBlog: InsertOneResult<BlogMongoModel> =
       await blogsCollection.insertOne(blog);
     if (!newBlog.acknowledged) {
       throw new DomainError("Failed to insert blog");
     }
-    return { ...blog, _id: newBlog.insertedId };
+    return newBlog.insertedId.toString();
   },
 
   async update(id: string, updateModel: BlogInputModel): Promise<void> {

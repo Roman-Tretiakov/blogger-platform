@@ -27,8 +27,10 @@ export const postsService = {
         );
       }
     }
-    const { items, totalCount } =
-      await postsQueryRepository.findMany(queryInput, blogId);
+    const { items, totalCount } = await postsQueryRepository.findMany(
+      queryInput,
+      blogId,
+    );
 
     return {
       page: queryInput.pageNumber,
@@ -49,17 +51,22 @@ export const postsService = {
 
   async create(
     inputModel: PostInputModel | BlogPostInputModel,
-    blogId?: string
-  ): Promise<PostViewModel> {
-    const blog = await blogsRepository.findById(blogId ?? (inputModel as PostInputModel).blogId)
-    if (blog === null){
-        throw new NotFoundError(
-          `No blog found by id: ${blogId} for post`,
-          "blogId",
-        );
+    blogId?: string,
+  ): Promise<string> {
+    const blog = await blogsRepository.findById(
+      blogId ?? (inputModel as PostInputModel).blogId,
+    );
+    if (blog === null) {
+      throw new NotFoundError(
+        `No blog found by id: ${blogId} for post`,
+        "blogId",
+      );
     }
-    const mongoMappedModel = mapToPostMongoModel(inputModel, {id: blog._id.toString(), blogName: blog.name});
-    return mapToPostViewModel(await postsRepository.create(mongoMappedModel));
+    const mongoMappedModel = mapToPostMongoModel(inputModel, {
+      id: blog._id.toString(),
+      blogName: blog.name,
+    });
+    return await postsRepository.create(mongoMappedModel);
   },
 
   async update(id: string, updateModel: PostInputModel): Promise<void> {
