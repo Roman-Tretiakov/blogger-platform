@@ -6,41 +6,40 @@ import { EndpointList } from "../../src/core/constants/endpoint-list";
 import { beforeEach, describe } from "node:test";
 //@ts-ignore
 import { getBasicAuthToken } from "../utils/get-basic-auth-token";
-import { client, closeDBConnection, runDB, usersCollection } from "../../src/db/mongo.db";
+import {
+  client,
+  closeDBConnection,
+  runDB,
+  usersCollection,
+} from "../../src/db/mongo.db";
 import { usersService } from "../../src/users/BLL/users.service";
 import { UserInputModel } from "../../src/users/types/inputTypes/user-input-model";
-import { UserMongoModel } from "../../src/users/repositories/type/user-mongo-model";
 import { ObjectId } from "mongodb";
 
 let app: any;
 const authToken: string = getBasicAuthToken();
-const testUsers: UserMongoModel[] = [
+const testUsers: UserInputModel[] = [
   {
-    login: 'Dimych',
-    email: 'dimych@gmail.com',
-    password: 'password123',
-    createdAt: new Date().toISOString(),
+    login: "Dimych",
+    email: "dimych@gmail.com",
+    password: "password123",
   },
   {
-    login: 'Natalia',
-    email: 'kuzyuberdina@gmail.com',
-    password: 'password456',
-    createdAt: new Date().toISOString(),
+    login: "Natalia",
+    email: "kuzyuberdina@gmail.com",
+    password: "password456",
   },
   {
-    login: 'Alex',
-    email: 'alex@gmail.com',
-    password: 'password789',
-    createdAt: new Date().toISOString(),
+    login: "Alex",
+    email: "alex@gmail.com",
+    password: "password789",
   },
   {
-    login: 'Dan',
-    email: 'dan@gmail.com',
-    password: 'password999',
-    createdAt: new Date().toISOString(),
-  }
+    login: "Dan",
+    email: "dan@gmail.com",
+    password: "password999",
+  },
 ];
-
 
 beforeAll(async () => {
   await runDB(
@@ -67,14 +66,15 @@ afterAll(async () => {
 describe("Users API", () => {
   beforeEach(async () => {
     // Создаем тестовых пользователей
-    await usersCollection.insertMany(testUsers);
+    for (const user of testUsers) {
+      await usersService.create(user);
+    }
   });
 
   describe("GET /api/users", () => {
     describe("Authentication", () => {
       test("Should return 401 without authorization", async () => {
-        const response = await request(app)
-          .get(EndpointList.USERS_PATH);
+        const response = await request(app).get(EndpointList.USERS_PATH);
 
         expect(response.status).toBe(HttpStatus.Unauthorized);
       });
@@ -437,10 +437,9 @@ describe("Users API", () => {
       const inputData: UserInputModel = {
         login: "ToDelete",
         email: "delete@example.com",
-        password: "qwerty123"
+        password: "qwerty123",
       };
       userId = await usersService.create(inputData);
-
     });
 
     describe("Positive scenarios", () => {
@@ -452,7 +451,9 @@ describe("Users API", () => {
         expect(response.status).toBe(204);
 
         // Проверяем, что пользователь удален
-        const userInDb = await usersCollection.findOne({ _id: new ObjectId(userId) });
+        const userInDb = await usersCollection.findOne({
+          _id: new ObjectId(userId),
+        });
         expect(userInDb).toBeNull();
       });
     });
