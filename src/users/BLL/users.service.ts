@@ -39,5 +39,9 @@ export const usersService = {
     if(result.deletedCount < 1) {
       throw new NotFoundError(`User with id ${id} not found`, "id");
     }
-  }
+  },
+
+  async clear(): Promise<void> {
+    await usersRepository.clear();
+  },
 };

@@ -13,7 +13,11 @@ export const usersRepository = {
     return newUser.insertedId.toString();
   },
 
-  async delete(userId: string): Promise<DeleteResult>{
+  async delete(userId: string): Promise<DeleteResult> {
     return await usersCollection.deleteOne({ id: new ObjectId(userId) });
-  }
+  },
+
+  async clear(): Promise<void> {
+    await usersCollection.drop();
+  },
 };
