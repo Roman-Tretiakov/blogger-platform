@@ -14,7 +14,9 @@ const swaggerOptions = {
     tags: [
       { name: "Blogs", description: "API for managing blogs" },
       { name: "Posts", description: "API for managing posts" },
-      { name: "Testing", description: "API for clearing the database"},
+      { name: "Testing", description: "API for clearing the database" },
+      { name: "Users", description: "API for managing users" },
+      { name: "Auth", description: "API for authorization" },
     ],
     components: {
       securitySchemes: {
@@ -31,6 +33,8 @@ const swaggerOptions = {
     join(__dirname, "../../blogs/docs/blogs.swagger.yml"),
     join(__dirname, "../../posts/docs/posts.swagger.yml"),
     join(__dirname, "../../testing/docs/testing.swagger.yml"),
+    join(__dirname, "../../users/docs/users.swagger.yml"),
+    join(__dirname, "../../auth/docs/auth.swagger.yml"),
   ],
 };
 

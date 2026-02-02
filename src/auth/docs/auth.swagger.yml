@@ -1,0 +1,54 @@
+tags:
+  - name: Auth
+    description: API for authorization
+paths:
+  /api/auth/login:
+    post:
+      summary: Authorize an exist user
+      tags: [ Auth ]
+      security: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInputModel'
+      responses:
+        204:
+          description: Login and Password are correct
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        401:
+          description: Unauthorized
+components:
+  schemas:
+    LoginInputModel:
+      type: object
+      required:
+        - loginOrEmail
+        - password
+      properties:
+        loginOrEmail:
+          type: string
+        password:
+          type: string
+    ValidationError:
+      type: object
+      properties:
+        field:
+          type: string
+          example: "name"
+        message:
+          type: string
+          example: "Invalid name"
+    ValidationErrorResponse:
+      type: object
+      properties:
+        errorsMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'

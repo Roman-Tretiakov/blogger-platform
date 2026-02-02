@@ -1,0 +1,194 @@
+tags:
+  - name: Users
+    description: API for managing users
+
+paths:
+  /api/users:
+    get:
+      summary: Returns all users
+      tags: [ Users ]
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - in: query
+          name: searchLoginTerm
+          schema:
+            type: string
+            default: null
+          description: "Search term for user Login: Login should contains this term in any position"
+        - in: query
+          name: searchEmailTerm
+          schema:
+            type: string
+            default: null
+          description: "Search term for user Email: Email should contains this term in any position"
+        - in: query
+          name: pageNumber
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: pageNumber is number of portions that should be returned
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: pageSize is portions size that should be returned
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [ createdAt, login, email ]
+            default: createdAt
+          description: Field to sort by
+        - in: query
+          name: sortDirection
+          schema:
+            type: string
+            enum: [ asc, desc ]
+            default: "desc"
+          description: Sort direction
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserListWithPagination'
+        401:
+          description: Unauthorized
+    post:
+      summary: Add new user to the system
+      tags: [ Users ]
+      security:
+        - basicAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInputModel'
+      responses:
+        201:
+          description: Returns the newly created user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserViewModel'
+        400:
+          description: If the inputModel has incorrect values.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        401:
+          description: Unauthorized
+
+  /api/users/{id}:
+    delete:
+      summary: Delete user by ID
+      tags: [ Users ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: "The unique identifier of the blog"
+          schema:
+            type: string
+            example: "2"
+      responses:
+        204:
+          description: No Content
+        401:
+          description: Unauthorized
+        404:
+          description: If specified user is not exists
+components:
+  schemas:
+    UserViewModel:
+      type: object
+      required:
+        - id
+        - login
+        - email
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: "The unique identifier for the user"
+          example: "ads123asdasd"
+        login:
+          type: string
+          description: "maxLength: 15"
+          example: "Tom Rider"
+        email:
+          type: string
+          description: "email format"
+          example: "123@dd.test"
+        createdAt:
+          type: string
+          description: "The date and time when the blog was created"
+          example: "2023-10-05T14:48:00.000Z"
+    UserInputModel:
+      type: object
+      required:
+        - login
+        - password
+        - email
+      properties:
+        login:
+          type: string
+          uniqueItems: true
+          maxLength: 10
+          minLength: 3
+          example: "UserLogin"
+        password:
+          type: string
+          maxLength: 20
+          minLength: 6
+          example: "qwerty123"
+        email:
+          type: string
+          uniqueItems: true
+          format: email
+    UserListWithPagination:
+      type: object
+      required:
+        - items
+      properties:
+        pagesCount:
+          type: integer
+          example: 10
+        page:
+          type: integer
+          example: 1
+        pageSize:
+          type: integer
+          example: 20
+        totalCount:
+          type: integer
+          example: 1000
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserViewModel'
+    ValidationError:
+      type: object
+      properties:
+        field:
+          type: string
+          example: "name"
+        message:
+          type: string
+          example: "Invalid name"
+    ValidationErrorResponse:
+      type: object
+      properties:
+        errorsMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
