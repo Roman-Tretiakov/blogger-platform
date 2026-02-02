@@ -11,6 +11,8 @@
     "test": "jest -i",
     "test:blogs": "jest __tests__/e2e_blogs/blogs.e2e.test.ts",
     "test:posts": "jest __tests__/e2e_posts/posts.e2e.test.ts",
+    "test:users": "jest __tests__/e2e_users/users.e2e.tests.ts",
+    "test:auth": "jest __tests__/e2e_auth/auth.e2e.tests.ts",
     "lint": "eslint --fix .",
     "format": "prettier --write ."
   },
