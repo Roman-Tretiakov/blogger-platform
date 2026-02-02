@@ -3,7 +3,7 @@ import { ErrorNames } from "../../core/enums/error-names";
 import {
   isEmailString,
   isLoginString,
-} from "../../core/utils/string_transforms";
+} from "../../core/utils/string-transforms";
 
 export const createUsersBodyValidation = [
   body()

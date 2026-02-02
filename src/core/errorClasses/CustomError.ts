@@ -1,4 +1,4 @@
-export class BadReqError extends Error {
+export class CustomError extends Error {
   constructor(
     message: string,
     public readonly field: string

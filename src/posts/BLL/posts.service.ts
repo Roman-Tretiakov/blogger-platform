@@ -8,7 +8,7 @@ import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { PostQueryInput } from "../routers/inputTypes/post-query-input";
 import { PostListWithPagination } from "../routers/outputTypes/post-list-with-pagination";
 import { postsQueryRepository } from "../repositories/posts.query-repository";
-import { BadReqError } from "../../core/errorClasses/BadReqError";
+import { CustomError } from "../../core/errorClasses/CustomError";
 
 export const postsService = {
   async findAll(): Promise<PostViewModel[]> {
@@ -72,7 +72,7 @@ export const postsService = {
   async update(id: string, updateModel: PostInputModel): Promise<void> {
     const blog = await blogsRepository.findById(updateModel.blogId);
     if (blog === null) {
-      throw new BadReqError(
+      throw new CustomError(
         `No blog found by id: ${updateModel.blogId} for post`,
         "blogId",
       );

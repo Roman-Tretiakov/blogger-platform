@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 import { ErrorNames } from "../../core/enums/error-names";
-import { isStringUrl } from "../../core/utils/string_transforms";
+import { isStringUrl } from "../../core/utils/string-transforms";
 
 export const createBlogsBodyValidationMiddleware = [
   body()

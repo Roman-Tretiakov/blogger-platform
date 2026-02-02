@@ -1,4 +1,4 @@
-import { Filter, ObjectId} from "mongodb";
+import { Filter, ObjectId, WithId } from "mongodb";
 import { UserMongoModel } from "./type/user-mongo-model";
 import { UserListWithPagination } from "../routers/outputTypes/user-list-with-pagination";
 import { UserQueryInput } from "../routers/inputTypes/user-query-input";
@@ -9,11 +9,19 @@ import { UserViewModel } from "../types/outputTypes/user-view-model";
 
 export const usersQueryRepository = {
   async getUserById(id: string): Promise<UserViewModel> {
-    const user = await usersCollection.findOne({_id: new ObjectId(id)});
+    const user = await usersCollection.findOne({ _id: new ObjectId(id) });
     if (user === null) {
-      throw new NotFoundError(`User with id: ${id} not found`, "id")
+      throw new NotFoundError(`User with id: ${id} not found`, "id");
     }
     return mapToUserViewModel(user);
+  },
+
+  async findByLoginOrEmail(
+    loginOrEmail: string[],
+  ): Promise<WithId<UserMongoModel> | null> {
+    return usersCollection.findOne({
+      $or: [{ login: { $in: loginOrEmail } }, { email: { $in: loginOrEmail } }],
+    });
   },
 
   async getAllUsersWithPagination(
@@ -42,7 +50,7 @@ export const usersQueryRepository = {
       pageSize: queryParams.pageSize,
       pagesCount: Math.ceil(totalCount / queryParams.pageSize),
       totalCount: totalCount,
-      items: items.map(mapToUserViewModel)
-    }
+      items: items.map(mapToUserViewModel),
+    };
   },
 };

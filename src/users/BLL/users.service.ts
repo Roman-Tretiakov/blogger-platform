@@ -1,13 +1,14 @@
 import { UserInputModel } from "../types/inputTypes/user-input-model";
 import { usersRepository } from "../repositories/users.repository";
 import { bcryptService } from "../../auth/adapters/bcrypt.service";
-import { BadReqError } from "../../core/errorClasses/BadReqError";
+import { CustomError } from "../../core/errorClasses/CustomError";
 import { DeleteResult } from "mongodb";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
+import { usersQueryRepository } from "../repositories/users.query-repository";
 
 export const usersService = {
   async create(inputData: UserInputModel): Promise<string> {
-    const existedLoginOrEmail = await usersRepository.findByLoginOrEmail([
+    const existedLoginOrEmail = await usersQueryRepository.findByLoginOrEmail([
       inputData.login,
       inputData.email,
     ]);
@@ -20,7 +21,7 @@ export const usersService = {
         field = "email";
         message = `User already exists with the same ${field}`;
       }
-      throw new BadReqError(message, field);
+      throw new CustomError(message, field);
     }
 
     const passwordHash = await bcryptService.generateHash(inputData.password);
