@@ -28,21 +28,41 @@ export const usersQueryRepository = {
     queryParams: UserQueryInput,
   ): Promise<UserListWithPagination> {
     const skip = (queryParams.pageNumber - 1) * queryParams.pageSize;
+
+    // Создаем фильтр с логикой OR
     const filter: Filter<UserMongoModel> = {};
+    const conditions = [];
 
     if (queryParams.searchLoginTerm) {
-      filter.searchLoginTerm = queryParams.searchLoginTerm;
+      conditions.push({
+        login: {
+          $regex: queryParams.searchLoginTerm,
+          $options: "i",
+        },
+      });
     }
+
     if (queryParams.searchEmailTerm) {
-      filter.searchEmailTerm = queryParams.searchEmailTerm;
+      conditions.push({
+        email: {
+          $regex: queryParams.searchEmailTerm,
+          $options: "i",
+        },
+      });
+    }
+
+    // Если есть хотя бы одно условие поиска, используем $or
+    if (conditions.length > 0) {
+      filter.$or = conditions;
     }
 
     const items = await usersCollection
-      .find(filter)
-      .sort({ [queryParams.sortBy]: queryParams.sortDirection })
+      .find(filter)  // Используем единый фильтр
+      .sort({ [queryParams.sortBy]: queryParams.sortDirection === 'asc' ? 1 : -1 })
       .skip(skip)
       .limit(queryParams.pageSize)
       .toArray();
+
     const totalCount = await usersCollection.countDocuments(filter);
 
     return {
@@ -52,5 +72,5 @@ export const usersQueryRepository = {
       totalCount: totalCount,
       items: items.map(mapToUserViewModel),
     };
-  },
+  }
 };
