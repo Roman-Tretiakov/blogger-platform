@@ -4,11 +4,7 @@ import { setupApp } from "../../src/setup-app";
 import { HttpStatus } from "../../src/core/enums/http-status";
 import { EndpointList } from "../../src/core/constants/endpoint-list";
 import { beforeEach, describe } from "node:test";
-import {
-  client,
-  closeDBConnection,
-  runDB
-} from "../../src/db/mongo.db";
+import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
 import { usersService } from "../../src/users/BLL/users.service";
 
 let app: any;
@@ -23,6 +19,11 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await usersService.clear();
+  await usersService.create({
+    login: "testuser",
+    email: "test@example.com",
+    password: "password123",
+  });
 });
 
 afterAll(async () => {
@@ -35,15 +36,6 @@ afterAll(async () => {
 });
 
 describe("POST /api/auth/login", () => {
-  beforeEach(async () => {
-    // Создаем тестового пользователя
-    await usersService.create({
-      login: "testuser",
-      email: "test@example.com",
-      password: "password123",
-    });
-  });
-
   describe("Positive scenarios", () => {
     test("Should login with valid login credentials", async () => {
       const response = await request(app).post(EndpointList.AUTH_PATH).send({
@@ -51,6 +43,7 @@ describe("POST /api/auth/login", () => {
         password: "password123", 
       });
 
+      console.log("Status code is: ", response.status);
       expect(response.status).toBe(HttpStatus.NoContent);
     });
 

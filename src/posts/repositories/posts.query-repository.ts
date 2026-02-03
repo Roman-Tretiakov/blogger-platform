@@ -1,4 +1,4 @@
-import { Filter, ObjectId, WithId } from "mongodb";
+import { Filter, ObjectId } from "mongodb";
 import { postsCollection } from "../../db/mongo.db";
 import { PostMongoModel } from "../BLL/dto/post-mongo-model";
 import { PostQueryInput } from "../routers/inputTypes/post-query-input";
@@ -6,6 +6,7 @@ import { PostViewModel } from "../BLL/dto/post-view-model-type";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { mapToPostViewModel } from "../mappers/map-to-post-view-model";
 import { blogsQueryRepository } from "../../blogs/repositories/blogs.query-repository";
+import { PostListWithPagination } from "../routers/outputTypes/post-list-with-pagination";
 
 export const postsQueryRepository = {
   async getPostById(id: string): Promise<PostViewModel> {
@@ -19,7 +20,7 @@ export const postsQueryRepository = {
   async findMany(
     queryInput: PostQueryInput,
     blogId?: string,
-  ): Promise<{ items: WithId<PostMongoModel>[]; totalCount: number }> {
+  ): Promise<PostListWithPagination> {
     const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } =
       queryInput;
     const skip: number = (pageNumber - 1) * pageSize;
@@ -47,6 +48,12 @@ export const postsQueryRepository = {
       .toArray();
 
     const totalCount = await postsCollection.countDocuments(filter);
-    return { items, totalCount };
+    return {
+      page: queryInput.pageNumber,
+      pageSize: queryInput.pageSize,
+      pagesCount: Math.ceil(totalCount / queryInput.pageSize),
+      totalCount: totalCount,
+      items: items.map(mapToPostViewModel),
+    };
   },
 };
