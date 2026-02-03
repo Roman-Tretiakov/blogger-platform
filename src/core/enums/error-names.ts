@@ -37,8 +37,20 @@ export enum ErrorNames {
   SORT_DIRECTION_TYPE_ERROR = "Sort direction must be one of: ",
 
   LOGIN_MISSING_ERROR = "Login field is required",
-  PASSWORD_MISSING_ERROR = "Password field is required",
-  FIELD_NOT_STRING = "Field must be string",
+  LOGIN_TYPE_ERROR = "Login must be a string",
   LOGIN_EMPTY_ERROR = "Login must not be empty",
+  LOGIN_LENGTH_ERROR = "Login field is required",
+  LOGIN_FORMAT_ERROR = "Login has incorrect format",
+
+  PASSWORD_MISSING_ERROR = "Password field is required",
   PASSWORD_EMPTY_ERROR = "Password must not be empty",
+  PASSWORD_TYPE_ERROR = "Password must be a string",
+  PASSWORD_LENGTH_ERROR = "Password field is required",
+
+  EMAIL_MISSING_ERROR = "Email field is required",
+  EMAIL_EMPTY_ERROR = "Email must not be empty",
+  EMAIL_TYPE_ERROR = "Email must be a string",
+  EMAIL_FORMAT_ERROR = "Email has incorrect format",
+
+  FIELD_NOT_STRING = "Field must be string",
 }

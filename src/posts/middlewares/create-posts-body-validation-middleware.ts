@@ -3,7 +3,9 @@ import { ErrorNames } from "../../core/enums/error-names";
 
 export const createPostsBodyValidationMiddleware= (requireBlogId: boolean = true) => {
   const postBodyValidations: any[] = [
-    body().notEmpty().withMessage(ErrorNames.BODY_MISSING_ERROR),
+    body()
+      .exists()
+      .withMessage(ErrorNames.BODY_MISSING_ERROR),
 
     body("title")
       .exists()

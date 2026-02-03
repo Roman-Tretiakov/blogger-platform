@@ -7,7 +7,7 @@ import { authHandler } from "./handlers/auth.handler";
 export const authRouter = Router();
 
 authRouter.post(
-  EndpointList.AUTH_PATH,
+  EndpointList.EMPTY_PATH,
   authBodyValidationMiddleware,
   inputValidationResultMiddleware,
   authHandler,

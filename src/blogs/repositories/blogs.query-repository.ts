@@ -1,13 +1,25 @@
 import { BlogQueryInput } from "../routers/inputTypes/blog-query-input";
-import { BlogMongoModel } from "../BLL/dto/blog-mongo-model";
-import { WithId } from "mongodb";
+import { ObjectId} from "mongodb";
 import { blogsCollection } from "../../db/mongo.db";
+import { NotFoundError } from "../../core/errorClasses/NotFoundError";
+import { BlogViewModel } from "../BLL/dto/blog-view-model-type";
+import { mapToBlogViewModel } from "../mappers/map-to-blog-view-model";
+import { BlogListWithPagination } from "../routers/outputTypes/blog-list-with-pagination";
 
 export const blogsQueryRepository = {
+  async getBlogById(id: string): Promise<BlogViewModel> {
+    const blog = await blogsCollection.findOne({_id: new ObjectId(id)});
+    if (blog === null) {
+      throw new NotFoundError(`Blog with id: ${id} not found`, "id");
+    }
+    return mapToBlogViewModel(blog);
+  },
+
   async findMany(
     queryInput: BlogQueryInput,
-  ): Promise<{ items: WithId<BlogMongoModel>[]; totalCount: number }> {
-    const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } = queryInput;
+  ): Promise<BlogListWithPagination> {
+    const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } =
+      queryInput;
     const skip: number = (pageNumber - 1) * pageSize;
     const filter: any = {};
 
@@ -23,6 +35,12 @@ export const blogsQueryRepository = {
       .toArray();
 
     const totalCount = await blogsCollection.countDocuments(filter);
-    return { items, totalCount};
+    return {
+      page: queryInput.pageNumber,
+      pageSize: queryInput.pageSize,
+      pagesCount: Math.ceil(totalCount / queryInput.pageSize),
+      totalCount: totalCount,
+      items: items.map(mapToBlogViewModel),
+    };
   },
 };

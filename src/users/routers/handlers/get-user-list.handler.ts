@@ -1,24 +1,24 @@
 import { Request, Response } from "express";
-import { HttpStatus } from "../../../core/enums/http-status";
+import { UserQueryInput } from "../inputTypes/user-query-input";
+import { usersQueryRepository } from "../../repositories/users.query-repository";
 import { errorsHandler } from "../../../core/utils/errors-hundler";
-import { PostQueryInput } from "../inputTypes/post-query-input";
 import { matchedData } from "express-validator";
 import { setDefaultSortAndPaginationIfNotExist } from "../../../core/utils/sort-and-pagination.utils";
-import { postsQueryRepository } from "../../repositories/posts.query-repository";
+import { HttpStatus } from "../../../core/enums/http-status";
 
-export async function getPostListHandler(
-  req: Request<{}, {}, {}, PostQueryInput>,
+export async function getUserListHandler(
+  req: Request<{}, {}, {}, UserQueryInput>,
   res: Response,
 ): Promise<void> {
-  try {
-    const sanitizedQuery = matchedData<PostQueryInput>(req, {
+  try{
+    const sanitizedQuery = matchedData<UserQueryInput>(req, {
       locations: ["query"],
       includeOptionals: true,
     });
     const queryInput = setDefaultSortAndPaginationIfNotExist(sanitizedQuery);
-    const postList = await postsQueryRepository.findMany(queryInput);
+    const userList = await usersQueryRepository.getAllUsersWithPagination(queryInput)
 
-    res.status(HttpStatus.Ok).send(postList);
+    res.status(HttpStatus.Ok).send(userList);
   } catch (e: unknown) {
     errorsHandler(e, res);
   }

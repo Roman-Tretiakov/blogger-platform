@@ -1,10 +1,10 @@
 import { body } from "express-validator";
 import { ErrorNames } from "../../core/enums/error-names";
-import { isStringUrl } from "../../core/utils/string_transforms";
+import { isStringUrl } from "../../core/utils/string-transforms";
 
 export const createBlogsBodyValidationMiddleware = [
   body()
-    .notEmpty()
+    .exists()
     .withMessage(ErrorNames.BODY_MISSING_ERROR),
 
   body("name")
@@ -36,7 +36,7 @@ export const createBlogsBodyValidationMiddleware = [
     .withMessage(ErrorNames.WEBSITEURL_MISSING_ERROR)
     .isLength({ max: 100 })
     .withMessage(ErrorNames.WEBSITEURL_LENGTH_ERROR)
-    .custom((str: string) => {
+    .custom((str: any) => {
       return isStringUrl(str);
     })
     .withMessage(ErrorNames.WEBSITEURL_FORMAT_ERROR),

@@ -4,7 +4,11 @@ import { HttpStatus } from '../../core/enums/http-status';
 export const USERNAME = process.env.ADMIN_USERNAME || 'admin';
 export const PASSWORD = process.env.ADMIN_PASSWORD || 'qwerty';
 
-export const superAdminGuardMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const superAdminGuardMiddleware = (
+  req: Request<{}, any, any, any>,
+  res: Response,
+  next: NextFunction
+) => {
     const auth = req.headers['authorization'] as string; // 'Basic xxxx'
     if (!auth) {
         res.sendStatus(HttpStatus.Unauthorized);

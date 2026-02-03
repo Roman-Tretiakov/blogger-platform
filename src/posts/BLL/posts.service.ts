@@ -8,7 +8,7 @@ import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { PostQueryInput } from "../routers/inputTypes/post-query-input";
 import { PostListWithPagination } from "../routers/outputTypes/post-list-with-pagination";
 import { postsQueryRepository } from "../repositories/posts.query-repository";
-import { BadReqError } from "../../core/errorClasses/BadReqError";
+import { CustomError } from "../../core/errorClasses/CustomError";
 
 export const postsService = {
   async findAll(): Promise<PostViewModel[]> {
@@ -27,8 +27,10 @@ export const postsService = {
         );
       }
     }
-    const { items, totalCount } =
-      await postsQueryRepository.findMany(queryInput, blogId);
+    const { items, totalCount } = await postsQueryRepository.findMany(
+      queryInput,
+      blogId,
+    );
 
     return {
       page: queryInput.pageNumber,
@@ -49,23 +51,28 @@ export const postsService = {
 
   async create(
     inputModel: PostInputModel | BlogPostInputModel,
-    blogId?: string
-  ): Promise<PostViewModel> {
-    const blog = await blogsRepository.findById(blogId ?? (inputModel as PostInputModel).blogId)
-    if (blog === null){
-        throw new NotFoundError(
-          `No blog found by id: ${blogId} for post`,
-          "blogId",
-        );
+    blogId?: string,
+  ): Promise<string> {
+    const blog = await blogsRepository.findById(
+      blogId ?? (inputModel as PostInputModel).blogId,
+    );
+    if (blog === null) {
+      throw new NotFoundError(
+        `No blog found by id: ${blogId} for post`,
+        "blogId",
+      );
     }
-    const mongoMappedModel = mapToPostMongoModel(inputModel, {id: blog._id.toString(), blogName: blog.name});
-    return mapToPostViewModel(await postsRepository.create(mongoMappedModel));
+    const mongoMappedModel = mapToPostMongoModel(inputModel, {
+      id: blog._id.toString(),
+      blogName: blog.name,
+    });
+    return await postsRepository.create(mongoMappedModel);
   },
 
   async update(id: string, updateModel: PostInputModel): Promise<void> {
     const blog = await blogsRepository.findById(updateModel.blogId);
     if (blog === null) {
-      throw new BadReqError(
+      throw new CustomError(
         `No blog found by id: ${updateModel.blogId} for post`,
         "blogId",
       );
