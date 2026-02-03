@@ -5,6 +5,7 @@ import { CustomError } from "../../core/errorClasses/CustomError";
 import { DeleteResult } from "mongodb";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { usersQueryRepository } from "../repositories/users.query-repository";
+import { HttpStatus } from "../../core/enums/http-status";
 
 export const usersService = {
   async create(inputData: UserInputModel): Promise<string> {
@@ -21,7 +22,7 @@ export const usersService = {
         field = "email";
         message = `User already exists with the same ${field}`;
       }
-      throw new CustomError(message, field);
+      throw new CustomError(message, field, HttpStatus.BadRequest);
     }
 
     const passwordHash = await bcryptService.generateHash(inputData.password);
@@ -33,10 +34,10 @@ export const usersService = {
     });
   },
 
-  async deleteById(id: string):Promise<void> {
+  async deleteById(id: string): Promise<void> {
     const result: DeleteResult = await usersRepository.delete(id);
 
-    if(result.deletedCount < 1) {
+    if (result.deletedCount < 1) {
       throw new NotFoundError(`User with id ${id} not found`, "id");
     }
   },

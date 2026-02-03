@@ -4,6 +4,7 @@ import { mapToPostMongoModel } from "../mappers/map-to-post-mongo-model";
 import { blogsRepository } from "../../blogs/repositories/blogs.repository";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { CustomError } from "../../core/errorClasses/CustomError";
+import { HttpStatus } from "../../core/enums/http-status";
 
 export const postsService = {
   async create(
@@ -32,6 +33,7 @@ export const postsService = {
       throw new CustomError(
         `No blog found by id: ${updateModel.blogId} for post`,
         "blogId",
+        HttpStatus.NotFound,
       );
     }
     await postsRepository.update(id, updateModel);

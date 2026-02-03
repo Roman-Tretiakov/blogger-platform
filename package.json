@@ -14,7 +14,8 @@
     "test:users": "jest __tests__/e2e_users/users.e2e.tests.ts",
     "test:auth": "jest __tests__/e2e_auth/auth.e2e.tests.ts",
     "lint": "eslint --fix .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "getTunnel": "ssh -R 80:localhost:5001 serveo.net"
   },
   "keywords": [],
   "author": "RomanT",
