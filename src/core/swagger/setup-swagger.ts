@@ -16,6 +16,7 @@ const swaggerOptions = {
       { name: "Posts", description: "API for managing posts" },
       { name: "Testing", description: "API for clearing the database" },
       { name: "Users", description: "API for managing users" },
+      { name: "Comments", description: "API for managing comments" },
       { name: "Auth", description: "API for authorization" },
     ],
     components: {
@@ -34,6 +35,7 @@ const swaggerOptions = {
     join(__dirname, "../../posts/docs/posts.swagger.yml"),
     join(__dirname, "../../testing/docs/testing.swagger.yml"),
     join(__dirname, "../../users/docs/users.swagger.yml"),
+    join(__dirname, "../../comments/docs/comments.swagger.yml"),
     join(__dirname, "../../auth/docs/auth.swagger.yml"),
   ],
 };
