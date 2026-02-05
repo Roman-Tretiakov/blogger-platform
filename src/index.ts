@@ -15,7 +15,6 @@ const bootstrap = async () => {
   const DB_URL: string = process.env.MONGODB_URI || "mongodb://0.0.0.0:27017";
 
   await runDB(DB_URL);
-  //await initDB();
 
   // запуск приложения
   app.listen(PORT, () => {
