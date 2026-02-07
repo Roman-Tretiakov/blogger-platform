@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { LoginInputModel } from "../../types/login-Input-model";
 import { authService } from "../../BLL/auth.service";
-import { HttpStatus } from "../../../core/enums/http-status";
+import { ResultStatus } from "../../../core/enums/result-statuses";
+import { resultStatusToHttpStatusMapper } from "../../../core/utils/result-code-to-http-status.mapper";
 
 export async function authHandler(
   req: Request<{}, {}, LoginInputModel>,
@@ -9,13 +10,13 @@ export async function authHandler(
 ): Promise<void> {
   const loginOrEmail: string = req.body.loginOrEmail;
   const password: string = req.body.password;
-  const result: boolean = await authService.checkLoginAndPassword(
-    loginOrEmail,
-    password,
-  );
+  const result = await authService.loginUser(loginOrEmail, password);
 
-  if (!result) {
-    res.status(HttpStatus.Unauthorized).send("Login or password is wrong!");
+  if (result.status !== ResultStatus.Success) {
+    res
+      .status(resultStatusToHttpStatusMapper(result.status))
+      .send(result.extensions);
   }
-  res.status(HttpStatus.NoContent).send();
+
+  res.status(resultStatusToHttpStatusMapper(result.status)).send(result.data);
 }

@@ -8,7 +8,7 @@ import { deleteBlogHandler } from "./handlers/delete-blog.handler";
 import { inputValidationResultMiddleware } from "../../core/middlewares/input-validation-result.middleware";
 import { createBlogsBodyValidationMiddleware } from "../middlewares/create-blogs-body-validation-middleware";
 import { paramIdValidationMiddleware } from "../../core/middlewares/params-id-validation.middleware";
-import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
+import { superAdminGuard } from "../../auth/middlewares/guards/super-admin.guard";
 import { paginationAndSortingValidation } from "../../core/middlewares/pagination-sorting-validation.middleware";
 import { BlogSortFields } from "./inputTypes/blog-sort-fields";
 import { createPostsBodyValidationMiddleware } from "../../posts/middlewares/create-posts-body-validation-middleware";
@@ -40,14 +40,14 @@ blogsRouter
   )
   .post(
     EndpointList.EMPTY_PATH,
-    superAdminGuardMiddleware,
+    superAdminGuard,
     createBlogsBodyValidationMiddleware,
     inputValidationResultMiddleware,
     createBlogHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
   .post(
     EndpointList.POSTS_BY_BLOG_ID,
-    superAdminGuardMiddleware,
+    superAdminGuard,
     paramIdValidationMiddleware,
     createPostsBodyValidationMiddleware(false),
     inputValidationResultMiddleware,
@@ -55,7 +55,7 @@ blogsRouter
   )
   .put(
     EndpointList.BY_ID,
-    superAdminGuardMiddleware,
+    superAdminGuard,
     paramIdValidationMiddleware,
     createBlogsBodyValidationMiddleware,
     inputValidationResultMiddleware,
@@ -63,7 +63,7 @@ blogsRouter
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
   .delete(
     EndpointList.BY_ID,
-    superAdminGuardMiddleware,
+    superAdminGuard,
     paramIdValidationMiddleware,
     inputValidationResultMiddleware,
     deleteBlogHandler,
