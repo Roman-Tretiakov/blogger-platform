@@ -16,6 +16,7 @@ export async function authHandler(
     res
       .status(resultStatusToHttpStatusMapper(result.status))
       .send(result.extensions);
+    return;
   }
 
   res.status(resultStatusToHttpStatusMapper(result.status)).send(result.data);
