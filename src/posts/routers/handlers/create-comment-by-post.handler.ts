@@ -17,17 +17,17 @@ export async function createCommentByPostHandler(
   const userId = req.userData!.userId;
   const userLogin = await usersQueryRepository.getMe(userId).then(u => u.login);
 
-  const result = await commentsService.createCommentByPostId(postId, content, userId, userLogin);
-  if (result.status !== ResultStatus.Created) {
-    res.status(resultStatusToHttpStatusMapper(result.status)).send(result.errorMessage);
+  const postResult = await commentsService.createCommentByPostId(postId, content, userId, userLogin);
+  if (postResult.status !== ResultStatus.Created) {
+    res.status(resultStatusToHttpStatusMapper(postResult.status)).send(postResult.errorMessage);
     return;
   }
 
-  const comment = await commentsQueryRepository.getById(result.data!)
-  if (comment.status !== ResultStatus.Success) {
-    res.status(HttpStatus.NotFound).send(result.errorMessage);
+  const commentResult = await commentsQueryRepository.getById(postResult.data!)
+  if (commentResult.status !== ResultStatus.Success) {
+    res.status(HttpStatus.NotFound).send(postResult.errorMessage);
     return;
   }
 
-  res.status(HttpStatus.Created).send(comment.data)
+  res.status(HttpStatus.Created).send(commentResult.data)
 }

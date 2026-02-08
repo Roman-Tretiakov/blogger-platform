@@ -14,6 +14,8 @@ import { PostSortFields } from "./inputTypes/post-sort-fields";
 import { accessTokenGuard } from "../../auth/middlewares/guards/access-token.guard";
 import { createCommentByPostHandler } from "./handlers/create-comment-by-post.handler";
 import { createCommentsBodyValidationMiddleware } from "../middlewares/create-comments-body-validation.middleware";
+import { CommentsSortFields } from "../../comments/routers/inputTypes/comments-sort-fields";
+import { getCommentsByPostListHandler } from "./handlers/get-comments-by-post-list.handler";
 
 export const postsRouter = Router({});
 
@@ -28,6 +30,10 @@ postsRouter
   )
   .get(
     EndpointList.COMMENTS_BY_POST_ID,
+    paramIdValidationMiddleware,
+    paginationAndSortingValidation(CommentsSortFields),
+    inputValidationResultMiddleware,
+    getCommentsByPostListHandler,
   )
   .get(
     EndpointList.EMPTY_PATH,
