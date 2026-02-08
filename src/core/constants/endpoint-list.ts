@@ -12,4 +12,5 @@ export const EndpointList = {
   LOGIN_PATH: "/login",
   ME_PATH: "/me",
   COMMENTS_PATH: "/api/comments",
+
 };

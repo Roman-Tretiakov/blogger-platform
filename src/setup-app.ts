@@ -21,6 +21,7 @@ export const setupApp = (app: Express) => {
     app.use(EndpointList.POSTS_PATH, postsRouter);
     app.use(EndpointList.USERS_PATH, usersRouter);
     app.use(EndpointList.AUTH_PATH, authRouter);
+    app.use(EndpointList.COMMENTS_PATH, authRouter);
     app.use(EndpointList.TESTING_PATH, testingRouter);
 
     setupSwagger(app);
