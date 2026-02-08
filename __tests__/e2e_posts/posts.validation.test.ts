@@ -68,7 +68,7 @@ describe("Post body validation tests", () => {
     });
   });
 
-  test("Content type error; POST /posts", async () => {
+  test("Content types error; POST /posts", async () => {
     const response = await request(app)
       .post(EndpointList.POSTS_PATH)
       .set("Authorization", authValue)

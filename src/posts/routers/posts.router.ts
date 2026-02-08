@@ -11,11 +11,23 @@ import { deletePostHandler } from "./handlers/delete-post.handler";
 import { createPostsBodyValidationMiddleware } from "../middlewares/create-posts-body-validation-middleware";
 import { paginationAndSortingValidation } from "../../core/middlewares/pagination-sorting-validation.middleware";
 import { PostSortFields } from "./inputTypes/post-sort-fields";
+import { accessTokenGuard } from "../../auth/middlewares/guards/access-token.guard";
+import { createCommentByPostHandler } from "./handlers/create-comment-by-post.handler";
 
 export const postsRouter = Router({});
 
 postsRouter
-  // videos crud routes:
+  .post(
+    EndpointList.COMMENTS_BY_POST_ID,
+    accessTokenGuard,
+    paramIdValidationMiddleware,
+    createCommentByPostHandler,
+    inputValidationResultMiddleware,
+    createCommentByPostHandler,
+  )
+  .get(
+    EndpointList.COMMENTS_BY_POST_ID,
+  )
   .get(
     EndpointList.EMPTY_PATH,
     paginationAndSortingValidation(PostSortFields),

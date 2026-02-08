@@ -5,6 +5,6 @@ export enum ResultStatus {
   Unauthorized = "Incorrect credentials or access token",
   BadRequest = "Incorrect data",
   Forbidden = "Not enough permissions",
-  Created = "Successfully created",
+  Created = "Data successfully created",
   NoContent = "Successfully processed, but no content to return",
 }

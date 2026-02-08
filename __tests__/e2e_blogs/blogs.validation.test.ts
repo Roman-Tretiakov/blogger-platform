@@ -74,7 +74,7 @@ describe("Blog body validation tests", () => {
     });
   });
 
-  test("Description type error; POST /blogs", async () => {
+  test("Description types error; POST /blogs", async () => {
     const response = await request(app)
       .post(EndpointList.BLOGS_PATH)
       .set("Authorization", authValue)
