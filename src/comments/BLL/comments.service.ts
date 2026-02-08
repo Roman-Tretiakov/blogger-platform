@@ -24,6 +24,7 @@ export const commentsService = {
 
     const comment: CommentMongoModel = {
       content: content,
+      postId: postId,
       commentatorInfo: {
         userId: id,
         userLogin: login,

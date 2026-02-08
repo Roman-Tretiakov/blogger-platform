@@ -13,6 +13,7 @@ import { paginationAndSortingValidation } from "../../core/middlewares/paginatio
 import { PostSortFields } from "./inputTypes/post-sort-fields";
 import { accessTokenGuard } from "../../auth/middlewares/guards/access-token.guard";
 import { createCommentByPostHandler } from "./handlers/create-comment-by-post.handler";
+import { createCommentsBodyValidationMiddleware } from "../middlewares/create-comments-body-validation.middleware";
 
 export const postsRouter = Router({});
 
@@ -21,7 +22,7 @@ postsRouter
     EndpointList.COMMENTS_BY_POST_ID,
     accessTokenGuard,
     paramIdValidationMiddleware,
-    createCommentByPostHandler,
+    createCommentsBodyValidationMiddleware,
     inputValidationResultMiddleware,
     createCommentByPostHandler,
   )
