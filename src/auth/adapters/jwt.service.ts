@@ -9,6 +9,7 @@ export const jwtService = {
     const payload = {
       userId: userId
     };
+
     return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
   },
 
@@ -26,10 +27,10 @@ export const jwtService = {
       return jwt.verify(token, JWT_SECRET) as { userId: string };
     } catch (err) {
       if (err instanceof jwt.TokenExpiredError) {
-        console.warn("Token expired at: ", err.expiredAt);
+        console.log("Token expired at: ", err.expiredAt);
       }
       else if (err instanceof jwt.JsonWebTokenError) {
-        console.warn("Invalid token: ", err.message);
+        console.log("Invalid token: ", err.message);
       }
       return null; // Невалидный токен
     }

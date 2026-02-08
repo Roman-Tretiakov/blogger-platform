@@ -33,7 +33,7 @@ paths:
       summary: Get information about current user
       tags: [ Auth ]
       security:
-        - basicAuth: [ ]
+        - bearerAuth: [ ]
       responses:
         200:
           description: Success
@@ -44,6 +44,12 @@ paths:
         401:
           description: Unauthorized
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Enter JWT Bearer token"
   schemas:
     LoginInputModel:
       type: object

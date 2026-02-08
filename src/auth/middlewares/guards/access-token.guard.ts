@@ -4,21 +4,29 @@ import { jwtService } from "../../adapters/jwt.service";
 import { IdType } from "../../../core/types/id-type";
 
 export const accessTokenGuard = (
-  req: Request<{}, any, any, any>,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const authHeader = req.headers["authorization"] as string;
-  if (!authHeader) return res.sendStatus(HttpStatus.Unauthorized);
+  if (!authHeader)
+    return res
+      .status(HttpStatus.Unauthorized)
+      .send("Header authorization is required");
 
   const [authType, token] = authHeader.split(" ");
-  if (authType.trim().toLowerCase() !== "bearer") return res.sendStatus(HttpStatus.Unauthorized);
-
-  const userId = jwtService.verifyToken(token);
-  if (userId) {
-    req.userId = userId as IdType; // Сохраняем данные пользователя в объекте запроса
-    next();
+  if (authType.trim().toLowerCase() !== "bearer") {
+    return res
+      .status(HttpStatus.Unauthorized)
+      .send("Header authorization must be in format 'Bearer ...'");
   }
 
-  res.sendStatus(HttpStatus.Unauthorized)
+  const userId = jwtService.verifyToken(token);
+  if (!userId) {
+    res.sendStatus(HttpStatus.Unauthorized);
+    return;
+  }
+
+  req.userData = userId as IdType; // Сохраняем данные пользователя в объекте запроса
+  next();
 };
