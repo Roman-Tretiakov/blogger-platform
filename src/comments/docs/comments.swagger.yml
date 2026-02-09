@@ -42,7 +42,7 @@ paths:
       summary: Delete comment specified by id
       tags: [ Comments ]
       security:
-        - basicAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - in: path
           name: commentId
@@ -64,8 +64,7 @@ paths:
     get:
       summary: Return comment by id
       tags: [ Comments ]
-      security:
-        - basicAuth: [ ]
+      security: []
       parameters:
         - in: path
           name: id
