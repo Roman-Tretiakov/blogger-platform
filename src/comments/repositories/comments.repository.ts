@@ -49,4 +49,8 @@ export const commentsRepository = {
       data: null
     };
   },
+
+  async clear(): Promise<void> {
+    await commentsCollection.drop();
+  },
 };
