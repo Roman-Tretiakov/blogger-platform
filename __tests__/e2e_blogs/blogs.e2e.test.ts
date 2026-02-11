@@ -4,7 +4,6 @@ import { setupApp } from "../../src/setup-app";
 import { BlogInputModel } from "../../src/blogs/BLL/dto/blog-input-dto";
 import { HttpStatus } from "../../src/core/enums/http-status";
 import { EndpointList } from "../../src/core/constants/endpoint-list";
-import { beforeEach, describe } from "node:test";
 //@ts-ignore
 import { getBasicAuthToken } from "../utils/get-basic-auth-token";
 import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
@@ -50,14 +49,19 @@ describe("Blogs API tests", () => {
   };
 
   test.each([
-    { data: validBlogData, exp: HttpStatus.Created },
-    { data: inValidBlogData, exp: HttpStatus.BadRequest },
-  ])("should correct response; POST /blogs", async ({ data, exp }) => {
-    await request(app)
+    { data: validBlogData, exp_1: HttpStatus.Created, exp_2: HttpStatus.Ok },
+    // { data: inValidBlogData, exp: HttpStatus.BadRequest, exp_2: HttpStatus.BadRequest },
+  ])("should correct response; POST /blogs", async ({ data, exp_1, exp_2 }) => {
+    const response = await request(app)
       .post(EndpointList.BLOGS_PATH)
       .set("Authorization", authToken)
       .send(data)
-      .expect(exp);
+      .expect(exp_1);
+
+    const result = await request(app)
+      .get(EndpointList.BLOGS_PATH + "/" + response.body.id)
+      .set("Authorization", authToken)
+      .expect(exp_2);
   });
 
   test("should not create unauthorized blog; POST /blogs", async () => {

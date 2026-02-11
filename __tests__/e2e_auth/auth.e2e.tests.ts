@@ -3,7 +3,6 @@ import express from "express";
 import { setupApp } from "../../src/setup-app";
 import { HttpStatus } from "../../src/core/enums/http-status";
 import { EndpointList } from "../../src/core/constants/endpoint-list";
-import { beforeEach, describe } from "node:test";
 import {
   client,
   closeDBConnection,

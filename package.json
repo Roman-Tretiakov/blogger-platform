@@ -14,7 +14,16 @@
     "test:users": "jest __tests__/e2e_users/users.e2e.tests.ts",
     "test:auth": "jest __tests__/e2e_auth/auth.e2e.tests.ts",
     "lint": "eslint --fix .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+
+    "pm2:start:watch": "pm2 delete blogger-backend || pm2 start dist/index.js --name \"blogger-backend\" --watch",
+    "pm2:logs": "pm2 logs blogger-backend",
+    "pm2:stop": "pm2 stop blogger-backend",
+    "pm2:restart": "pm2 restart blogger-backend",
+    "pm2:delete": "pm2 delete blogger-backend",
+    "pm2:status": "pm2 status",
+    "pm2:monit": "pm2 monit",
+    "dev:prod": "pnpm run build && pnpm run pm2:start && pnpm run pm2:logs"
   },
   "keywords": [],
   "author": "RomanT",
