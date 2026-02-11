@@ -18,9 +18,13 @@ const bootstrap = async () => {
   //await initDB();
 
   // запуск приложения
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`);
   });
+
+  server.keepAliveTimeout = 120000;
+  server.headersTimeout = 121000;
+  server.timeout = 120000;
 };
 
-bootstrap().then();
+bootstrap().catch(console.error);
