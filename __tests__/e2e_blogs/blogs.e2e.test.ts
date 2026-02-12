@@ -1,3 +1,4 @@
+import axios, { AxiosResponse } from "axios";
 import request from "supertest";
 import express from "express";
 import { setupApp } from "../../src/setup-app";
@@ -19,10 +20,11 @@ beforeAll(async () => {
   );
   app = express();
   setupApp(app);
+  await blogsService.clear();
 });
 
 beforeEach(async () => {
-  await blogsService.clear();
+
 });
 
 afterAll(async () => {
@@ -52,16 +54,39 @@ describe("Blogs API tests", () => {
     { data: validBlogData, exp_1: HttpStatus.Created, exp_2: HttpStatus.Ok },
     // { data: inValidBlogData, exp: HttpStatus.BadRequest, exp_2: HttpStatus.BadRequest },
   ])("should correct response; POST /blogs", async ({ data, exp_1, exp_2 }) => {
-    const response = await request(app)
-      .post(EndpointList.BLOGS_PATH)
-      .set("Authorization", authToken)
-      .send(data)
-      .expect(exp_1);
+    const url = "https://blogger-platform-be.vercel.app";
+    try {
+      const response: AxiosResponse = await axios.post(
+        url + EndpointList.BLOGS_PATH,
+        data,
+        { headers: { Authorization: authToken } },
+      );
+      expect(response.status).toBe(exp_1);
 
-    const result = await request(app)
-      .get(EndpointList.BLOGS_PATH + "/" + response.body.id)
-      .set("Authorization", authToken)
-      .expect(exp_2);
+      const blogId = response.data.id;
+      const getResponse: AxiosResponse = await axios.get(
+        url + EndpointList.BLOGS_PATH + "/" + blogId,
+        {
+          headers: {
+            Authorization: authToken,
+          },
+        },
+      );
+      expect(getResponse.status).toBe(exp_2);
+    } catch (error) {
+      throw error;
+    }
+
+    // const response = await request(app)
+    //   .post(EndpointList.BLOGS_PATH)
+    //   .set("Authorization", authToken)
+    //   .send(data)
+    //   .expect(exp_1);
+    //
+    // const result = await request(app)
+    //   .get(EndpointList.BLOGS_PATH + "/" + response.body.id)
+    //   .set("Authorization", authToken)
+    //   .expect(exp_2);
   });
 
   test("should not create unauthorized blog; POST /blogs", async () => {
@@ -108,8 +133,8 @@ describe("Blogs API tests", () => {
       .get(EndpointList.BLOGS_PATH)
       .expect(HttpStatus.Ok);
 
-    expect(blogListResponse.body).toBeInstanceOf(Array);
-    expect(blogListResponse.body.length).toBeGreaterThanOrEqual(3);
+    expect(blogListResponse.body.items).toBeInstanceOf(Array);
+    expect(blogListResponse.body.items.length).toBeGreaterThanOrEqual(3);
   });
 
   test("should return blog by id; GET /blogs/:id", async () => {
@@ -176,18 +201,18 @@ describe("Blogs API tests", () => {
   });
 });
 
-describe("Sorting and pagination Blogs tests", () => {
-  //test suits:
-  const blog1: BlogInputModel = {
-    name: "Test blog",
-    description: "about",
-    websiteUrl: "http://blog.com",
-  }
-
-  const searchNameTerms: any[] = [
-    { value: "tom", exp: true },
-    { value: "test" },
-    { value: "blog1" },
-    { value: " " },
-  ];
-});
+// describe("Sorting and pagination Blogs tests", () => {
+//   //test suits:
+//   const blog1: BlogInputModel = {
+//     name: "Test blog",
+//     description: "about",
+//     websiteUrl: "http://blog.com",
+//   };
+//
+//   const searchNameTerms: any[] = [
+//     { value: "tom", exp: true },
+//     { value: "test" },
+//     { value: "blog1" },
+//     { value: " " },
+//   ];
+// });

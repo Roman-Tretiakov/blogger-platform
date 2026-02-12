@@ -22,10 +22,9 @@ const bootstrap = async () => {
     console.log(`Example app listening on port ${PORT}`);
   });
 
-  server.keepAliveTimeout = 120000;
-  server.headersTimeout = 121000;
-
-  server.timeout = 120000;
+  server.keepAliveTimeout = 300000;
+  server.headersTimeout = 301000;
+  server.timeout = 300000;
 };
 
 bootstrap().catch(console.error);
