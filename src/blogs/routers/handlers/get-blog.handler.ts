@@ -5,7 +5,7 @@ import { errorsHandler } from "../../../core/utils/errors-hundler";
 import { blogsQueryRepository } from "../../repositories/blogs.query-repository";
 
 export async function getBlogHandler(
-  req: Request<{ id: string }>,
+  req: Request,
   res: Response,
 ) {
   const id: string = req.params.id;
