@@ -12,23 +12,7 @@ export async function createBlogHandler(
   try {
     const inputData = req.body;
     const createdBlogId: string = await blogsService.create(inputData);
-
-    let createdBlog = null;
-    let attempts = 0;
-    const maxAttempts = 2;
-
-    while (attempts < maxAttempts && createdBlog === null) {
-      attempts++;
-      try {
-        createdBlog = await blogsQueryRepository.getBlogById(createdBlogId)
-      } catch (e) {
-        if (attempts === maxAttempts) {
-          console.log("2nd attempt to get blog by id failed");
-          throw e;
-        }
-      }
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
+    const createdBlog = await blogsQueryRepository.getBlogById(createdBlogId);
 
     res.status(HttpStatus.Created).send(createdBlog);
   } catch (e: unknown) {
