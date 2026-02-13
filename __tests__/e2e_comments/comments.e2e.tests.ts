@@ -2,7 +2,6 @@ import request from "supertest";
 import express from "express";
 import { setupApp } from "../../src/setup-app";
 import { EndpointList } from "../../src/core/constants/endpoint-list";
-import { beforeEach, describe } from "node:test";
 import {
   client,
   closeDBConnection,
