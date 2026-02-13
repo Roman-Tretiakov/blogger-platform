@@ -11,8 +11,8 @@ export async function getBlogHandler(
   const id: string = req.params.id;
   try {
     const blog: BlogViewModel = await blogsQueryRepository.getBlogById(id);
-    res.status(HttpStatus.Ok).send(blog);
+    return res.status(HttpStatus.Ok).send(blog);
   } catch (e: unknown) {
-    errorsHandler(e, res);
+    return errorsHandler(e, res);
   }
 }
