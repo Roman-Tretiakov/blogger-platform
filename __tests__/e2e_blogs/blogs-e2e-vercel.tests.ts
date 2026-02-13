@@ -5,8 +5,15 @@ import { EndpointList } from "../../src/core/constants/endpoint-list";
 //@ts-ignore
 import { getBasicAuthToken } from "../utils/get-basic-auth-token";
 
-const BASE_URL = "https://blogger-platform-be.vercel.app";
+const BASE_URL = "http://localhost:5001";
 const authToken: string = getBasicAuthToken();
+
+beforeAll(async () => {
+  const clearDB = await axios.delete(
+    BASE_URL + EndpointList.TESTING_PATH + EndpointList.TEST_DELETE_ALL,
+  );
+  expect(clearDB.status).toBe(HttpStatus.NoContent);
+});
 
 // TESTS:
 describe("Blogs API tests", () => {
@@ -29,7 +36,7 @@ describe("Blogs API tests", () => {
     const postResponse: AxiosResponse = await axios.post(
       BASE_URL + EndpointList.BLOGS_PATH,
       data,
-      { headers: { Authorization: authToken } }
+      { headers: { Authorization: authToken } },
     );
     expect(postResponse.status).toBe(exp_1);
 
@@ -37,8 +44,8 @@ describe("Blogs API tests", () => {
     const getResponse: AxiosResponse = await axios.get(
       BASE_URL + EndpointList.BLOGS_PATH + "/" + blogId,
       {
-        headers: { Authorization: authToken }
-      }
+        headers: { Authorization: authToken },
+      },
     );
     expect(getResponse.status).toBe(exp_2);
   });
@@ -50,10 +57,7 @@ describe("Blogs API tests", () => {
     };
 
     try {
-      await axios.post(
-        BASE_URL + EndpointList.BLOGS_PATH,
-        newBlog
-      );
+      await axios.post(BASE_URL + EndpointList.BLOGS_PATH, newBlog);
     } catch (error: any) {
       expect(error.response.status).toBe(HttpStatus.Unauthorized);
     }
@@ -76,21 +80,21 @@ describe("Blogs API tests", () => {
     await axios.post(
       BASE_URL + EndpointList.BLOGS_PATH,
       { ...newBlog1 },
-      { headers: { Authorization: authToken } }
+      { headers: { Authorization: authToken } },
     );
     await axios.post(
       BASE_URL + EndpointList.BLOGS_PATH,
       { ...newBlog2 },
-      { headers: { Authorization: authToken } }
+      { headers: { Authorization: authToken } },
     );
     await axios.post(
       BASE_URL + EndpointList.BLOGS_PATH,
       { ...newBlog3 },
-      { headers: { Authorization: authToken } }
+      { headers: { Authorization: authToken } },
     );
 
     const blogListResponse: AxiosResponse = await axios.get(
-      BASE_URL + EndpointList.BLOGS_PATH
+      BASE_URL + EndpointList.BLOGS_PATH,
     );
 
     expect(blogListResponse.status).toBe(HttpStatus.Ok);
@@ -106,12 +110,12 @@ describe("Blogs API tests", () => {
     const createResponse: AxiosResponse = await axios.post(
       BASE_URL + EndpointList.BLOGS_PATH,
       { ...newBlog1 },
-      { headers: { Authorization: authToken } }
+      { headers: { Authorization: authToken } },
     );
     expect(createResponse.status).toBe(HttpStatus.Created);
 
     const getResponse: AxiosResponse = await axios.get(
-      BASE_URL + EndpointList.BLOGS_PATH + "/" + createResponse.data.id
+      BASE_URL + EndpointList.BLOGS_PATH + "/" + createResponse.data.id,
     );
     expect(getResponse.status).toBe(HttpStatus.Ok);
     expect(getResponse.data).toEqual(createResponse.data);
@@ -129,19 +133,19 @@ describe("Blogs API tests", () => {
     const createResponse: AxiosResponse = await axios.post(
       BASE_URL + EndpointList.BLOGS_PATH,
       { ...newBlog },
-      { headers: { Authorization: authToken } }
+      { headers: { Authorization: authToken } },
     );
     expect(createResponse.status).toBe(HttpStatus.Created);
 
     const putResponse: AxiosResponse = await axios.put(
       BASE_URL + EndpointList.BLOGS_PATH + "/" + createResponse.data.id,
       { ...updatedValidBlog },
-      { headers: { Authorization: authToken } }
+      { headers: { Authorization: authToken } },
     );
     expect(putResponse.status).toBe(HttpStatus.NoContent);
 
     const getResponse: AxiosResponse = await axios.get(
-      BASE_URL + EndpointList.BLOGS_PATH + "/" + createResponse.data.id
+      BASE_URL + EndpointList.BLOGS_PATH + "/" + createResponse.data.id,
     );
     expect(getResponse.status).toBe(HttpStatus.Ok);
     expect(getResponse.data.name).toEqual(updatedValidBlog.name);
@@ -155,19 +159,19 @@ describe("Blogs API tests", () => {
     const createResponse: AxiosResponse = await axios.post(
       BASE_URL + EndpointList.BLOGS_PATH,
       { ...newBlog },
-      { headers: { Authorization: authToken } }
+      { headers: { Authorization: authToken } },
     );
     expect(createResponse.status).toBe(HttpStatus.Created);
 
     const deleteResponse: AxiosResponse = await axios.delete(
       BASE_URL + EndpointList.BLOGS_PATH + "/" + createResponse.data.id,
-      { headers: { Authorization: authToken } }
+      { headers: { Authorization: authToken } },
     );
     expect(deleteResponse.status).toBe(HttpStatus.NoContent);
 
     try {
       await axios.get(
-        BASE_URL + EndpointList.BLOGS_PATH + "/" + createResponse.data.id
+        BASE_URL + EndpointList.BLOGS_PATH + "/" + createResponse.data.id,
       );
     } catch (error: any) {
       expect(error.response.status).toBe(HttpStatus.NotFound);
