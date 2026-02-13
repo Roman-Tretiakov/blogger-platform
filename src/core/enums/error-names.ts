@@ -9,7 +9,7 @@ export enum ErrorNames {
 
   CONTENT_MISSING_ERROR = "Content is required",
   CONTENT_TYPE_ERROR = "Content must be string",
-  CONTENT_LENGTH_ERROR = "Content must be between up to 1000 symbols",
+  CONTENT_LENGTH_ERROR = "Content must be within acceptable values",
 
   DESCRIPTION_MISSING_ERROR = "Description is required",
   DESCRIPTION_TYPE_ERROR = "Description must be string",

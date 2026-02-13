@@ -2,13 +2,21 @@ import { Router } from "express";
 import { EndpointList } from "../../core/constants/endpoint-list";
 import { authBodyValidationMiddleware } from "../middlewares/auth-body-validation.middleware";
 import { inputValidationResultMiddleware } from "../../core/middlewares/input-validation-result.middleware";
-import { authHandler } from "./handlers/auth.handler";
+import { loginHandler } from "./handlers/login.handler";
+import { accessTokenGuard } from "../middlewares/guards/access-token.guard";
+import { getLoggedUserHandler } from "./handlers/get-me.handler";
 
 export const authRouter = Router();
 
 authRouter.post(
-  EndpointList.EMPTY_PATH,
+  EndpointList.LOGIN_PATH,
   authBodyValidationMiddleware,
   inputValidationResultMiddleware,
-  authHandler,
+  loginHandler,
+);
+
+authRouter.get(
+  EndpointList.ME_PATH,
+  accessTokenGuard,
+  getLoggedUserHandler,
 );

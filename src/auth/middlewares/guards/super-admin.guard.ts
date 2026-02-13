@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
-import { HttpStatus } from '../../core/enums/http-status';
+import { HttpStatus } from '../../../core/enums/http-status';
 
 export const USERNAME = process.env.ADMIN_USERNAME || 'admin';
 export const PASSWORD = process.env.ADMIN_PASSWORD || 'qwerty';
 
-export const superAdminGuardMiddleware = (
+export const superAdminGuard = (
   req: Request<{}, any, any, any>,
   res: Response,
   next: NextFunction

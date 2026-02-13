@@ -6,6 +6,7 @@ import { usersCollection } from "../../db/mongo.db";
 import { mapToUserViewModel } from "../mappers/map-to-user-view-model";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { UserViewModel } from "../types/outputTypes/user-view-model";
+import { MeViewModel } from "../../auth/routers/outputTypes/me-view-model";
 
 export const usersQueryRepository = {
   async getUserById(id: string): Promise<UserViewModel> {
@@ -72,5 +73,14 @@ export const usersQueryRepository = {
       totalCount: totalCount,
       items: items.map(mapToUserViewModel),
     };
+  },
+
+  async getMe(userId: string): Promise<MeViewModel> {
+    const user = await this.getUserById(userId);
+    return {
+      login: user.login,
+      email: user.email,
+      userId: user.id,
+    }
   }
 };

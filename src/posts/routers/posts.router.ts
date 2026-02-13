@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
+import { superAdminGuard } from "../../auth/middlewares/guards/super-admin.guard";
 import { EndpointList } from "../../core/constants/endpoint-list";
 import { paramIdValidationMiddleware } from "../../core/middlewares/params-id-validation.middleware";
 import { inputValidationResultMiddleware } from "../../core/middlewares/input-validation-result.middleware";
@@ -11,11 +11,30 @@ import { deletePostHandler } from "./handlers/delete-post.handler";
 import { createPostsBodyValidationMiddleware } from "../middlewares/create-posts-body-validation-middleware";
 import { paginationAndSortingValidation } from "../../core/middlewares/pagination-sorting-validation.middleware";
 import { PostSortFields } from "./inputTypes/post-sort-fields";
+import { accessTokenGuard } from "../../auth/middlewares/guards/access-token.guard";
+import { createCommentByPostHandler } from "./handlers/create-comment-by-post.handler";
+import { createCommentsBodyValidationMiddleware } from "../middlewares/create-comments-body-validation.middleware";
+import { CommentsSortFields } from "../../comments/routers/inputTypes/comments-sort-fields";
+import { getCommentsByPostListHandler } from "./handlers/get-comments-by-post-list.handler";
 
 export const postsRouter = Router({});
 
 postsRouter
-  // videos crud routes:
+  .post(
+    EndpointList.COMMENTS_BY_POST_ID,
+    accessTokenGuard,
+    paramIdValidationMiddleware,
+    createCommentsBodyValidationMiddleware,
+    inputValidationResultMiddleware,
+    createCommentByPostHandler,
+  )
+  .get(
+    EndpointList.COMMENTS_BY_POST_ID,
+    paramIdValidationMiddleware,
+    paginationAndSortingValidation(CommentsSortFields),
+    inputValidationResultMiddleware,
+    getCommentsByPostListHandler,
+  )
   .get(
     EndpointList.EMPTY_PATH,
     paginationAndSortingValidation(PostSortFields),
@@ -30,21 +49,21 @@ postsRouter
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
   .post(
     EndpointList.EMPTY_PATH,
-    superAdminGuardMiddleware,
+    superAdminGuard,
     createPostsBodyValidationMiddleware(),
     inputValidationResultMiddleware,
     createPostHandler,
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
   .post(
     EndpointList.EMPTY_PATH,
-    superAdminGuardMiddleware,
+    superAdminGuard,
     createPostsBodyValidationMiddleware(),
     inputValidationResultMiddleware,
     createPostHandler,
   )
   .put(
     EndpointList.BY_ID,
-    superAdminGuardMiddleware,
+    superAdminGuard,
     paramIdValidationMiddleware,
     createPostsBodyValidationMiddleware(),
     inputValidationResultMiddleware,
@@ -52,7 +71,7 @@ postsRouter
   ) // сюда добавляем мидлвэры на валидацию перед обработчиками
   .delete(
     EndpointList.BY_ID,
-    superAdminGuardMiddleware,
+    superAdminGuard,
     paramIdValidationMiddleware,
     inputValidationResultMiddleware,
     deletePostHandler,

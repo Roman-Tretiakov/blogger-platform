@@ -3,11 +3,13 @@ import { DBCollectionNames, DBName } from "./db-collection-names";
 import { BlogMongoModel } from "../blogs/BLL/dto/blog-mongo-model";
 import { PostMongoModel } from "../posts/BLL/dto/post-mongo-model";
 import { UserMongoModel } from "../users/repositories/type/user-mongo-model";
+import { CommentMongoModel } from "../comments/repositories/types/comment-mongo-model";
 
 export let client: MongoClient;
 export let blogsCollection: Collection<BlogMongoModel>;
 export let postsCollection: Collection<PostMongoModel>;
 export let usersCollection: Collection<UserMongoModel>;
+export let commentsCollection: Collection<CommentMongoModel>
 
 // Подключения к бд
 export async function runDB(url: string): Promise<void> {
@@ -18,6 +20,7 @@ export async function runDB(url: string): Promise<void> {
   blogsCollection = db.collection<BlogMongoModel>(DBCollectionNames.BLOGS);
   postsCollection = db.collection<PostMongoModel>(DBCollectionNames.POSTS);
   usersCollection = db.collection<UserMongoModel>(DBCollectionNames.USERS);
+  commentsCollection = db.collection<CommentMongoModel>(DBCollectionNames.COMMENTS);
 
   try {
     await client.connect();

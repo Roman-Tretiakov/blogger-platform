@@ -8,5 +8,9 @@ export const EndpointList = {
   POSTS_BY_BLOG_ID: "/:id/posts",
   POSTS_PATH: "/api/posts",
   USERS_PATH: "/api/users",
-  AUTH_PATH: "/api/auth/login",
+  AUTH_PATH: "/api/auth",
+  LOGIN_PATH: "/login",
+  ME_PATH: "/me",
+  COMMENTS_PATH: "/api/comments",
+  COMMENTS_BY_POST_ID: "/:id/comments",
 };

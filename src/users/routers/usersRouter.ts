@@ -6,7 +6,7 @@ import { inputValidationResultMiddleware } from "../../core/middlewares/input-va
 import { createUsersBodyValidation } from "../middlewares/create-users-body-validation.middleware";
 import { createUserHandler } from "./handlers/create-users.handler";
 import { getUserListHandler } from "./handlers/get-user-list.handler";
-import { superAdminGuardMiddleware } from "../../auth/middlewares/super-admin.guard-middleware";
+import { superAdminGuard } from "../../auth/middlewares/guards/super-admin.guard";
 import { paramIdValidationMiddleware } from "../../core/middlewares/params-id-validation.middleware";
 import { deleteUserHandler } from "./handlers/delete-users.handler";
 
@@ -15,21 +15,21 @@ export const usersRouter = Router({});
 usersRouter
   .get(
     EndpointList.EMPTY_PATH,
-    superAdminGuardMiddleware,
+    superAdminGuard,
     paginationAndSortingValidation(UserSortFields),
     inputValidationResultMiddleware,
     getUserListHandler,
   )
   .post(
     EndpointList.EMPTY_PATH,
-    superAdminGuardMiddleware,
+    superAdminGuard,
     createUsersBodyValidation,
     inputValidationResultMiddleware,
     createUserHandler,
   )
   .delete(
     EndpointList.BY_ID,
-    superAdminGuardMiddleware,
+    superAdminGuard,
     paramIdValidationMiddleware,
     inputValidationResultMiddleware,
     deleteUserHandler,

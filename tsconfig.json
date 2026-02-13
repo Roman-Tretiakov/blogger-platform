@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/core/types"  // Указываем папку с декларативными файлами
+    ],
     "target": "es2016",
     "module": "commonjs",
     "rootDir": "./src",
@@ -10,6 +14,9 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "src/**/*.d.ts"
+  ],
   "exclude": ["__tests__", "dist", "node_modules"]
 }
