@@ -1,16 +1,16 @@
 import request from "supertest";
 import express, { Express } from "express";
-import { setupApp } from "../../src/setup-app";
-import { HttpStatus } from "../../src/core/enums/http-status";
-import { EndpointList } from "../../src/core/constants/endpoint-list";
+import { setupApp } from "../../../src/setup-app";
+import { HttpStatus } from "../../../src/core/enums/http-status";
+import { EndpointList } from "../../../src/core/constants/endpoint-list";
 import { beforeEach } from "node:test";
-import { PostInputModel } from "../../src/posts/BLL/dto/post-input-dto";
+import { PostInputModel } from "../../../src/posts/BLL/dto/post-input-dto";
 //@ts-ignore
-import { getBasicAuthToken } from "../utils/get-basic-auth-token";
-import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
+import { getBasicAuthToken } from "../../utils/get-basic-auth-token";
+import { client, closeDBConnection, runDB } from "../../../src/db/mongo.db";
 //@ts-ignore
-import { BlogInputModel } from "../../src/blogs/BLL/dto/blog-input-dto";
-import { postsService } from "../../src/posts/BLL/posts.service";
+import { BlogInputModel } from "../../../src/blogs/BLL/dto/blog-input-dto";
+import { postsService } from "../../../src/posts/BLL/posts.service";
 
 let app: Express;
 let blog_id: string;

@@ -1,15 +1,15 @@
 import request from "supertest";
 import express from "express";
-import { setupApp } from "../../src/setup-app";
-import { BlogInputModel } from "../../src/blogs/BLL/dto/blog-input-dto";
-import { HttpStatus } from "../../src/core/enums/http-status";
-import { EndpointList } from "../../src/core/constants/endpoint-list";
+import { setupApp } from "../../../src/setup-app";
+import { BlogInputModel } from "../../../src/blogs/BLL/dto/blog-input-dto";
+import { HttpStatus } from "../../../src/core/enums/http-status";
+import { EndpointList } from "../../../src/core/constants/endpoint-list";
 import { beforeEach, describe } from "node:test";
 //@ts-ignore
-import { getBasicAuthToken } from "../utils/get-basic-auth-token";
-import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
+import { getBasicAuthToken } from "../../utils/get-basic-auth-token";
+import { client, closeDBConnection, runDB } from "../../../src/db/mongo.db";
 //@ts-ignore
-import { blogsService } from "../../src/blogs/BLL/blogs.service";
+import { blogsService } from "../../../src/blogs/BLL/blogs.service";
 
 let app: any;
 const authToken: string = getBasicAuthToken();
@@ -178,7 +178,7 @@ describe("Sorting and pagination Blogs tests", () => {
     name: "Test blog",
     description: "about",
     websiteUrl: "http://blog.com",
-  }
+  };
 
   const searchNameTerms: any[] = [
     { value: "tom", exp: true },

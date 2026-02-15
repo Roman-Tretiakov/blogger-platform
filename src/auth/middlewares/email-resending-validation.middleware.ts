@@ -7,12 +7,12 @@ export const emailResendingValidationMiddleware = [
 
   body("email")
     .exists()
-    .withMessage(ErrorNames.LOGIN_MISSING_ERROR)
+    .withMessage(ErrorNames.EMAIL_MISSING_ERROR)
     .isString()
     .withMessage(ErrorNames.FIELD_NOT_STRING)
     .trim()
     .notEmpty({ ignore_whitespace: true })
-    .withMessage(ErrorNames.LOGIN_EMPTY_ERROR)
+    .withMessage(ErrorNames.EMAIL_EMPTY_ERROR)
     .custom((str: any) => {
       return isEmailString(str);
     })
