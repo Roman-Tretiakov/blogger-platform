@@ -6,12 +6,15 @@ import { DeleteResult } from "mongodb";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { usersQueryRepository } from "../repositories/users.query-repository";
 import { HttpStatus } from "../../core/enums/http-status";
+import { User } from "./user-entity";
 
 export const usersService = {
   async create(inputData: UserInputModel): Promise<string> {
+    const { login, password, email } = inputData;
+
     const existedLoginOrEmail = await usersQueryRepository.findByLoginOrEmail([
-      inputData.login,
-      inputData.email,
+      login,
+      email,
     ]);
     if (existedLoginOrEmail) {
       let message, field: string;
@@ -25,13 +28,18 @@ export const usersService = {
       throw new CustomError(message, field, HttpStatus.BadRequest);
     }
 
-    const passwordHash = await bcryptService.generateHash(inputData.password);
+    const passwordHash = await bcryptService.generateHash(password);
 
-    return await usersRepository.create({
-      ...inputData,
-      password: passwordHash,
-      createdAt: new Date().toISOString(),
-    });
+    const newUser = new User(login, email, passwordHash);
+
+    return await usersRepository.create(
+      newUser,
+      //{
+      // ...inputData,
+      // password: passwordHash,
+      // createdAt: new Date().toISOString(),
+      //}
+    );
   },
 
   async deleteById(id: string): Promise<void> {
