@@ -66,14 +66,14 @@ paths:
                   type: string
                   description: User email
                   example: "test@test.com"
-        responses:
-            204:
-                description: "Input data is accepted. Email with confirmation code will be send to passed email address. Confirmation code should be inside link as query param, for example: https://some-front.com/confirm-registration?code=youtcodehere"
-            400:
-                description: "If the inputModel has incorrect values or if email is already confirmed"
-                content:
+      responses:
+          204:
+              description: "Input data is accepted. Email with confirmation code will be send to passed email address. Confirmation code should be inside link as query param, for example: https://some-front.com/confirm-registration?code=youtcodehere"
+          400:
+              description: "If the inputModel has incorrect values or if email is already confirmed"
+              content:
                 application/json:
-                    schema:
+                  schema:
                     $ref: '#/components/schemas/ValidationErrorResponse'
   /api/auth/registration-confirmation:
     post:

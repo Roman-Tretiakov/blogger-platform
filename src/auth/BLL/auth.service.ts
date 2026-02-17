@@ -9,6 +9,7 @@ import { nodemailerService } from "../adapters/emailSendler/nodemailer.service";
 import { MailServices } from "../adapters/enums/mail-services";
 import { usersRepository } from "../../users/repositories/users.repository";
 import { emailExamples } from "../adapters/emailSendler/emailExamples";
+import { randomUUID } from "crypto";
 
 export const authService = {
   async registerUser(
@@ -131,6 +132,60 @@ export const authService = {
           };
         });
     }
+
+    return {
+      status: ResultStatus.Success,
+      errorMessage: "",
+      extensions: [],
+      data: null,
+    };
+  },
+
+  async resendEmail(email: string): Promise<Result> {
+    const user = await usersQueryRepository.findByLoginOrEmail([email]);
+    if (!user) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: "User with such email doesn't exist!",
+        extensions: [
+          {
+            field: "email",
+            message: "User with such email doesn't exist!",
+          },
+        ],
+        data: null,
+      };
+    }
+    if (user.isConfirmed) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: "Email is already been applied!",
+        extensions: [
+          {
+            field: "email",
+            message: "Email is already been applied!",
+          },
+        ],
+        data: null,
+      };
+    }
+
+    user.isConfirmed = false;
+    user.confirmationCode = randomUUID();
+    nodemailerService
+      .sendEmail(
+        MailServices.MAIL_RU,
+        email,
+        user.confirmationCode,
+        emailExamples.registrationEmail,
+      )
+      .catch((e) => {
+        console.error("Failed to send confirmation email:", e);
+      });
+
+    await usersRepository.update(user._id.toString(), {
+      ...user,
+    });
 
     return {
       status: ResultStatus.Success,
