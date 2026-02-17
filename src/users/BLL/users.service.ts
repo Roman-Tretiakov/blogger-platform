@@ -29,17 +29,14 @@ export const usersService = {
     }
 
     const passwordHash = await bcryptService.generateHash(password);
-
-    const newUser = new User(login, email, passwordHash);
-
-    return await usersRepository.create(
-      newUser,
-      //{
-      // ...inputData,
-      // password: passwordHash,
-      // createdAt: new Date().toISOString(),
-      //}
+    const newUser = new User(
+      login,
+      email,
+      passwordHash,
+      new Date().toISOString(),
     );
+
+    return await usersRepository.create(newUser);
   },
 
   async deleteById(id: string): Promise<void> {

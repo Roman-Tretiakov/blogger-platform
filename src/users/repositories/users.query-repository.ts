@@ -25,6 +25,14 @@ export const usersQueryRepository = {
     });
   },
 
+  async findUserByConfirmationCode(
+    code: string,
+  ): Promise<WithId<UserMongoModel> | null> {
+    return usersCollection.findOne({
+      confirmationCode: code,
+    });
+  },
+
   async getAllUsersWithPagination(
     queryParams: UserQueryInput,
   ): Promise<UserListWithPagination> {
@@ -58,8 +66,10 @@ export const usersQueryRepository = {
     }
 
     const items = await usersCollection
-      .find(filter)  // Используем единый фильтр
-      .sort({ [queryParams.sortBy]: queryParams.sortDirection === 'asc' ? 1 : -1 })
+      .find(filter) // Используем единый фильтр
+      .sort({
+        [queryParams.sortBy]: queryParams.sortDirection === "asc" ? 1 : -1,
+      })
       .skip(skip)
       .limit(queryParams.pageSize)
       .toArray();
@@ -81,6 +91,6 @@ export const usersQueryRepository = {
       login: user.login,
       email: user.email,
       userId: user.id,
-    }
-  }
+    };
+  },
 };

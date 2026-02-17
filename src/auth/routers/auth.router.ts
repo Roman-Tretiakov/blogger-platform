@@ -9,6 +9,8 @@ import { registrationHandler } from "./handlers/registration.handler";
 import { registrationConfirmationHandler } from "./handlers/registration-confirmation.handler";
 import { registrationEmailResending } from "./handlers/registration-email-resending";
 import { createUsersBodyValidation } from "../../users/middlewares/create-users-body-validation.middleware";
+import { registrationConfirmationBodyValidation } from "../middlewares/registration-confirmation-body.validation";
+import { emailResendingValidationMiddleware } from "../middlewares/email-resending-validation.middleware";
 
 export const authRouter = Router();
 
@@ -21,14 +23,14 @@ authRouter.post(
 
 authRouter.post(
   EndpointList.REGISTRATION_CONFIRMATION_PATH,
-  createUsersBodyValidation,
+  registrationConfirmationBodyValidation,
   inputValidationResultMiddleware,
   registrationConfirmationHandler,
 );
 
 authRouter.post(
   EndpointList.REGISTRATION_EMAIL_RESENDING_PATH,
-  authBodyValidationMiddleware,
+  emailResendingValidationMiddleware,
   inputValidationResultMiddleware,
   registrationEmailResending,
 );

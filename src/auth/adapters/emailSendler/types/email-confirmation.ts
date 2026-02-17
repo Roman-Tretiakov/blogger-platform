@@ -1,5 +1,5 @@
 export type EmailConfirmation = {
-  expirationDate: string;
-  confirmationCode: string;
+  expirationDate: null | string;
+  confirmationCode: null | string;
   isConfirmed: boolean;
 };
