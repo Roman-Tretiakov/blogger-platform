@@ -9,9 +9,6 @@ import express from "express";
 import { usersService } from "../../src/users/BLL/users.service";
 
 let app: any;
-let testUserLogin = "testuser";
-let testUserEmail = "test@example.com";
-let testUserPassword = "password123";
 
 describe("AUTH-INTEGRATION", () => {
   beforeAll(async () => {
@@ -38,8 +35,6 @@ describe("AUTH-INTEGRATION", () => {
   afterAll((done) => done());
 
   describe("User Registration", () => {
-    //nodemailerService.sendEmail = emailServiceMock.sendEmail;
-
     nodemailerService.sendEmail = jest
       .fn()
       .mockImplementation(
@@ -50,9 +45,9 @@ describe("AUTH-INTEGRATION", () => {
     const registerUserUseCase = authService.registerUser;
 
     it("should register user with correct data", async () => {
-      const { login, pass, email } = testSeeder.createUserDto();
+      const { login, email, pass } = testSeeder.createUserDto();
 
-      const result = await registerUserUseCase(login, pass, email);
+      const result = await registerUserUseCase(login, email, pass);
 
       expect(result.status).toBe(ResultStatus.Success);
       expect(nodemailerService.sendEmail).toHaveBeenCalled();
@@ -60,10 +55,10 @@ describe("AUTH-INTEGRATION", () => {
     });
 
     it("should not register user twice", async () => {
-      const { login, pass, email } = testSeeder.createUserDto();
+      const { login, email, pass } = testSeeder.createUserDto();
       await testSeeder.insertUser({ login, pass, email });
 
-      const result = await registerUserUseCase(login, pass, email);
+      const result = await registerUserUseCase(login, email, pass);
 
       expect(result.status).toBe(ResultStatus.BadRequest);
       //collection.countDoc().toBe(1)

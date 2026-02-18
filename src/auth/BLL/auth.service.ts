@@ -18,7 +18,7 @@ export const authService = {
     password: string,
   ): Promise<Result> {
     const result = await this.checkLoginAndPassword([login, email], password);
-    debugger;
+
     if (result) {
       const user = await usersQueryRepository.getUserById(result);
       const loginMatch = user.login === login;

@@ -84,7 +84,7 @@ beforeEach(async () => {
       postId: testPostId,
       createdAt: new Date().toISOString(),
     })
-    .then();
+    .then((res) => res.data);
 });
 
 afterAll(async () => {
