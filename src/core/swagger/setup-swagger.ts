@@ -12,12 +12,12 @@ const swaggerOptions = {
       description: "Open API",
     },
     tags: [
+      { name: "Auth", description: "API for authorization" },
       { name: "Blogs", description: "API for managing blogs" },
       { name: "Posts", description: "API for managing posts" },
       { name: "Testing", description: "API for clearing the database" },
       { name: "Users", description: "API for managing users" },
       { name: "Comments", description: "API for managing comments" },
-      { name: "Auth", description: "API for authorization" },
     ],
     components: {
       securitySchemes: {

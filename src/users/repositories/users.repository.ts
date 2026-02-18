@@ -17,6 +17,16 @@ export const usersRepository = {
     return await usersCollection.deleteOne({ _id: new ObjectId(userId) });
   },
 
+  async update(userId: string, userData: UserMongoModel): Promise<void> {
+    const updateResult = await usersCollection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: userData },
+    );
+    if (updateResult.matchedCount === 0) {
+      throw new DomainError(`No user found with id: ${userId}`);
+    }
+  },
+
   async clear(): Promise<void> {
     await usersCollection.drop();
   },

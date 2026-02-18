@@ -28,6 +28,80 @@ paths:
                 $ref: '#/components/schemas/ValidationErrorResponse'
         401:
           description: Unauthorized
+  /api/auth/registration:
+    post:
+      summary: "Registration in the system. Email with confirmation code will be send to passed email address"
+      tags: [ Auth ]
+      security: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInputModel'
+      responses:
+        204:
+          description: "Input data is accepted. Email with confirmation code will be send to passed email address. Confirmation code should be inside link as query param, for example: https://some-front.com/confirm-registration?code=youtcodehere"
+        400:
+          description: "If the inputModel has incorrect values (in particular if the user with the given email or login already exists)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+  /api/auth/registration-email-resending:
+    post:
+      summary: Resend email with confirmation code
+      tags: [ Auth ]
+      security: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  description: User email
+                  example: "test@test.com"
+      responses:
+          204:
+              description: "Input data is accepted. Email with confirmation code will be send to passed email address. Confirmation code should be inside link as query param, for example: https://some-front.com/confirm-registration?code=youtcodehere"
+          400:
+              description: "If the inputModel has incorrect values or if email is already confirmed"
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/ValidationErrorResponse'
+  /api/auth/registration-confirmation:
+    post:
+      summary: Confirm registration
+      tags: [ Auth ]
+      security: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+              properties:
+                code:
+                  type: string
+                  description: Confirmation code sent to email
+                  example: "123456"
+      responses:
+        204:
+          description: Email was verified. Account was activated
+        400:
+          description: If the confirmation code is incorrect, expired or already been applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
   /api/auth/me:
     get:
       summary: Get information about current user
@@ -51,6 +125,25 @@ components:
       bearerFormat: JWT
       description: "Enter JWT Bearer token"
   schemas:
+    UserInputModel:
+      type: object
+      required:
+        - login
+        - password
+        - email
+      properties:
+        login:
+          type: string
+          description: User login
+          example: "john_doe"
+        password:
+          type: string
+          description: User password
+          example: "password123"
+        email:
+          type: string
+          description: User email
+          example: "test@test.com"
     LoginInputModel:
       type: object
       required:

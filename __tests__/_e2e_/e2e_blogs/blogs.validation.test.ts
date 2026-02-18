@@ -1,12 +1,12 @@
 import express from "express";
 import request from "supertest";
-import { setupApp } from "../../src/setup-app";
-import { EndpointList } from "../../src/core/constants/endpoint-list";
-import { HttpStatus } from "../../src/core/enums/http-status";
-import { ErrorNames } from "../../src/core/enums/error-names";
-import { BlogInputModel } from "../../src/blogs/BLL/dto/blog-input-dto";
-import { blogsService } from "../../src/blogs/BLL/blogs.service";
-import { client, closeDBConnection } from "../../src/db/mongo.db";
+import { setupApp } from "../../../src/setup-app";
+import { EndpointList } from "../../../src/core/constants/endpoint-list";
+import { HttpStatus } from "../../../src/core/enums/http-status";
+import { ErrorNames } from "../../../src/core/enums/error-names";
+import { BlogInputModel } from "../../../src/blogs/BLL/dto/blog-input-dto";
+import { blogsService } from "../../../src/blogs/BLL/blogs.service";
+import { client, closeDBConnection } from "../../../src/db/mongo.db";
 
 describe("Blog body validation tests", () => {
   const app = express();
@@ -65,7 +65,8 @@ describe("Blog body validation tests", () => {
       .set("Authorization", authValue)
       .send({
         ...validBlogBody,
-        websiteUrl: "http://www.toooloooooooooooooooongsitttttteeeeeeeee-rururururururururururururururururururururururururu.com",
+        websiteUrl:
+          "http://www.toooloooooooooooooooongsitttttteeeeeeeee-rururururururururururururururururururururururururu.com",
       })
       .expect(HttpStatus.BadRequest);
     expect(response.body.errorsMessages).toContain({

@@ -13,4 +13,7 @@ export const EndpointList = {
   ME_PATH: "/me",
   COMMENTS_PATH: "/api/comments",
   COMMENTS_BY_POST_ID: "/:id/comments",
+  REGISTRATION_PATH: "/registration",
+  REGISTRATION_EMAIL_RESENDING_PATH: "/registration-email-resending",
+  REGISTRATION_CONFIRMATION_PATH: "/registration-confirmation",
 };

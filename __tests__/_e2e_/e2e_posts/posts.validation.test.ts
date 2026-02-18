@@ -1,10 +1,10 @@
 import express from "express";
 import request from "supertest";
-import { setupApp } from "../../src/setup-app";
-import { EndpointList } from "../../src/core/constants/endpoint-list";
-import { HttpStatus } from "../../src/core/enums/http-status";
-import { ErrorNames } from "../../src/core/enums/error-names";
-import { PostInputModel } from "../../src/posts/BLL/dto/post-input-dto";
+import { setupApp } from "../../../src/setup-app";
+import { EndpointList } from "../../../src/core/constants/endpoint-list";
+import { HttpStatus } from "../../../src/core/enums/http-status";
+import { ErrorNames } from "../../../src/core/enums/error-names";
+import { PostInputModel } from "../../../src/posts/BLL/dto/post-input-dto";
 
 describe("Post body validation tests", () => {
   const app = express();
@@ -59,7 +59,8 @@ describe("Post body validation tests", () => {
       .set("Authorization", authValue)
       .send({
         ...validPostBody,
-        shortDescription: "toooloooooooooooooooongsitttttteeeeeeeee-rururururururururururururururururururururururururuqwerqwerqwer",
+        shortDescription:
+          "toooloooooooooooooooongsitttttteeeeeeeee-rururururururururururururururururururururururururuqwerqwerqwer",
       })
       .expect(HttpStatus.BadRequest);
     expect(response.body.errorsMessages).toContain({

@@ -5,8 +5,35 @@ import { inputValidationResultMiddleware } from "../../core/middlewares/input-va
 import { loginHandler } from "./handlers/login.handler";
 import { accessTokenGuard } from "../middlewares/guards/access-token.guard";
 import { getLoggedUserHandler } from "./handlers/get-me.handler";
+import { registrationHandler } from "./handlers/registration.handler";
+import { registrationConfirmationHandler } from "./handlers/registration-confirmation.handler";
+import { registrationEmailResending } from "./handlers/registration-email-resending";
+import { createUsersBodyValidation } from "../../users/middlewares/create-users-body-validation.middleware";
+import { registrationConfirmationBodyValidation } from "../middlewares/registration-confirmation-body.validation";
+import { emailResendingValidationMiddleware } from "../middlewares/email-resending-validation.middleware";
 
 export const authRouter = Router();
+
+authRouter.post(
+  EndpointList.REGISTRATION_PATH,
+  createUsersBodyValidation,
+  inputValidationResultMiddleware,
+  registrationHandler,
+);
+
+authRouter.post(
+  EndpointList.REGISTRATION_CONFIRMATION_PATH,
+  registrationConfirmationBodyValidation,
+  inputValidationResultMiddleware,
+  registrationConfirmationHandler,
+);
+
+authRouter.post(
+  EndpointList.REGISTRATION_EMAIL_RESENDING_PATH,
+  emailResendingValidationMiddleware,
+  inputValidationResultMiddleware,
+  registrationEmailResending,
+);
 
 authRouter.post(
   EndpointList.LOGIN_PATH,
@@ -15,8 +42,4 @@ authRouter.post(
   loginHandler,
 );
 
-authRouter.get(
-  EndpointList.ME_PATH,
-  accessTokenGuard,
-  getLoggedUserHandler,
-);
+authRouter.get(EndpointList.ME_PATH, accessTokenGuard, getLoggedUserHandler);

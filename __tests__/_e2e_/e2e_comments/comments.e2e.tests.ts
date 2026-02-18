@@ -1,18 +1,18 @@
 import request from "supertest";
 import express from "express";
-import { setupApp } from "../../src/setup-app";
-import { EndpointList } from "../../src/core/constants/endpoint-list";
+import { setupApp } from "../../../src/setup-app";
+import { EndpointList } from "../../../src/core/constants/endpoint-list";
 import {
   client,
   closeDBConnection,
   commentsCollection,
   runDB,
-} from "../../src/db/mongo.db";
-import { usersService } from "../../src/users/BLL/users.service";
+} from "../../../src/db/mongo.db";
+import { usersService } from "../../../src/users/BLL/users.service";
 import { ObjectId } from "mongodb";
-import { commentsRepository } from "../../src/comments/repositories/comments.repository";
-import { postsRepository } from "../../src/posts/repositories/posts.repository";
-import { blogsRepository } from "../../src/blogs/repositories/blogs.repository";
+import { commentsRepository } from "../../../src/comments/repositories/comments.repository";
+import { postsRepository } from "../../../src/posts/repositories/posts.repository";
+import { blogsRepository } from "../../../src/blogs/repositories/blogs.repository";
 
 let app: any;
 let testUserLogin = "testuser";
@@ -53,7 +53,6 @@ beforeEach(async () => {
   await commentsRepository.clear();
   await postsRepository.clear();
   await blogsRepository.clear();
-
 
   // Создаем тестовый блог
   testBlogId = await blogsRepository.create({
