@@ -1,7 +1,7 @@
 import { usersQueryRepository } from "../../users/repositories/users.query-repository";
 import { bcryptService } from "../adapters/bcrypt.service";
 import { Result } from "../../core/types/result-object-type";
-import { accessTokenViewModel } from "../routers/outputTypes/access-token-view-model";
+import { pairTokensViewModel } from "../routers/outputTypes/pair-tokens-view-model";
 import { ResultStatus } from "../../core/enums/result-statuses";
 import { jwtService } from "../adapters/jwt.service";
 import { User } from "../../users/BLL/user-entity";
@@ -198,16 +198,30 @@ export const authService = {
   async loginUser(
     loginOrEmail: string,
     password: string,
-  ): Promise<Result<accessTokenViewModel | null>> {
+    cookies: string,
+  ): Promise<Result<pairTokensViewModel | null>> {
     const result = await this.checkLoginAndPassword([loginOrEmail], password);
 
     if (result) {
-      const token = jwtService.createToken(result);
+      const accessToken = jwtService.createToken(result);
+      // TODO: refreshTokenService.createRefreshToken(refreshTokenType.UUID);
+      const refreshToken = {
+        value: "",
+        cookieOptions: {
+          domain: undefined,
+          path: undefined,
+          httpOnly: true,
+          secure: true,
+          sameSite: undefined,
+          maxAge: 60000,
+        },
+      };
+
       return {
         status: ResultStatus.Success,
         errorMessage: "",
         extensions: [],
-        data: { accessToken: token },
+        data: { accessToken: accessToken, refreshToken: refreshToken },
       };
     }
 

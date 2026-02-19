@@ -4,6 +4,7 @@ import { authService } from "../../BLL/auth.service";
 import { ResultStatus } from "../../../core/enums/result-statuses";
 import { resultStatusToHttpStatusMapper } from "../../../core/utils/result-code-to-http-status.mapper";
 import { RequestWithBody } from "../../../core/types/request-types";
+import { CookieNames } from "../../../core/constants/cookie-names";
 
 export async function loginHandler(
   req: RequestWithBody<LoginInputModel>,
@@ -11,7 +12,11 @@ export async function loginHandler(
 ): Promise<void> {
   const loginOrEmail: string = req.body.loginOrEmail;
   const password: string = req.body.password;
-  const result = await authService.loginUser(loginOrEmail, password);
+  const result = await authService.loginUser(
+    loginOrEmail,
+    password,
+    req.cookies[CookieNames.REFRESH_TOKEN],
+  );
 
   if (result.status !== ResultStatus.Success) {
     res
@@ -20,5 +25,12 @@ export async function loginHandler(
     return;
   }
 
-  res.status(resultStatusToHttpStatusMapper(result.status)).send(result.data);
+  res
+    .status(resultStatusToHttpStatusMapper(result.status))
+    .cookie(
+      CookieNames.REFRESH_TOKEN,
+      result.data!.refreshToken.value,
+      result.data!.refreshToken.cookieOptions,
+    )
+    .send(result.data!.accessToken);
 }

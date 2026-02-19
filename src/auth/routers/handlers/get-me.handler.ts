@@ -6,13 +6,14 @@ import { usersQueryRepository } from "../../../users/repositories/users.query-re
 
 export async function getLoggedUserHandler(
   req: RequestWithUserId<IdType>,
-  res: Response): Promise<void> {
-  const userId = req.userData!.userId
+  res: Response,
+): Promise<void> {
+  const userId = req.userData!.userId;
 
   if (!userId) {
     res.status(HttpStatus.Unauthorized).send("Request not contains userId");
     return;
   }
-  const me = await usersQueryRepository.getMe(userId)
+  const me = await usersQueryRepository.getMe(userId);
   res.status(HttpStatus.Ok).send(me);
 }

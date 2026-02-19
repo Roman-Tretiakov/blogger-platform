@@ -16,4 +16,6 @@ export const EndpointList = {
   REGISTRATION_PATH: "/registration",
   REGISTRATION_EMAIL_RESENDING_PATH: "/registration-email-resending",
   REGISTRATION_CONFIRMATION_PATH: "/registration-confirmation",
+  REFRESH_TOKEN_PATH: "/refresh-token",
+  LOGOUT_PATH: "/logout",
 };

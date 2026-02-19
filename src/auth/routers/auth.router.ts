@@ -11,6 +11,9 @@ import { registrationEmailResending } from "./handlers/registration-email-resend
 import { createUsersBodyValidation } from "../../users/middlewares/create-users-body-validation.middleware";
 import { registrationConfirmationBodyValidation } from "../middlewares/registration-confirmation-body.validation";
 import { emailResendingValidationMiddleware } from "../middlewares/email-resending-validation.middleware";
+import { refreshTokenGuard } from "../middlewares/guards/refresh-token.guard";
+import { updateTokensHandler } from "./handlers/update-tokens.handler";
+import { logoutHandler } from "./handlers/logout.handler";
 
 export const authRouter = Router();
 
@@ -41,5 +44,13 @@ authRouter.post(
   inputValidationResultMiddleware,
   loginHandler,
 );
+
+authRouter.post(
+  EndpointList.REFRESH_TOKEN_PATH,
+  refreshTokenGuard,
+  updateTokensHandler,
+);
+
+authRouter.post(EndpointList.LOGOUT_PATH, refreshTokenGuard, logoutHandler);
 
 authRouter.get(EndpointList.ME_PATH, accessTokenGuard, getLoggedUserHandler);
