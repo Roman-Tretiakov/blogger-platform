@@ -10,6 +10,8 @@ import { MailServices } from "../adapters/enums/mail-services";
 import { usersRepository } from "../../users/repositories/users.repository";
 import { emailExamples } from "../adapters/emailSendler/emailExamples";
 import { randomUUID } from "crypto";
+import { TokensTypes } from "../adapters/enums/tokens-types";
+import { tokensRepository } from "../../refreshTokens/repositories/tokens.repository";
 
 export const authService = {
   async registerUser(
@@ -48,7 +50,7 @@ export const authService = {
     const newUser = new User(login, email, passwordHash);
     newUser.generateNewConfirmationCode().emailConfirmed(false);
 
-    await usersRepository.create(newUser).catch((e) => {
+    await usersRepository.create(newUser).catch(() => {
       return {
         status: ResultStatus.Failure,
         errorMessage: "Something went wrong during user creation!",
@@ -123,7 +125,7 @@ export const authService = {
         .update(user._id.toString(), {
           ...user,
         })
-        .catch((e) => {
+        .catch(() => {
           return {
             status: ResultStatus.Failure,
             errorMessage: "Something went wrong during email confirmation!",
@@ -198,24 +200,23 @@ export const authService = {
   async loginUser(
     loginOrEmail: string,
     password: string,
-    cookies: string,
   ): Promise<Result<pairTokensViewModel | null>> {
     const result = await this.checkLoginAndPassword([loginOrEmail], password);
 
     if (result) {
-      const accessToken = jwtService.createToken(result);
-      // TODO: refreshTokenService.createRefreshToken(refreshTokenType.UUID);
-      const refreshToken = {
-        value: "",
-        cookieOptions: {
-          domain: undefined,
-          path: undefined,
-          httpOnly: true,
-          secure: true,
-          sameSite: undefined,
-          maxAge: 60000,
-        },
-      };
+      const accessToken = jwtService.createToken(result, TokensTypes.AT);
+      const refreshToken = jwtService.createToken(result, TokensTypes.RT);
+
+      await tokensRepository
+        .addTokenToWhitelist(refreshToken, result)
+        .catch((e: any) => {
+          return {
+            status: ResultStatus.Failure,
+            errorMessage: `Something went wrong during token generation: ${e}`,
+            extensions: [],
+            data: null,
+          };
+        });
 
       return {
         status: ResultStatus.Success,

@@ -4,7 +4,8 @@ import { BlogMongoModel } from "../blogs/BLL/dto/blog-mongo-model";
 import { PostMongoModel } from "../posts/BLL/dto/post-mongo-model";
 import { UserMongoModel } from "../users/repositories/type/user-mongo-model";
 import { CommentMongoModel } from "../comments/repositories/types/comment-mongo-model";
-import { RefreshTokenMongoModel } from "../auth/types/refresh-token-mongo-model";
+import { WhiteListTokenMongoModel } from "../auth/types/white-list-token-mongo-model";
+import { BlackListTokenMongoModel } from "../auth/types/black-list-token-mongo-model";
 
 export let client: MongoClient;
 export let tokensDbClient: MongoClient;
@@ -12,8 +13,8 @@ export let blogsCollection: Collection<BlogMongoModel>;
 export let postsCollection: Collection<PostMongoModel>;
 export let usersCollection: Collection<UserMongoModel>;
 export let commentsCollection: Collection<CommentMongoModel>;
-export let blackListTokensCollection: Collection<RefreshTokenMongoModel>;
-export let whiteListTokensCollection: Collection<RefreshTokenMongoModel>;
+export let blackListTokensCollection: Collection<BlackListTokenMongoModel>;
+export let whiteListTokensCollection: Collection<WhiteListTokenMongoModel>;
 
 // Подключения к бд
 export async function runDB(url: string): Promise<void> {
@@ -43,10 +44,10 @@ export async function runTokensDB(url: string): Promise<void> {
   const rtDb: Db = tokensDbClient.db(TokensDBName);
 
   //Инициализация коллекций
-  blackListTokensCollection = rtDb.collection<RefreshTokenMongoModel>(
+  blackListTokensCollection = rtDb.collection<BlackListTokenMongoModel>(
     DBCollectionNames.RT_TOKENS,
   );
-  whiteListTokensCollection = rtDb.collection<RefreshTokenMongoModel>(
+  whiteListTokensCollection = rtDb.collection<WhiteListTokenMongoModel>(
     DBCollectionNames.RT_TOKENS,
   );
 
