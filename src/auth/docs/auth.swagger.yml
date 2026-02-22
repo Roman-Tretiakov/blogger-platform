@@ -15,17 +15,37 @@ paths:
               $ref: '#/components/schemas/LoginInputModel'
       responses:
         200:
-          description: Returns JWT-token
+          description: Returns JWT accessToken (expired after 10 seconds) in body and JWT refreshToken in cookie (http-only, secure) (expired after 20 seconds).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
         400:
-          description: Validation error
+          description: If the inputModel has incorrect values
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
+        401:
+          description: Unauthorized
+  /api/auth/refresh-token:
+    post:
+      summary: Generate new pair of access and refresh tokens (in cookie client must send correct refreshToken that will be revoked after refreshing)
+      tags: [ Auth ]
+      security:
+        - refreshToken: []
+      responses:
+        200:
+          description: Returns JWT accessToken (expired after 10 seconds) in body and JWT refreshToken in cookie (http-only, secure) (expired after 20 seconds).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Secure; SameSite=Strict; Max-Age=20; Path=/api/auth/refresh-token"
         401:
           description: Unauthorized
   /api/auth/registration:
@@ -117,6 +137,17 @@ paths:
                 $ref: '#/components/schemas/MeViewModel'
         401:
           description: Unauthorized
+  /api/auth/logout:
+    post:
+      summary: In cookie client must send correct refreshToken that will be revoked
+      tags: [ Auth ]
+      security:
+        - refreshToken: [ ]
+      responses:
+        204:
+          description: No Content
+        401:
+          description: Unauthorized
 components:
   securitySchemes:
     bearerAuth:
@@ -124,6 +155,11 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: "Enter JWT Bearer token"
+    refreshToken:
+      type: apiKey
+      in: cookie
+      name: refreshToken
+      description: JWT refresh token в http-only cookie. Токен должен быть валидным и не истекшим.
   schemas:
     UserInputModel:
       type: object
