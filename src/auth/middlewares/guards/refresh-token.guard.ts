@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { jwtService } from "../../adapters/jwt.service";
 import { TokensTypes } from "../../adapters/enums/tokens-types";
+import { IdType } from "../../../core/types/id-type";
 
 export const refreshTokenGuard = (
   req: Request,
@@ -16,15 +17,17 @@ export const refreshTokenGuard = (
         .send("Refresh token is missing");
     }
 
-    const verifiedToken: any = jwtService.verifyToken(
+    const verifiedUserId: any = jwtService.verifyToken(
       refreshToken,
       TokensTypes.RT,
     );
-    if (!verifiedToken) {
+    if (!verifiedUserId) {
       return res
         .status(HttpStatus.Unauthorized)
         .send("Refresh token is invalid or expired");
     }
+
+    req.userData = verifiedUserId as IdType; // Сохраняем данные пользователя в объекте запроса
     next();
   } catch (error: unknown) {
     return res.status(HttpStatus.InternalServerError).send(`message: ${error}`);
