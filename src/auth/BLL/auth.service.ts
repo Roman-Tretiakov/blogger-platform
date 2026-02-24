@@ -261,11 +261,8 @@ export const authService = {
     userId: string,
   ): Promise<Result<PairTokensViewModel | null>> {
     if (
-      !(await tokensRepository.addTokenToBlackList(oldRefreshToken)) ||
-      (await tokensRepository.removeToken(
-        oldRefreshTokenId,
-        TokenMongoType.WhiteListToken,
-      )) < 1
+      (await this.deleteTokenFromWhiteList(oldRefreshTokenId)).status !==
+      ResultStatus.Success
     ) {
       return {
         status: ResultStatus.Failure,
@@ -293,6 +290,28 @@ export const authService = {
         accessToken: accessToken,
         refreshToken: refreshToken,
       },
+    };
+  },
+
+  async deleteTokenFromWhiteList(tokenId: string): Promise<Result> {
+    if (
+      (await tokensRepository.removeToken(
+        tokenId,
+        TokenMongoType.WhiteListToken,
+      )) < 1
+    ) {
+      return {
+        status: ResultStatus.Failure,
+        errorMessage: `Error happened during token deleting, token id: ${tokenId}`,
+        extensions: [],
+        data: null,
+      };
+    }
+    return {
+      status: ResultStatus.Success,
+      errorMessage: "",
+      extensions: [],
+      data: null,
     };
   },
 };
