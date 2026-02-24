@@ -8,7 +8,6 @@ export async function logoutHandler(
   req: Request,
   res: Response,
 ): Promise<void> {
-  //TODO: удалить refreshToken из БД и удалить куки
   const userId = req.userData!.userId;
   const refreshToken: string = req.cookies.refreshToken;
 
@@ -30,5 +29,5 @@ export async function logoutHandler(
       .send(deleteTokenResult.errorMessage);
   }
 
-  res.status(HttpStatus.NoContent).send();
+  res.status(HttpStatus.NoContent).clearCookie("refreshToken").send();
 }
