@@ -1,7 +1,7 @@
 import { usersQueryRepository } from "../../users/repositories/users.query-repository";
 import { bcryptService } from "../adapters/bcrypt.service";
 import { Result } from "../../core/types/result-object-type";
-import { pairTokensViewModel } from "../routers/outputTypes/pair-tokens-view-model";
+import { PairTokensViewModel } from "../routers/outputTypes/pair-tokens-view-model";
 import { ResultStatus } from "../../core/enums/result-statuses";
 import { jwtService } from "../adapters/jwt.service";
 import { User } from "../../users/BLL/user-entity";
@@ -12,6 +12,7 @@ import { emailExamples } from "../adapters/emailSendler/emailExamples";
 import { randomUUID } from "crypto";
 import { TokensTypes } from "../adapters/enums/tokens-types";
 import { tokensRepository } from "../../refreshTokens/repositories/tokens.repository";
+import { TokenMongoType } from "../../refreshTokens/types/token-mongo-type";
 
 export const authService = {
   async registerUser(
@@ -200,7 +201,7 @@ export const authService = {
   async loginUser(
     loginOrEmail: string,
     password: string,
-  ): Promise<Result<pairTokensViewModel | null>> {
+  ): Promise<Result<PairTokensViewModel | null>> {
     const result = await this.checkLoginAndPassword([loginOrEmail], password);
 
     if (result) {
@@ -252,5 +253,46 @@ export const authService = {
     }
 
     return user._id.toString();
+  },
+
+  async rotateTokensPair(
+    oldRefreshToken: string,
+    oldRefreshTokenId: string,
+    userId: string,
+  ): Promise<Result<PairTokensViewModel | null>> {
+    if (
+      !(await tokensRepository.addTokenToBlackList(oldRefreshToken)) ||
+      (await tokensRepository.removeToken(
+        oldRefreshTokenId,
+        TokenMongoType.WhiteListToken,
+      )) < 1
+    ) {
+      return {
+        status: ResultStatus.Failure,
+        errorMessage: "Deleting old refresh token is failure",
+        extensions: [],
+        data: null,
+      };
+    }
+    const refreshToken = jwtService.createToken(userId, TokensTypes.RT);
+    const accessToken = jwtService.createToken(userId, TokensTypes.AT);
+
+    if (!(await tokensRepository.addTokenToWhitelist(refreshToken, userId))) {
+      return {
+        status: ResultStatus.Failure,
+        errorMessage: "Adding new refresh token is failure",
+        extensions: [],
+        data: null,
+      };
+    }
+    return {
+      status: ResultStatus.Success,
+      errorMessage: "",
+      extensions: [],
+      data: {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      },
+    };
   },
 };

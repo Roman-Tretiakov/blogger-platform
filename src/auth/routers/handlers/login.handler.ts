@@ -12,11 +12,7 @@ export async function loginHandler(
 ): Promise<void> {
   const loginOrEmail: string = req.body.loginOrEmail;
   const password: string = req.body.password;
-  const result = await authService.loginUser(
-    loginOrEmail,
-    password,
-    req.cookies[CookieNames.REFRESH_TOKEN],
-  );
+  const result = await authService.loginUser(loginOrEmail, password);
 
   if (result.status !== ResultStatus.Success) {
     res
@@ -27,10 +23,11 @@ export async function loginHandler(
 
   res
     .status(resultStatusToHttpStatusMapper(result.status))
-    .cookie(
-      CookieNames.REFRESH_TOKEN,
-      result.data!.refreshToken.value,
-      result.data!.refreshToken.cookieOptions,
-    )
+    .cookie(CookieNames.REFRESH_TOKEN, result.data!.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 25 * 1000, // 25 сек.
+    })
     .send(result.data!.accessToken);
 }

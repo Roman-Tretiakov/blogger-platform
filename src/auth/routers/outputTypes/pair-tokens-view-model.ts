@@ -1,4 +1,4 @@
-export type pairTokensViewModel = {
+export type PairTokensViewModel = {
   accessToken: string;
   refreshToken: string;
 };
