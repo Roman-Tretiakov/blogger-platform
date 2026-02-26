@@ -26,9 +26,23 @@ const swaggerOptions = {
           scheme: "basic",
           description: "Base64 encoded username and password",
         },
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "Enter JWT Bearer token for access token",
+        },
+        refreshToken: {
+          type: "apiKey",
+          in: "cookie",
+          name: "refreshToken",
+          description:
+            "JWT refresh token in http-only cookie. Токен должен быть валидным и не истекшим.",
+        },
       },
     },
-    security: [{ basicAuth: [] }],
+    // Убираем глобальную security, так как разные эндпоинты используют разные схемы
+    security: [],
   },
   apis: [
     join(__dirname, "../../blogs/docs/blogs.swagger.yml"),
@@ -43,5 +57,41 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 export const setupSwagger = (app: Express) => {
-  app.use("/api", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  // Настройка Swagger UI с поддержкой credentials
+  app.use(
+    "/api",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, {
+      swaggerOptions: {
+        withCredentials: true, // РАЗРЕШАЕМ отправку cookies
+        requestInterceptor: (request: any) => {
+          // Добавляем credentials: 'include' к каждому запросу
+          request.credentials = "include";
+
+          // Логирование для отладки (можно убрать после настройки)
+          console.log("Swagger Request:", {
+            url: request.url,
+            method: request.method,
+            hasCookie: !!document.cookie,
+          });
+
+          return request;
+        },
+        responseInterceptor: (response: any) => {
+          // Логирование ответов (опционально)
+          return response;
+        },
+      },
+      // Кастомизация интерфейса
+      customSiteTitle: "Blogger Platform API Documentation",
+      customCss: ".swagger-ui .topbar { display: none }",
+      customfavIcon: "/favicon.ico",
+    }),
+  );
+
+  // Добавляем маршрут для получения openapi.json (полезно для отладки)
+  app.get("/api-docs.json", (req, res) => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(swaggerSpec);
+  });
 };

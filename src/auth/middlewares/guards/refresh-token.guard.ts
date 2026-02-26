@@ -10,7 +10,20 @@ export const refreshTokenGuard = (
   next: NextFunction,
 ) => {
   try {
-    const refreshToken: string | undefined = req.cookies["refreshToken"];
+    // console.log("=== Refresh Token Debug ===");
+    // console.log("Headers:", {
+    //   cookie: req.headers.cookie,
+    //   authorization: req.headers.authorization,
+    //   "x-refresh-token": req.headers["x-refresh-token"],
+    // });
+    // console.log("req.cookies:", req.cookies);
+
+    const refreshToken: string | undefined = req.cookies.refreshToken;
+    // console.log(
+    //   "Extracted refreshToken:",
+    //   refreshToken ? "Present" : "Missing",
+    // );
+
     if (!refreshToken) {
       return res
         .status(HttpStatus.Unauthorized)
@@ -27,6 +40,7 @@ export const refreshTokenGuard = (
         .send("Refresh token is invalid or expired");
     }
 
+    // @ts-ignore
     req.userData = verifiedUserId as IdType; // Сохраняем данные пользователя в объекте запроса
     next();
   } catch (error: unknown) {
