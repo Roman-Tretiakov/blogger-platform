@@ -27,7 +27,7 @@ export async function loginHandler(
       httpOnly: true,
       secure: true,
       sameSite: "lax",
-      maxAge: 25 * 1000, // 25 сек.
+      maxAge: 250 * 1000, // 25 сек.
     })
     .send(result.data!.accessToken);
 }
