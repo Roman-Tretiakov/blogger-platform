@@ -5,6 +5,7 @@ import { ResultStatus } from "../../../core/enums/result-statuses";
 import { resultStatusToHttpStatusMapper } from "../../../core/utils/result-code-to-http-status.mapper";
 import { RequestWithBody } from "../../../core/types/request-types";
 import { CookieNames } from "../../../core/constants/cookie-names";
+import { appConfig } from "../../../core/config/appConfig";
 
 export async function loginHandler(
   req: RequestWithBody<LoginInputModel>,
@@ -26,8 +27,7 @@ export async function loginHandler(
     .cookie(CookieNames.REFRESH_TOKEN, result.data!.refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
-      maxAge: 250 * 1000, // 25 сек.
+      maxAge: (appConfig.RT_TOKEN_TIME + 10) * 1000, // сек.
     })
-    .send(result.data!.accessToken);
+    .send({ accessToken: result.data!.accessToken });
 }

@@ -42,5 +42,5 @@ export async function updateTokensHandler(
       sameSite: "strict",
       maxAge: 25 * 1000, // 25 сек.
     })
-    .send(newPairTokens.data!.accessToken);
+    .send({ accessToken: newPairTokens.data!.accessToken });
 }

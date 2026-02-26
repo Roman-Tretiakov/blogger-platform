@@ -10,6 +10,7 @@ import {
   runTokensDB,
 } from "../../../src/db/mongo.db";
 import { usersService } from "../../../src/users/BLL/users.service";
+import { tokensRepository } from "../../../src/refreshTokens/repositories/tokens.repository";
 
 const extractRefreshToken = (
   cookiesHeader: string | string[] | undefined,
@@ -39,6 +40,7 @@ let confirmationCode: string;
 beforeAll(async () => {
   await runDB(process.env.MONGODB_URI!);
   await runTokensDB(process.env.RT_TOKENS_MONGODB_URI!);
+  await tokensRepository.clear();
   app = express();
   setupApp(app);
 });

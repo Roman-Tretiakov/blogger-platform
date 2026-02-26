@@ -49,4 +49,9 @@ export const tokensRepository = {
 
     return result.deletedCount;
   },
+
+  async clear(): Promise<void> {
+    await whiteListTokensCollection.drop();
+    await blackListTokensCollection.drop();
+  },
 };
