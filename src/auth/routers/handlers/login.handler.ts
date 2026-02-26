@@ -27,6 +27,7 @@ export async function loginHandler(
     .cookie(CookieNames.REFRESH_TOKEN, result.data!.refreshToken, {
       httpOnly: true,
       secure: true,
+      sameSite: "strict",
       maxAge: (appConfig.RT_TOKEN_TIME + 10) * 1000, // сек.
     })
     .send({ accessToken: result.data!.accessToken });

@@ -5,6 +5,7 @@ import { resultStatusToHttpStatusMapper } from "../../../core/utils/result-code-
 import { CookieNames } from "../../../core/constants/cookie-names";
 import { tokensQueryRepository } from "../../../refreshTokens/repositories/tokens.query-repository";
 import { HttpStatus } from "../../../core/enums/http-status";
+import { appConfig } from "../../../core/config/appConfig";
 
 export async function updateTokensHandler(
   req: Request,
@@ -13,17 +14,22 @@ export async function updateTokensHandler(
   const userId = req.userData!.userId;
   const refreshToken: string = req.cookies.refreshToken;
 
-  const result = await tokensQueryRepository.isTokenWhitelistedAndValid(
+  const result = await tokensQueryRepository.isTokenWhitelisted(
     refreshToken,
     userId,
   );
   if (result.status !== ResultStatus.Success) {
     res.status(HttpStatus.Unauthorized).send();
     return;
+  } else if (
+    await tokensQueryRepository.isWhiteListTokenExpires(result.data!)
+  ) {
+    await authService.deleteTokenFromWhiteList(result.data!);
+    res.status(HttpStatus.Unauthorized).send();
+    return;
   }
 
   const newPairTokens = await authService.rotateTokensPair(
-    refreshToken,
     result.data!,
     userId,
   );
@@ -40,7 +46,7 @@ export async function updateTokensHandler(
       httpOnly: true,
       secure: true,
       sameSite: "strict",
-      maxAge: 25 * 1000, // 25 сек.
+      maxAge: (appConfig.RT_TOKEN_TIME + 10) * 1000, // сек.
     })
     .send({ accessToken: newPairTokens.data!.accessToken });
 }

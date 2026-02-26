@@ -11,7 +11,7 @@ export async function logoutHandler(
   const userId = req.userData!.userId;
   const refreshToken: string = req.cookies.refreshToken;
 
-  const tokenId = await tokensQueryRepository.isTokenWhitelistedAndValid(
+  const tokenId = await tokensQueryRepository.isTokenWhitelisted(
     refreshToken,
     userId,
   );

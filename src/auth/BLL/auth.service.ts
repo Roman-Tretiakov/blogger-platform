@@ -256,7 +256,6 @@ export const authService = {
   },
 
   async rotateTokensPair(
-    oldRefreshToken: string,
     oldRefreshTokenId: string,
     userId: string,
   ): Promise<Result<PairTokensViewModel | null>> {

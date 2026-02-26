@@ -84,11 +84,11 @@ describe("Auth API End-to-End Tests", () => {
         expect(cookies).toBeDefined();
         const refreshCookie = extractRefreshToken(cookies);
         expect(refreshCookie).toBeDefined();
-        expect(refreshCookie).toContain("HttpOnly");
-        expect(refreshCookie).toContain("Secure");
-        expect(refreshCookie).toContain("SameSite=Strict");
-        expect(refreshCookie).toContain("Max-Age=20");
-        expect(refreshCookie).toContain("Path=/api/auth/refresh-token");
+        expect(cookies[0]).toContain("HttpOnly");
+        expect(cookies[0]).toContain("Secure");
+        expect(cookies[0]).toContain("SameSite=Strict");
+        expect(cookies[0]).toContain("Max-Age=20");
+        expect(cookies[0]).toContain("Path=/api/auth/refresh-token");
 
         // Сохраняем токены для других тестов
         accessToken = response.body.accessToken;
