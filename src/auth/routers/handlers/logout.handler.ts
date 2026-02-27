@@ -1,33 +1,27 @@
-import { Request, Response } from "express";
-import { tokensQueryRepository } from "../../../refreshTokens/repositories/tokens.query-repository";
+import { Response } from "express";
 import { ResultStatus } from "../../../core/enums/result-statuses";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { authService } from "../../BLL/auth.service";
+import { CookieNames } from "../../../core/constants/cookie-names";
+import { RequestWithUserData } from "../../../core/types/request-types";
+import { IdType } from "../../../core/types/id-type";
 
 export async function logoutHandler(
-  req: Request,
+  req: RequestWithUserData<IdType>,
   res: Response,
 ): Promise<void> {
-  const userId = req.userData!.userId;
-  const refreshToken: string = req.cookies.refreshToken;
+  const tokenId: string = req.userData!.tokenId!;
 
-  const tokenId = await tokensQueryRepository.isTokenWhitelisted(
-    refreshToken,
-    userId,
-  );
-  if (tokenId.status !== ResultStatus.Success) {
-    res.status(HttpStatus.Unauthorized).send();
-    return;
-  }
-
-  const deleteTokenResult = await authService.deleteTokenFromWhiteList(
-    <string>tokenId.data,
-  );
+  const deleteTokenResult = await authService.deleteTokenFromWhiteList(tokenId);
   if (deleteTokenResult.status !== ResultStatus.Success) {
     res
       .status(HttpStatus.InternalServerError)
       .send(deleteTokenResult.errorMessage);
+    return;
   }
 
-  res.status(HttpStatus.NoContent).send();
+  res
+    .clearCookie(CookieNames.REFRESH_TOKEN)
+    .status(HttpStatus.NoContent)
+    .send();
 }

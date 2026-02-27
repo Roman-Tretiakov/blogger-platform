@@ -15,7 +15,7 @@ export const tokensRepository = {
     const tokenData: WhiteListTokenMongoModel = {
       token: token,
       userId: userId,
-      expiresAt: new Date(Date.now() + appConfig.RT_TOKEN_TIME * 1000), // Устанавливаем время истечения токена на основе текущего времени и времени жизни RT из конфигурации
+      expiresAt: new Date(Date.now() + appConfig.RT_TOKEN_TIME), // Устанавливаем время истечения токена на основе текущего времени и времени жизни RT из конфигурации
     };
 
     const result = await whiteListTokensCollection.insertOne(tokenData);

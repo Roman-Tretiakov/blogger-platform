@@ -42,11 +42,11 @@ export const tokensQueryRepository = {
 
   async isWhiteListTokenExpires(tokenId: string): Promise<boolean> {
     const currentDate = new Date();
-    const isExpires = await whiteListTokensCollection.findOne({
+    const token = await whiteListTokensCollection.findOne({
       _id: new ObjectId(tokenId),
-      expiresAt: { $gt: currentDate },
     });
 
-    return !!isExpires;
+    if (!token) return true;
+    return token.expiresAt < currentDate;
   },
 };
