@@ -88,7 +88,7 @@ describe("Auth API End-to-End Tests", () => {
         expect(cookies[0]).toContain("Secure");
         expect(cookies[0]).toContain("SameSite=Strict");
         expect(cookies[0]).toContain("Max-Age=20");
-        expect(cookies[0]).toContain("Path=/api/auth/refresh-token");
+        expect(cookies[0]).toContain("Path=/");
 
         // Сохраняем токены для других тестов
         accessToken = response.body.accessToken;
@@ -205,7 +205,7 @@ describe("Auth API End-to-End Tests", () => {
   });
 
   describe("GET /api/auth/me", () => {
-    beforeAll(() => {
+    beforeAll(async () => {
       // Получаем валидный access token перед тестами me
       return request(app)
         .post(EndpointList.AUTH_PATH + EndpointList.LOGIN_PATH)

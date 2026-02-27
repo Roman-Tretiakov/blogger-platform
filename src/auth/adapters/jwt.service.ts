@@ -15,11 +15,11 @@ export const jwtService = {
     switch (type) {
       case TokensTypes.AT:
         return jwt.sign(payload, JWT_AT_SECRET, {
-          expiresIn: JWT_AT_EXPIRES_IN * 1000, // Умножаем на 1000, так как jwt ожидает время в секундах, а у нас в конфиге время в миллисекундах
+          expiresIn: JWT_AT_EXPIRES_IN,
         });
       case TokensTypes.RT:
         return jwt.sign(payload, JWT_RT_SECRET, {
-          expiresIn: JWT_RT_EXPIRES_IN * 1000, // Умножаем на 1000, так как jwt ожидает время в секундах, а у нас в конфиге время в миллисекундах
+          expiresIn: JWT_RT_EXPIRES_IN,
         });
     }
   },
@@ -41,7 +41,7 @@ export const jwtService = {
         case TokensTypes.RT:
           return jwt.verify(token, JWT_RT_SECRET) as { userId: string };
       }
-    } catch (err) {
+    } catch (err: any) {
       if (err instanceof jwt.TokenExpiredError) {
         console.log("Token expired at: ", err.expiredAt);
       } else if (err instanceof jwt.JsonWebTokenError) {
