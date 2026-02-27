@@ -3,7 +3,6 @@ import { HttpStatus } from "../../../core/enums/http-status";
 import { jwtService } from "../../adapters/jwt.service";
 import { TokensTypes } from "../../adapters/enums/tokens-types";
 import { tokensQueryRepository } from "../../../refreshTokens/repositories/tokens.query-repository";
-import { ResultStatus } from "../../../core/enums/result-statuses";
 import { authService } from "../../BLL/auth.service";
 
 export const refreshTokenGuard = async (
@@ -29,31 +28,30 @@ export const refreshTokenGuard = async (
         .send("Refresh token is invalid or expired");
     }
 
-    // ✅ Добавляем проверку наличия токена в whitelist
-    const tokenResult = await tokensQueryRepository.isTokenWhitelisted(
+    // Добавляем проверку наличия токена в whitelist
+    const token = await tokensQueryRepository.getValidTokenDetails(
       refreshToken,
       verifiedUserId.userId,
     );
 
-    if (tokenResult.status !== ResultStatus.Success) {
+    if (!token.data) {
       return res
         .status(HttpStatus.Unauthorized)
-        .send("Refresh token not found in whitelist");
+        .send("Refresh token not found");
     }
 
     // Проверяем не истек ли токен
-    const isExpired = await tokensQueryRepository.isWhiteListTokenExpires(
-      tokenResult.data!,
-    );
-    if (isExpired) {
-      await authService.deleteTokenFromWhiteList(tokenResult.data!);
-      return res.status(HttpStatus.Unauthorized).send("Refresh token expired");
+    if (token.data.expiresAt < new Date()) {
+      await authService.deleteTokenFromWhiteList(token.data.id);
+      return res
+        .status(HttpStatus.Unauthorized)
+        .send(`Refresh token with id expired: ${token.data.expiresAt}`);
     }
 
     req.userData = {
       // Сохраняем данные пользователя в объекте запроса
       userId: verifiedUserId,
-      tokenId: tokenResult.data,
+      tokenId: token.data.id,
     };
     next();
   } catch (error: unknown) {
