@@ -29,5 +29,5 @@ export async function logoutHandler(
       .send(deleteTokenResult.errorMessage);
   }
 
-  res.status(HttpStatus.NoContent).clearCookie("refreshToken").send();
+  res.status(HttpStatus.NoContent).send();
 }
