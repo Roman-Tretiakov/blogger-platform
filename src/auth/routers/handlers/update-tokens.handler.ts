@@ -29,7 +29,7 @@ export async function updateTokensHandler(
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      maxAge: appConfig.RT_TOKEN_TIME * 1000, // сек.
+      maxAge: appConfig.RT_TOKEN_TIME + 10000, // сек.
     })
     .send({ accessToken: newPairTokens.data!.accessToken });
 }
