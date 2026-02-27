@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { jwtService } from "../../adapters/jwt.service";
 import { TokensTypes } from "../../adapters/enums/tokens-types";
-import { IdType } from "../../../core/types/id-type";
 import { tokensQueryRepository } from "../../../refreshTokens/repositories/tokens.query-repository";
 import { ResultStatus } from "../../../core/enums/result-statuses";
 import { authService } from "../../BLL/auth.service";
@@ -51,8 +50,11 @@ export const refreshTokenGuard = async (
       return res.status(HttpStatus.Unauthorized).send("Refresh token expired");
     }
 
-    req.userData = verifiedUserId as IdType; // Сохраняем данные пользователя в объекте запроса
-    req.tokenId = tokenResult.data as string;
+    req.userData = {
+      // Сохраняем данные пользователя в объекте запроса
+      userId: verifiedUserId,
+      tokenId: tokenResult.data,
+    };
     next();
   } catch (error: unknown) {
     return res.status(HttpStatus.InternalServerError).send(`message: ${error}`);
