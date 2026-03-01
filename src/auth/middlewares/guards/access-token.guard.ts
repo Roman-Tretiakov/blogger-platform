@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { jwtService } from "../../adapters/jwt.service";
-import { IdType } from "../../../core/types/id-type";
 import { TokensTypes } from "../../adapters/enums/tokens-types";
 
 export const accessTokenGuard = (
@@ -24,10 +23,9 @@ export const accessTokenGuard = (
 
   const userId = jwtService.verifyToken(token, TokensTypes.AT);
   if (!userId) {
-    res.sendStatus(HttpStatus.Unauthorized);
-    return;
+    return res.sendStatus(HttpStatus.Unauthorized);
   }
 
-  req.userData = userId as IdType; // Сохраняем данные пользователя в объекте запроса
+  req.userData = userId; // Сохраняем данные пользователя в объекте запроса
   next();
 };
