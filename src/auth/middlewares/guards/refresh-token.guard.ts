@@ -18,7 +18,7 @@ export const refreshTokenGuard = async (
         .send("Refresh token is missing");
     }
 
-    const verifiedUserId: any = jwtService.verifyToken(
+    const verifiedUserId: { userId: string } | null = jwtService.verifyToken(
       refreshToken,
       TokensTypes.RT,
     );
@@ -50,7 +50,7 @@ export const refreshTokenGuard = async (
 
     req.userData = {
       // Сохраняем данные пользователя в объекте запроса
-      userId: verifiedUserId,
+      userId: verifiedUserId.userId,
       tokenId: token.data.id,
     };
     next();
