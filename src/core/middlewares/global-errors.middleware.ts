@@ -11,7 +11,7 @@ export const globalErrorsHandler = (
   console.error("Global error handler caught:", err);
 
   if (err instanceof NotFoundError) {
-    res.status(HttpStatus.Unauthorized).send("User not found");
+    res.status(HttpStatus.Unauthorized).send(`User not found: ${err}`);
     return;
   }
   console.error("Unhandled error:", err);
