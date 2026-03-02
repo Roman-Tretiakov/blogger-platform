@@ -15,5 +15,7 @@ export const globalErrorsHandler = (
     return;
   }
   console.error("Unhandled error:", err);
-  res.status(HttpStatus.InternalServerError).send("Internal server error");
+  res
+    .status(HttpStatus.InternalServerError)
+    .send(`Internal server error: ${err}`);
 };
