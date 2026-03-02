@@ -9,7 +9,7 @@ export async function getLoggedUserHandler(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const userId = req.userData!.userId;
+  const userId = (req.userData!.userId as any).userId;
 
   if (!userId) {
     res.status(HttpStatus.Unauthorized).send("Request not contains userId");
