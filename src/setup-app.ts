@@ -9,6 +9,7 @@ import { usersRouter } from "./users/routers/usersRouter";
 import { authRouter } from "./auth/routers/auth.router";
 import { commentsRouter } from "./comments/routers/comments.router";
 import cookieParser from "cookie-parser";
+import { globalErrorsHandler } from "./core/middlewares/global-errors.middleware";
 
 export const setupApp = (app: Express) => {
   app.use(express.json()); // middleware для парсинга JSON в теле запроса
@@ -28,4 +29,6 @@ export const setupApp = (app: Express) => {
   app.use(EndpointList.TESTING_PATH, testingRouter);
 
   setupSwagger(app);
+
+  app.use(globalErrorsHandler);
 };

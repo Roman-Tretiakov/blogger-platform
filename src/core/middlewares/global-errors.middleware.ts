@@ -1,0 +1,17 @@
+import { Request, Response, NextFunction } from "express";
+import { NotFoundError } from "../errorClasses/NotFoundError";
+import { HttpStatus } from "../enums/http-status";
+
+export const globalErrorsHandler = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (err instanceof NotFoundError) {
+    res.status(HttpStatus.Unauthorized).send("User not found");
+    return;
+  }
+  console.error("Unhandled error:", err);
+  res.status(HttpStatus.InternalServerError).send("Internal server error");
+};
