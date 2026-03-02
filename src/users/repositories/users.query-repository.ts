@@ -10,6 +10,10 @@ import { MeViewModel } from "../../auth/routers/outputTypes/me-view-model";
 
 export const usersQueryRepository = {
   async getUserById(id: string): Promise<UserViewModel> {
+    if (!ObjectId.isValid(id)) {
+      throw new NotFoundError(`User with id: ${id} not found`, "id");
+    }
+
     const user = await usersCollection.findOne({ _id: new ObjectId(id) });
     if (user === null) {
       throw new NotFoundError(`User with id: ${id} not found`, "id");

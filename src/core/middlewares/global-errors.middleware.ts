@@ -8,6 +8,8 @@ export const globalErrorsHandler = (
   res: Response,
   next: NextFunction,
 ) => {
+  console.error("Global error handler caught:", err);
+
   if (err instanceof NotFoundError) {
     res.status(HttpStatus.Unauthorized).send("User not found");
     return;
