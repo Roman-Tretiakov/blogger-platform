@@ -11,11 +11,11 @@ export const globalErrorsHandler = (
   console.error("Global error handler caught:", err);
 
   if (err instanceof NotFoundError) {
-    res.status(HttpStatus.Unauthorized).send(`User not found: ${err}`);
+    res.status(HttpStatus.Unauthorized).send(`User not found: ${err.message}`);
     return;
   }
   console.error("Unhandled error:", err);
   res
     .status(HttpStatus.InternalServerError)
-    .send(`Internal server error: ${err}`);
+    .send(`Internal server error: ${err.message}`);
 };
