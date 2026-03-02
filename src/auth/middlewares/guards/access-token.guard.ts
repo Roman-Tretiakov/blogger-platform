@@ -21,11 +21,11 @@ export const accessTokenGuard = (
       .send("Header authorization must be in format 'Bearer ...'");
   }
 
-  const userId = jwtService.verifyToken(token, TokensTypes.AT);
-  if (!userId) {
+  const verifiedData = jwtService.verifyToken(token, TokensTypes.AT);
+  if (!verifiedData) {
     return res.sendStatus(HttpStatus.Unauthorized);
   }
 
-  req.userData = userId; // Сохраняем данные пользователя в объекте запроса
+  req.userData = { userId: verifiedData.userId }; // Сохраняем данные пользователя в объекте запроса
   next();
 };
