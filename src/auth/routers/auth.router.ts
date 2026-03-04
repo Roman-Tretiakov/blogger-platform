@@ -14,11 +14,13 @@ import { emailResendingValidationMiddleware } from "../middlewares/email-resendi
 import { refreshTokenGuard } from "../middlewares/guards/refresh-token.guard";
 import { updateTokensHandler } from "./handlers/update-tokens.handler";
 import { logoutHandler } from "./handlers/logout.handler";
+import { rateLimitsMiddleware } from "../../core/middlewares/rateLimiter/rate-limits.middleware";
 
 export const authRouter = Router();
 
 authRouter.post(
   EndpointList.REGISTRATION_PATH,
+  rateLimitsMiddleware,
   createUsersBodyValidation,
   inputValidationResultMiddleware,
   registrationHandler,
@@ -40,6 +42,7 @@ authRouter.post(
 
 authRouter.post(
   EndpointList.LOGIN_PATH,
+  rateLimitsMiddleware,
   authBodyValidationMiddleware,
   inputValidationResultMiddleware,
   loginHandler,
@@ -47,10 +50,16 @@ authRouter.post(
 
 authRouter.post(
   EndpointList.REFRESH_TOKEN_PATH,
+  rateLimitsMiddleware,
   refreshTokenGuard,
   updateTokensHandler,
 );
 
 authRouter.post(EndpointList.LOGOUT_PATH, refreshTokenGuard, logoutHandler);
 
-authRouter.get(EndpointList.ME_PATH, accessTokenGuard, getLoggedUserHandler);
+authRouter.get(
+  EndpointList.ME_PATH,
+  rateLimitsMiddleware,
+  accessTokenGuard,
+  getLoggedUserHandler,
+);

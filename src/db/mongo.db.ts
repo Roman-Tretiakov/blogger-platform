@@ -6,6 +6,7 @@ import { UserMongoModel } from "../users/repositories/type/user-mongo-model";
 import { CommentMongoModel } from "../comments/repositories/types/comment-mongo-model";
 import { WhiteListTokenMongoModel } from "../auth/types/white-list-token-mongo-model";
 import { BlackListTokenMongoModel } from "../auth/types/black-list-token-mongo-model";
+import { RateLimiterDocument } from "../core/coreClasses/rateLimiter";
 
 export let client: MongoClient;
 export let tokensDbClient: MongoClient;
@@ -15,6 +16,7 @@ export let usersCollection: Collection<UserMongoModel>;
 export let commentsCollection: Collection<CommentMongoModel>;
 export let blackListTokensCollection: Collection<BlackListTokenMongoModel>;
 export let whiteListTokensCollection: Collection<WhiteListTokenMongoModel>;
+export let rateLimitsCollection: Collection<RateLimiterDocument>;
 
 // Подключения к бд
 export async function runDB(url: string): Promise<void> {
@@ -28,11 +30,24 @@ export async function runDB(url: string): Promise<void> {
   commentsCollection = db.collection<CommentMongoModel>(
     DBCollectionNames.COMMENTS,
   );
+  rateLimitsCollection = db.collection(DBCollectionNames.RATE_LIMITS);
 
   try {
     await client.connect();
     await db.command({ ping: 1 });
     console.log(`✅ Connected to the database ${db.databaseName}`);
+
+    const rateLimitsIndexes = await rateLimitsCollection.indexes();
+    const hasTTLIndex = rateLimitsIndexes.some(
+      (index) => index.name === "expireAt_1",
+    );
+    if (!hasTTLIndex) {
+      await rateLimitsCollection.createIndex(
+        { expireAt: 1 },
+        { expireAfterSeconds: 0 },
+      );
+      console.log("✅ TTL index created on rateLimitsCollection");
+    }
   } catch (e) {
     await client.close();
     throw new Error(`❌ Database not connected: ${e}`);
