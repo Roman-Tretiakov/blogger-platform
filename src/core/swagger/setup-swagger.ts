@@ -8,7 +8,7 @@ const swaggerOptions = {
     openapi: "3.0.0",
     info: {
       title: "Blogger platform API",
-      version: "1.0.0",
+      version: "2.0.0",
       description: "Open API",
     },
     tags: [
@@ -18,6 +18,10 @@ const swaggerOptions = {
       { name: "Testing", description: "API for clearing the database" },
       { name: "Users", description: "API for managing users" },
       { name: "Comments", description: "API for managing comments" },
+      {
+        name: "SecurityDevices",
+        description: "API for managing auth device sessions",
+      },
     ],
     components: {
       securitySchemes: {
@@ -51,6 +55,7 @@ const swaggerOptions = {
     join(__dirname, "../../users/docs/users.swagger.yml"),
     join(__dirname, "../../comments/docs/comments.swagger.yml"),
     join(__dirname, "../../auth/docs/auth.swagger.yml"),
+    join(__dirname, "../../securityDevices/docs/securityDevices.swagger.yml"),
   ],
 };
 

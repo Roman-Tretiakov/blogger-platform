@@ -1,6 +1,6 @@
 tags:
   - name: Comments
-    description: API for managing blogs
+    description: API for managing comments
 
 paths:
   /api/comments/{commentId}:
