@@ -28,9 +28,11 @@ paths:
                 $ref: '#/components/schemas/ValidationErrorResponse'
         401:
           description: Unauthorized
+        429:
+            description: Too Many Requests (if user try to login more than 5 times from one IP during 10 seconds)
   /api/auth/refresh-token:
     post:
-      summary: Generate new pair of access and refresh tokens (in cookie client must send correct refreshToken that will be revoked after refreshing)
+      summary: Generate new pair of access and refresh tokens (in cookie client must send correct refreshToken that will be revoked after refreshing) Device LastActiveDate should be overrode by issued Date of new refresh token
       tags: [ Auth ]
       security:
         - refreshToken: []

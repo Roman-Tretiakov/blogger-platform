@@ -52,21 +52,10 @@ authRouter.post(
 
 authRouter.post(
   EndpointList.REFRESH_TOKEN_PATH,
-  rateLimitsMiddleware,
   refreshTokenGuard,
   updateTokensHandler,
 );
 
-authRouter.post(
-  EndpointList.LOGOUT_PATH,
-  rateLimitsMiddleware,
-  refreshTokenGuard,
-  logoutHandler,
-);
+authRouter.post(EndpointList.LOGOUT_PATH, refreshTokenGuard, logoutHandler);
 
-authRouter.get(
-  EndpointList.ME_PATH,
-  rateLimitsMiddleware,
-  accessTokenGuard,
-  getLoggedUserHandler,
-);
+authRouter.get(EndpointList.ME_PATH, accessTokenGuard, getLoggedUserHandler);
