@@ -8,4 +8,5 @@ export const DBCollectionNames = {
   COMMENTS: "comments",
   RT_TOKENS: "refreshTokens",
   RATE_LIMITS: "rateLimits",
+  AUTH_DEVICES: "authDevices",
 };

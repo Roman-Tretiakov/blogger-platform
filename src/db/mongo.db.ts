@@ -7,6 +7,7 @@ import { CommentMongoModel } from "../comments/repositories/types/comment-mongo-
 import { WhiteListTokenMongoModel } from "../auth/types/white-list-token-mongo-model";
 import { BlackListTokenMongoModel } from "../auth/types/black-list-token-mongo-model";
 import { RateLimiterDocument } from "../core/coreClasses/rateLimiter";
+import { AuthDevicesSessions } from "../securityDevices/BLL/types/auth-devices-sessions.interface";
 
 export let client: MongoClient;
 export let tokensDbClient: MongoClient;
@@ -17,6 +18,7 @@ export let commentsCollection: Collection<CommentMongoModel>;
 export let blackListTokensCollection: Collection<BlackListTokenMongoModel>;
 export let whiteListTokensCollection: Collection<WhiteListTokenMongoModel>;
 export let rateLimitsCollection: Collection<RateLimiterDocument>;
+export let authDevicesCollection: Collection<AuthDevicesSessions>;
 
 // Подключения к бд
 export async function runDB(url: string): Promise<void> {
@@ -31,6 +33,7 @@ export async function runDB(url: string): Promise<void> {
     DBCollectionNames.COMMENTS,
   );
   rateLimitsCollection = db.collection(DBCollectionNames.RATE_LIMITS);
+  authDevicesCollection = db.collection(DBCollectionNames.AUTH_DEVICES);
 
   try {
     await client.connect();
@@ -38,7 +41,7 @@ export async function runDB(url: string): Promise<void> {
     console.log(`✅ Connected to the database ${db.databaseName}`);
 
     const rateLimitsIndexes = await rateLimitsCollection.indexes();
-    const hasTTLIndex = rateLimitsIndexes.some(
+    let hasTTLIndex = rateLimitsIndexes.some(
       (index) => index.name === "expireAt_1",
     );
     if (!hasTTLIndex) {
@@ -47,6 +50,18 @@ export async function runDB(url: string): Promise<void> {
         { expireAfterSeconds: 0 },
       );
       console.log("✅ TTL index created on rateLimitsCollection");
+    }
+
+    const authDevicesIndexes = await authDevicesCollection.indexes();
+    hasTTLIndex = authDevicesIndexes.some(
+      (index) => index.name === "expireAt_1",
+    );
+    if (!hasTTLIndex) {
+      await authDevicesCollection.createIndex(
+        { expireAt: 1 },
+        { expireAfterSeconds: 0 },
+      );
+      console.log("✅ TTL index created on authDevicesCollection");
     }
   } catch (e) {
     await client.close();
