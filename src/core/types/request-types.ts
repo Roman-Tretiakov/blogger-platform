@@ -21,3 +21,10 @@ export type RequestWithBodyAndUserId<B, U extends IdType> = Request<
   U
 >;
 export type RequestWithUserData<U extends IdType> = Request<{}, {}, {}, {}, U>;
+export type RequestWithQueryAndUserData<Q, U extends IdType> = Request<
+  {},
+  {},
+  {},
+  Q,
+  U
+>;
