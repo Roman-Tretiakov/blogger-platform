@@ -28,6 +28,7 @@ export const rateLimitsMiddleware = async (
       "X-RateLimit-Remaining",
       Math.max(0, maxRequests - rateCount),
     );
+
     next();
   } catch (error: unknown) {
     return res.status(HttpStatus.InternalServerError).send(`message: ${error}`);

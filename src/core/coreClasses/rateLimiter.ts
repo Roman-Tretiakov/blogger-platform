@@ -5,7 +5,7 @@ export interface RateLimiterDocument {
   ip: string;
   url: string;
   date: Date;
-  expiresAt: Date;
+  expireAt: Date;
 }
 
 export class RateLimiter {
@@ -19,13 +19,13 @@ export class RateLimiter {
     ttlMs: number = appConfig.TTL_INDEX_MONGO_DB_TIME,
   ): Promise<void> {
     const now = new Date();
-    const expiresAt = new Date(now.getTime() + ttlMs);
+    const expireAt = new Date(now.getTime() + ttlMs);
 
     await this.collection.insertOne({
       ip,
       url,
       date: now,
-      expiresAt,
+      expireAt: expireAt,
     });
   }
 
