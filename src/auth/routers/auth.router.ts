@@ -28,6 +28,7 @@ authRouter.post(
 
 authRouter.post(
   EndpointList.REGISTRATION_CONFIRMATION_PATH,
+  rateLimitsMiddleware,
   registrationConfirmationBodyValidation,
   inputValidationResultMiddleware,
   registrationConfirmationHandler,
@@ -35,6 +36,7 @@ authRouter.post(
 
 authRouter.post(
   EndpointList.REGISTRATION_EMAIL_RESENDING_PATH,
+  rateLimitsMiddleware,
   emailResendingValidationMiddleware,
   inputValidationResultMiddleware,
   registrationEmailResending,
@@ -55,7 +57,12 @@ authRouter.post(
   updateTokensHandler,
 );
 
-authRouter.post(EndpointList.LOGOUT_PATH, refreshTokenGuard, logoutHandler);
+authRouter.post(
+  EndpointList.LOGOUT_PATH,
+  rateLimitsMiddleware,
+  refreshTokenGuard,
+  logoutHandler,
+);
 
 authRouter.get(
   EndpointList.ME_PATH,
