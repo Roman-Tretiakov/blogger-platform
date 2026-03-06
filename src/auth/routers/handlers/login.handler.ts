@@ -22,6 +22,24 @@ export async function loginHandler(
     return;
   }
 
+  req.session.userId = result.data!.userId;
+  req.session.deviceId = req.sessionID;
+  req.session.isAuthenticated = true;
+  const sessionId = req.sessionID;
+
+  await authService.createAuthDeviceSession({
+    userId: result.data!.userId,
+    deviceInfo: {
+      deviceId: sessionId,
+      title: req.headers["user-agent"] || "unknown",
+      ip: req.ip || null,
+    },
+    issuedAt: new Date(),
+    expireAt: new Date(Date.now() + appConfig.RT_TOKEN_TIME),
+    lastActiveDate: new Date(),
+    isCurrentSession: true,
+  });
+
   res
     .status(resultStatusToHttpStatusMapper(result.status))
     .cookie(CookieNames.REFRESH_TOKEN, result.data!.refreshToken, {

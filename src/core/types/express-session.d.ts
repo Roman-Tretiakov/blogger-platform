@@ -7,5 +7,6 @@ declare module "express-session" {
     userAgent?: string;
     ip?: string;
     lastActive?: Date;
+    isAuthenticated?: boolean;
   }
 }

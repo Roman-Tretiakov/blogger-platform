@@ -6,7 +6,7 @@ export interface AuthDevicesSessions {
   deviceInfo: {
     deviceId: string; //session id
     title: string;
-    ip: string;
+    ip: string | null;
   };
   issuedAt: Date;
   expireAt: Date;

@@ -13,6 +13,8 @@ import { randomUUID } from "crypto";
 import { TokensTypes } from "../adapters/enums/tokens-types";
 import { tokensRepository } from "../../refreshTokens/repositories/tokens.repository";
 import { TokenMongoType } from "../../refreshTokens/types/token-mongo-type";
+import { UserIdModel } from "../types/userId-model";
+import { AuthDevicesSessions } from "../../securityDevices/BLL/types/auth-devices-sessions.interface";
 
 export const authService = {
   async registerUser(
@@ -201,7 +203,7 @@ export const authService = {
   async loginUser(
     loginOrEmail: string,
     password: string,
-  ): Promise<Result<PairTokensViewModel | null>> {
+  ): Promise<Result<UserIdModel | null>> {
     const result = await this.checkLoginAndPassword([loginOrEmail], password);
 
     if (result) {
@@ -223,7 +225,11 @@ export const authService = {
         status: ResultStatus.Success,
         errorMessage: "",
         extensions: [],
-        data: { accessToken: accessToken, refreshToken: refreshToken },
+        data: {
+          userId: result,
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        },
       };
     }
 
@@ -312,5 +318,11 @@ export const authService = {
       extensions: [],
       data: null,
     };
+  },
+
+  async createAuthDeviceSession(
+    sessionData: AuthDevicesSessions,
+  ): Promise<void> {
+    const sessionId = sessionData.deviceInfo.deviceId;
   },
 };
