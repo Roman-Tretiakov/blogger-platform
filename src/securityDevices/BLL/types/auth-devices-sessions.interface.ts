@@ -4,7 +4,7 @@ export interface AuthDevicesSessions {
   _id?: ObjectId;
   userId: string;
   deviceInfo: {
-    deviceId: string;
+    deviceId: string; //session id
     title: string;
     ip: string;
   };

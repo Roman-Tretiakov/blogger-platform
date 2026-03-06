@@ -9,7 +9,7 @@ const bootstrap = async () => {
 
   // создание приложения
   const app = express();
-  app.set("trust proxy", true); // для корректной работы secure cookies при использовании прокси (например, при деплое на Heroku)
+  app.set("trust proxy", 1); // для корректной работы secure cookies при использовании прокси (например, при деплое на Heroku)
   setupApp(app);
 
   // порты приложения

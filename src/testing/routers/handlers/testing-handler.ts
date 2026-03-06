@@ -12,6 +12,7 @@ export const testingHandler = async (req: Request, res: Response) => {
   await usersRepository.clear();
   await commentsRepository.clear();
   await tokensRepository.clear();
+  //TODO: clear authDevicesCollection
 
   res.status(HttpStatus.NoContent).send("All data is deleted");
 };
