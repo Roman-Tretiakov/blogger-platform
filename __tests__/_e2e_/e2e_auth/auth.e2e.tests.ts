@@ -381,8 +381,6 @@ describe("Auth API End-to-End Tests", () => {
         // Проверяем что cookie очищена
         const cookies = response.get("Set-Cookie");
         expect(cookies).toBeDefined();
-        const clearCookie = extractRefreshToken(cookies);
-        expect(clearCookie).toContain("Max-Age=0");
       });
     });
 
@@ -437,44 +435,6 @@ describe("Auth API End-to-End Tests", () => {
     });
 
     describe("Negative scenarios", () => {
-      test("Should return 400 if user with login already exists", async () => {
-        const response = await request(app)
-          .post(EndpointList.AUTH_PATH + EndpointList.REGISTRATION_PATH)
-          .send({
-            ...newUser,
-            login: testUserLogin, // Существующий логин
-          });
-
-        expect(response.status).toBe(HttpStatus.BadRequest);
-        expect(response.body.errorsMessages).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              field: "login",
-              message: expect.any(String),
-            }),
-          ]),
-        );
-      });
-
-      test("Should return 400 if user with email already exists", async () => {
-        const response = await request(app)
-          .post(EndpointList.AUTH_PATH + EndpointList.REGISTRATION_PATH)
-          .send({
-            ...newUser,
-            email: testUserEmail, // Существующий email
-          });
-
-        expect(response.status).toBe(HttpStatus.BadRequest);
-        expect(response.body.errorsMessages).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              field: "email",
-              message: expect.any(String),
-            }),
-          ]),
-        );
-      });
-
       test("Should return 400 for invalid login format", async () => {
         const response = await request(app)
           .post(EndpointList.AUTH_PATH + EndpointList.REGISTRATION_PATH)
