@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { jwtService } from "../../adapters/jwt.service";
 import { TokensTypes } from "../../adapters/enums/tokens-types";
-import { tokensQueryRepository } from "../../../refreshTokens/repositories/tokens.query-repository";
-import { authService } from "../../BLL/auth.service";
+import { authDevicesQueryRepository } from "../../../securityDevices/repositories/authDevices.query-repository";
+import { authDevicesRepository } from "../../../securityDevices/repositories/authDevices.repository";
 
 export const refreshTokenGuard = async (
   req: Request,
@@ -18,41 +18,32 @@ export const refreshTokenGuard = async (
         .send("Refresh token is missing");
     }
 
-    const verifiedUserId: any = jwtService.verifyToken(
-      refreshToken,
-      TokensTypes.RT,
-    );
-    if (!verifiedUserId) {
+    const payload = jwtService.verifyToken(refreshToken, TokensTypes.RT);
+    if (!payload || !payload.deviceId) {
       return res
         .status(HttpStatus.Unauthorized)
         .send("Refresh token is invalid or expired");
     }
 
-    // Добавляем проверку наличия токена в whitelist
-    const token = await tokensQueryRepository.getValidTokenDetails(
-      refreshToken,
-      verifiedUserId.userId,
+    const session = await authDevicesQueryRepository.findByDeviceId(
+      payload.deviceId,
     );
-
-    if (!token.data) {
+    if (!session) {
       return res
         .status(HttpStatus.Unauthorized)
-        .send("Refresh token not found");
+        .send("Session not found for the provided device id");
     }
-
-    // Проверяем не истек ли токен
-    if (token.data.expiresAt < new Date()) {
-      await authService.deleteTokenFromWhiteList(token.data.id);
-      return res
-        .status(HttpStatus.Unauthorized)
-        .send(`Refresh token with id expired: ${token.data.expiresAt}`);
+    if (session.expireAt < new Date()) {
+      await authDevicesRepository.deleteByDeviceId(payload.deviceId);
+      return res.status(HttpStatus.Unauthorized).send("Session has expired");
     }
 
     req.userData = {
       // Сохраняем данные пользователя в объекте запроса
-      userId: verifiedUserId,
-      tokenId: token.data.id,
+      userId: payload.userId,
+      deviceId: payload.deviceId,
     };
+
     next();
   } catch (error: unknown) {
     return res.status(HttpStatus.InternalServerError).send(`message: ${error}`);

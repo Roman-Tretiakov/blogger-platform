@@ -11,35 +11,11 @@ import { commentsRouter } from "./comments/routers/comments.router";
 import cookieParser from "cookie-parser";
 import { globalErrorsHandler } from "./core/middlewares/global-errors.middleware";
 import { securityDevicesRouter } from "./securityDevices/routers/security-devices.router";
-import session from "express-session";
-import { appConfig } from "./core/config/appConfig";
-import MongoStore from "connect-mongo";
 
 export const setupApp = (app: Express) => {
   app.use(express.json()); // middleware для парсинга JSON в теле запроса
   app.use(cookieParser()); // middleware для парсинга куки в хедере запроса
 
-  app.use(
-    session({
-      secret: appConfig.SESSION_SECRET || "default,secret",
-      resave: false,
-      saveUninitialized: false,
-      store: MongoStore.create({
-        mongoUrl: appConfig.MONGO_DB_URL,
-        collectionName: "expressSessions",
-        ttl: appConfig.TTL_INDEX_EXPRESS_SESSION_TIME,
-        autoRemove: "native",
-      }),
-      name: "sessionId",
-      cookie: {
-        secure: appConfig.ENVIRONMENT === "production",
-        httpOnly: true,
-        maxAge: appConfig.RT_TOKEN_TIME + 10000, // миллисекунды
-        sameSite: "none",
-      },
-      rolling: true,
-    }),
-  );
   app.get(EndpointList.SLASH_PATH, (req: Request, res: Response) => {
     res.status(HttpStatus.Ok).send("Welcome to Blogger platform Service API!");
   });

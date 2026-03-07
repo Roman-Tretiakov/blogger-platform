@@ -4,12 +4,11 @@ export interface AuthDevicesSessions {
   _id?: ObjectId;
   userId: string;
   deviceInfo: {
-    deviceId: string; //session id
+    deviceId: string;
     title: string;
     ip: string | null;
   };
   issuedAt: Date;
   expireAt: Date;
   lastActiveDate: Date;
-  isCurrentSession: boolean;
 }
