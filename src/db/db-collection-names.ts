@@ -6,7 +6,6 @@ export const DBCollectionNames = {
   POSTS: "posts",
   USERS: "users",
   COMMENTS: "comments",
-  RT_TOKENS: "refreshTokens",
   RATE_LIMITS: "rateLimits",
   AUTH_DEVICES: "authDevices",
 };

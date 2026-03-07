@@ -13,23 +13,23 @@ export async function updateTokensHandler(
   res: Response,
 ): Promise<void> {
   const userId = req.userData!.userId;
-  const tokenId = req.userData!.tokenId!;
+  const deviceId = req.userData!.deviceId!;
 
-  const newPairTokens = await authService.rotateTokensPair(tokenId, userId);
-  if (newPairTokens.status !== ResultStatus.Success) {
+  const result = await authService.rotateTokensPair(deviceId, userId);
+  if (result.status !== ResultStatus.Success) {
     res
-      .status(resultStatusToHttpStatusMapper(newPairTokens.status))
-      .send(newPairTokens.extensions);
+      .status(resultStatusToHttpStatusMapper(result.status))
+      .send(result.extensions);
     return;
   }
 
   res
     .status(HttpStatus.Ok)
-    .cookie(CookieNames.REFRESH_TOKEN, newPairTokens.data!.refreshToken, {
+    .cookie(CookieNames.REFRESH_TOKEN, result.data!.refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "none",
-      maxAge: appConfig.RT_TOKEN_TIME + 10000, // сек.
+      sameSite: "strict",
+      maxAge: appConfig.RT_TOKEN_TIME + 10000,
     })
-    .send({ accessToken: newPairTokens.data!.accessToken });
+    .send({ accessToken: result.data!.accessToken });
 }

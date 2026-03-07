@@ -11,10 +11,10 @@ import { usersRepository } from "../../users/repositories/users.repository";
 import { emailExamples } from "../adapters/emailSendler/emailExamples";
 import { randomUUID } from "crypto";
 import { TokensTypes } from "../adapters/enums/tokens-types";
-import { tokensRepository } from "../../refreshTokens/repositories/tokens.repository";
-import { TokenMongoType } from "../../refreshTokens/types/token-mongo-type";
 import { UserIdModel } from "../types/userId-model";
 import { AuthDevicesSessions } from "../../securityDevices/BLL/types/auth-devices-sessions.interface";
+import { authDevicesRepository } from "../../securityDevices/repositories/authDevices.repository";
+import { authDevicesQueryRepository } from "../../securityDevices/repositories/authDevices.query-repository";
 
 export const authService = {
   async registerUser(
@@ -203,41 +203,35 @@ export const authService = {
   async loginUser(
     loginOrEmail: string,
     password: string,
+    deviceId: string,
   ): Promise<Result<UserIdModel | null>> {
-    const result = await this.checkLoginAndPassword([loginOrEmail], password);
+    const userId = await this.checkLoginAndPassword([loginOrEmail], password);
 
-    if (result) {
-      const accessToken = jwtService.createToken(result, TokensTypes.AT);
-      const refreshToken = jwtService.createToken(result, TokensTypes.RT);
-
-      await tokensRepository
-        .addTokenToWhitelist(refreshToken, result)
-        .catch((e: any) => {
-          return {
-            status: ResultStatus.Failure,
-            errorMessage: `Something went wrong during token generation: ${e}`,
-            extensions: [],
-            data: null,
-          };
-        });
-
+    if (!userId) {
       return {
-        status: ResultStatus.Success,
-        errorMessage: "",
-        extensions: [],
-        data: {
-          userId: result,
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-        },
+        status: ResultStatus.Unauthorized,
+        data: null,
+        errorMessage: ResultStatus.Unauthorized,
+        extensions: [{ field: "loginOrEmail", message: "Wrong credentials!" }],
       };
     }
 
+    const accessToken = jwtService.createToken(userId, TokensTypes.AT);
+    const refreshToken = jwtService.createToken(
+      userId,
+      TokensTypes.RT,
+      deviceId,
+    );
+
     return {
-      status: ResultStatus.Unauthorized,
-      data: null,
-      errorMessage: ResultStatus.Unauthorized,
-      extensions: [{ field: "loginOrEmail", message: "Wrong credentials!" }],
+      status: ResultStatus.Success,
+      errorMessage: "",
+      extensions: [],
+      data: {
+        userId: userId,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      },
     };
   },
 
@@ -262,31 +256,28 @@ export const authService = {
   },
 
   async rotateTokensPair(
-    oldRefreshTokenId: string,
+    deviceId: string,
     userId: string,
   ): Promise<Result<PairTokensViewModel | null>> {
-    if (
-      (await this.deleteTokenFromWhiteList(oldRefreshTokenId)).status !==
-      ResultStatus.Success
-    ) {
+    const session = await authDevicesQueryRepository.findByDeviceId(deviceId);
+    if (!session) {
       return {
         status: ResultStatus.Failure,
-        errorMessage: "Deleting old refresh token is failure",
+        errorMessage: "Session not found!",
         extensions: [],
         data: null,
       };
     }
-    const refreshToken = jwtService.createToken(userId, TokensTypes.RT);
+
+    const refreshToken = jwtService.createToken(
+      userId,
+      TokensTypes.RT,
+      deviceId,
+    );
     const accessToken = jwtService.createToken(userId, TokensTypes.AT);
 
-    if (!(await tokensRepository.addTokenToWhitelist(refreshToken, userId))) {
-      return {
-        status: ResultStatus.Failure,
-        errorMessage: "Adding new refresh token is failure",
-        extensions: [],
-        data: null,
-      };
-    }
+    await authDevicesRepository.updateLastActiveDate(deviceId);
+
     return {
       status: ResultStatus.Success,
       errorMessage: "",
@@ -298,16 +289,12 @@ export const authService = {
     };
   },
 
-  async deleteTokenFromWhiteList(tokenId: string): Promise<Result> {
-    if (
-      (await tokensRepository.removeToken(
-        tokenId,
-        TokenMongoType.WhiteListToken,
-      )) < 1
-    ) {
+  async deleteSession(deviceId: string): Promise<Result> {
+    const deleteCount = await authDevicesRepository.deleteByDeviceId(deviceId);
+    if (deleteCount < 1) {
       return {
         status: ResultStatus.Failure,
-        errorMessage: `Error happened during token deleting, token id: ${tokenId}`,
+        errorMessage: `Error happened during session deleting, device id: ${deviceId}`,
         extensions: [],
         data: null,
       };
@@ -320,9 +307,35 @@ export const authService = {
     };
   },
 
-  async createAuthDeviceSession(
-    sessionData: AuthDevicesSessions,
+  async createAuthDeviceSession(session: AuthDevicesSessions): Promise<void> {
+    await authDevicesRepository.create(session);
+  },
+
+  async deleteAllSessionsExceptCurrent(
+    userId: string,
+    currentDeviceId: string,
   ): Promise<void> {
-    const sessionId = sessionData.deviceInfo.deviceId;
+    await authDevicesRepository.deleteAllExceptCurrent(userId, currentDeviceId);
+  },
+
+  async findSessionByDeviceId(
+    deviceId: string,
+  ): Promise<Result<AuthDevicesSessions | null>> {
+    const session = await authDevicesQueryRepository.findByDeviceId(deviceId);
+    if (!session) {
+      return {
+        status: ResultStatus.NotFound,
+        errorMessage: "Session not found!",
+        extensions: [],
+        data: null,
+      };
+    }
+
+    return {
+      status: ResultStatus.Success,
+      errorMessage: "",
+      extensions: [],
+      data: session,
+    };
   },
 };

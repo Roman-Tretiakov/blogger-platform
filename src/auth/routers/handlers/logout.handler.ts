@@ -10,13 +10,13 @@ export async function logoutHandler(
   req: RequestWithUserData<IdType>,
   res: Response,
 ): Promise<void> {
-  const tokenId: string = req.userData!.tokenId!;
+  const deviceId: string = req.userData!.deviceId!;
 
-  const deleteTokenResult = await authService.deleteTokenFromWhiteList(tokenId);
-  if (deleteTokenResult.status !== ResultStatus.Success) {
+  const deleteSessionResult = await authService.deleteSession(deviceId);
+  if (deleteSessionResult.status !== ResultStatus.Success) {
     res
       .status(HttpStatus.InternalServerError)
-      .send(deleteTokenResult.errorMessage);
+      .send(deleteSessionResult.errorMessage);
     return;
   }
 

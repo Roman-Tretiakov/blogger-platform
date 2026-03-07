@@ -3,14 +3,10 @@ import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { HttpStatus } from "../../../src/core/enums/http-status";
 import { EndpointList } from "../../../src/core/constants/endpoint-list";
-import {
-  client,
-  closeDBConnection,
-  runDB,
-  runTokensDB,
-} from "../../../src/db/mongo.db";
+import { client, closeDBConnection, runDB } from "../../../src/db/mongo.db";
 import { usersService } from "../../../src/users/BLL/users.service";
-import { tokensRepository } from "../../../src/refreshTokens/repositories/tokens.repository";
+import { appConfig } from "../../../src/core/config/appConfig";
+import { authDevicesRepository } from "../../../src/securityDevices/repositories/authDevices.repository";
 
 const extractRefreshToken = (
   cookiesHeader: string | string[] | undefined,
@@ -38,9 +34,8 @@ let testUserId: string;
 let confirmationCode: string;
 
 beforeAll(async () => {
-  await runDB(process.env.MONGODB_URI!);
-  await runTokensDB(process.env.RT_TOKENS_MONGODB_URI!);
-  await tokensRepository.clear();
+  await runDB(appConfig.MONGO_DB_URL!);
+  await authDevicesRepository.clear();
   app = express();
   setupApp(app);
 });

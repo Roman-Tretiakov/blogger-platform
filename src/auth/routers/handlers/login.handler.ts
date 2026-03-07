@@ -6,6 +6,7 @@ import { resultStatusToHttpStatusMapper } from "../../../core/utils/result-code-
 import { RequestWithBody } from "../../../core/types/request-types";
 import { CookieNames } from "../../../core/constants/cookie-names";
 import { appConfig } from "../../../core/config/appConfig";
+import { randomUUID } from "crypto";
 
 export async function loginHandler(
   req: RequestWithBody<LoginInputModel>,
@@ -13,7 +14,8 @@ export async function loginHandler(
 ): Promise<void> {
   const loginOrEmail: string = req.body.loginOrEmail;
   const password: string = req.body.password;
-  const result = await authService.loginUser(loginOrEmail, password);
+  const deviceId = randomUUID();
+  const result = await authService.loginUser(loginOrEmail, password, deviceId);
 
   if (result.status !== ResultStatus.Success) {
     res
@@ -22,22 +24,16 @@ export async function loginHandler(
     return;
   }
 
-  req.session.userId = result.data!.userId;
-  req.session.deviceId = req.sessionID;
-  req.session.isAuthenticated = true;
-  const sessionId = req.sessionID;
-
   await authService.createAuthDeviceSession({
     userId: result.data!.userId,
     deviceInfo: {
-      deviceId: sessionId,
+      deviceId: deviceId,
       title: req.headers["user-agent"] || "unknown",
       ip: req.ip || null,
     },
     issuedAt: new Date(),
     expireAt: new Date(Date.now() + appConfig.RT_TOKEN_TIME),
     lastActiveDate: new Date(),
-    isCurrentSession: true,
   });
 
   res

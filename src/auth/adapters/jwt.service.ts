@@ -8,10 +8,12 @@ const JWT_AT_EXPIRES_IN: number = appConfig.AT_TOKEN_TIME;
 const JWT_RT_EXPIRES_IN: number = appConfig.RT_TOKEN_TIME;
 
 export const jwtService = {
-  createToken(userId: string, type: TokensTypes): string {
-    const payload = {
-      userId: userId,
-    };
+  createToken(userId: string, type: TokensTypes, deviceId?: string): string {
+    const payload: Record<string, string> = { userId: userId };
+    if (type === TokensTypes.RT) {
+      payload.deviceId = deviceId as string;
+    }
+
     switch (type) {
       case TokensTypes.AT:
         return jwt.sign(payload, JWT_AT_SECRET, {
@@ -33,13 +35,21 @@ export const jwtService = {
     }
   },
 
-  verifyToken(token: string, type: TokensTypes): { userId: string } | null {
+  verifyToken(
+    token: string,
+    type: TokensTypes,
+  ): { userId: string; deviceId?: string } | null {
     try {
       switch (type) {
         case TokensTypes.AT:
-          return jwt.verify(token, JWT_AT_SECRET) as { userId: string };
+          return jwt.verify(token, JWT_AT_SECRET) as {
+            userId: string;
+          };
         case TokensTypes.RT:
-          return jwt.verify(token, JWT_RT_SECRET) as { userId: string };
+          return jwt.verify(token, JWT_RT_SECRET) as {
+            userId: string;
+            deviceId: string;
+          };
       }
     } catch (err: any) {
       if (err instanceof jwt.TokenExpiredError) {

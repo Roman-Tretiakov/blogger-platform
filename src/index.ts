@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { setupApp } from "./setup-app";
-import { runDB, runTokensDB } from "./db/mongo.db";
+import { runDB } from "./db/mongo.db";
 import { appConfig } from "./core/config/appConfig";
 
 const bootstrap = async () => {
@@ -15,11 +15,8 @@ const bootstrap = async () => {
   // порты приложения
   const PORT: number = appConfig.PORT || 5001;
   const DB_URL: string = appConfig.MONGO_DB_URL || "mongodb://0.0.0.0:27017";
-  const TOKENS_DB_URL: string =
-    appConfig.RT_MONGO_DB_URL || "mongodb://0.0.0.0:27020";
 
   await runDB(DB_URL);
-  await runTokensDB(TOKENS_DB_URL);
 
   // запуск приложения
   const server = app.listen(PORT, () => {
