@@ -32,7 +32,7 @@ export async function loginHandler(
       ip: req.ip || null,
     },
     issuedAt: new Date(),
-    expireAt: new Date(Date.now() + appConfig.RT_TOKEN_TIME),
+    expireAt: new Date(new Date().getTime() + Number(appConfig.RT_TOKEN_TIME)),
     lastActiveDate: new Date(),
   });
 

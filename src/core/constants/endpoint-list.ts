@@ -18,5 +18,5 @@ export const EndpointList = {
   REGISTRATION_CONFIRMATION_PATH: "/registration-confirmation",
   REFRESH_TOKEN_PATH: "/refresh-token",
   LOGOUT_PATH: "/logout",
-  SECURITY_DEVICES_PATH: "/security/devices",
+  SECURITY_DEVICES_PATH: "/api/security/devices",
 };

@@ -3,7 +3,11 @@ import { AuthDevicesSessions } from "../BLL/types/auth-devices-sessions.interfac
 
 export const authDevicesRepository = {
   async create(session: AuthDevicesSessions): Promise<void> {
-    await authDevicesCollection.insertOne(session);
+    try {
+      await authDevicesCollection.insertOne(session);
+    } catch (error: any) {
+      console.error("Failed to create auth device session:", error.message);
+    }
   },
 
   // При ротации токенов — обновляем lastActiveDate в существующей записи
