@@ -7,6 +7,8 @@ import { RequestWithBody } from "../../../core/types/request-types";
 import { CookieNames } from "../../../core/constants/cookie-names";
 import { appConfig } from "../../../core/config/appConfig";
 import { randomUUID } from "crypto";
+import { TokensTypes } from "../../adapters/enums/tokens-types";
+import { jwtService } from "../../adapters/jwt.service";
 
 export async function loginHandler(
   req: RequestWithBody<LoginInputModel>,
@@ -24,8 +26,14 @@ export async function loginHandler(
     return;
   }
 
+  const decoded = jwtService.verifyToken(
+    result.data!.refreshToken!,
+    TokensTypes.RT,
+  );
+
   await authService.createAuthDeviceSession({
     userId: result.data!.userId,
+    refreshTokenVersion: decoded!.iat!,
     deviceInfo: {
       deviceId: deviceId,
       title: req.headers["user-agent"] || "unknown",

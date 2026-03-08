@@ -276,7 +276,8 @@ export const authService = {
     );
     const accessToken = jwtService.createToken(userId, TokensTypes.AT);
 
-    await authDevicesRepository.updateLastActiveDate(deviceId);
+    const decoded = jwtService.verifyToken(refreshToken, TokensTypes.RT);
+    await authDevicesRepository.updateLastActiveDate(deviceId, decoded!.iat!);
 
     return {
       status: ResultStatus.Success,

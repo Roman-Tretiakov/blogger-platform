@@ -10,11 +10,11 @@ export const authDevicesRepository = {
     }
   },
 
-  // При ротации токенов — обновляем lastActiveDate в существующей записи
-  async updateLastActiveDate(deviceId: string): Promise<void> {
+  // При ротации токенов — обновляем lastActiveDate в существующей записи и версию токена в БД, а не создаем новую запись
+  async updateLastActiveDate(deviceId: string, iat: number): Promise<void> {
     await authDevicesCollection.updateOne(
       { "deviceInfo.deviceId": deviceId },
-      { $set: { lastActiveDate: new Date() } },
+      { $set: { lastActiveDate: new Date(), refreshTokenVersion: iat } },
     );
   },
 

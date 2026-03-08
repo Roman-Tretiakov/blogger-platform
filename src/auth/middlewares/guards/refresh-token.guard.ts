@@ -37,6 +37,11 @@ export const refreshTokenGuard = async (
       await authDevicesRepository.deleteByDeviceId(payload.deviceId);
       return res.status(HttpStatus.Unauthorized).send("Session has expired");
     }
+    if (session.refreshTokenVersion !== payload.iat) {
+      return res
+        .status(HttpStatus.Unauthorized)
+        .send("Refresh token is outdated");
+    }
 
     req.userData = {
       // Сохраняем данные пользователя в объекте запроса

@@ -38,7 +38,7 @@ export const jwtService = {
   verifyToken(
     token: string,
     type: TokensTypes,
-  ): { userId: string; deviceId?: string } | null {
+  ): { userId: string; deviceId?: string; iat?: number } | null {
     try {
       switch (type) {
         case TokensTypes.AT:
@@ -49,6 +49,7 @@ export const jwtService = {
           return jwt.verify(token, JWT_RT_SECRET) as {
             userId: string;
             deviceId: string;
+            iat: number;
           };
       }
     } catch (err: any) {
