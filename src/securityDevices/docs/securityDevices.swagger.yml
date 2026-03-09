@@ -18,7 +18,7 @@ paths:
         '401':
           description: Unauthorized
       security:
-        - bearerAuth: []
+        - refreshToken: []
     delete:
       summary: Terminate all other (exclude current) device's sessions
       tags:
@@ -29,7 +29,7 @@ paths:
         '401':
           description: Unauthorized
       security:
-        - bearerAuth: []
+        - refreshToken: []
   /security/devices/{deviceId}:
     delete:
       summary: Terminate specified device session
@@ -53,9 +53,14 @@ paths:
         '404':
           description: Not Found (Device not found)
       security:
-        - bearerAuth: []
+        - refreshToken: []
 components:
   securitySchemes:
+    refreshToken:
+      type: apiKey
+      in: cookie
+      name: refreshToken
+      description: JWT refresh token в http-only cookie. Токен должен быть валидным и не истекшим.
     bearerAuth:
       type: http
       scheme: bearer
