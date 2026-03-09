@@ -64,7 +64,7 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 export const setupSwagger = (app: Express) => {
   // Настройка Swagger UI с поддержкой credentials
   app.use(
-    "/api",
+    "/api-docs",
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec, {
       swaggerOptions: {
