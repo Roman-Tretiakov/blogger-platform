@@ -50,7 +50,7 @@ export async function loginHandler(
       httpOnly: true,
       secure: true,
       sameSite: "strict",
-      maxAge: (appConfig.RT_TOKEN_TIME + 10) * 1000, // сек.
+      maxAge: appConfig.RT_TOKEN_TIME + 1000, // Устанавливаем время жизни куки чуть больше, чем время жизни RT, чтобы гарантировать удаление куки после истечения срока действия токена
     })
     .send({ accessToken: result.data!.accessToken });
 }

@@ -8,19 +8,19 @@ import { deleteSessionByIdHandler } from "./handlers/delete-session-by-id.handle
 export const securityDevicesRouter = Router({});
 
 securityDevicesRouter.get(
-  EndpointList.SECURITY_DEVICES_PATH,
+  EndpointList.EMPTY_PATH,
   refreshTokenGuard,
   getSessionListHandler,
 );
 
 securityDevicesRouter.delete(
-  EndpointList.SECURITY_DEVICES_PATH,
+  EndpointList.EMPTY_PATH,
   refreshTokenGuard,
   deleteAllSessionsExceptCurrentHandler,
 );
 
 securityDevicesRouter.delete(
-  EndpointList.SECURITY_DEVICES_PATH + EndpointList.BY_ID,
+  EndpointList.BY_ID,
   refreshTokenGuard,
   deleteSessionByIdHandler,
 );
