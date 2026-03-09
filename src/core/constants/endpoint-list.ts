@@ -19,4 +19,5 @@ export const EndpointList = {
   REFRESH_TOKEN_PATH: "/refresh-token",
   LOGOUT_PATH: "/logout",
   SECURITY_DEVICES_PATH: "/api/security/devices",
+  SECURITY_DEVICE_BY_ID: "/:deviceId",
 };

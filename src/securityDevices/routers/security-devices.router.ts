@@ -20,7 +20,7 @@ securityDevicesRouter.delete(
 );
 
 securityDevicesRouter.delete(
-  EndpointList.BY_ID,
+  EndpointList.SECURITY_DEVICE_BY_ID,
   refreshTokenGuard,
   deleteSessionByIdHandler,
 );
