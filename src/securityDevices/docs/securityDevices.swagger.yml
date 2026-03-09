@@ -30,7 +30,7 @@ paths:
           description: Unauthorized
       security:
         - refreshToken: []
-  api/security/devices/{deviceId}:
+  /api/security/devices/{deviceId}:
     delete:
       summary: Terminate specified device session
       tags:
