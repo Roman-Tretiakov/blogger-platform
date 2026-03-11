@@ -15,7 +15,7 @@ import {
 import { UsersService } from "../../../src/users/BLL/users.service";
 import { UserInputModel } from "../../../src/users/types/inputTypes/user-input-model";
 import { ObjectId } from "mongodb";
-import { iocContainer } from "../../../src/core/utils/ioc-container";
+import { iocContainer } from "../../../src/composition-root";
 
 let app: any;
 const authToken: string = getBasicAuthToken();
@@ -42,8 +42,7 @@ const testUsers: UserInputModel[] = [
   },
 ];
 
-const UsersServiceInstance =
-  iocContainer.getInstance<UsersService>(UsersService);
+const usersService = iocContainer.resolve(UsersService);
 
 beforeAll(async () => {
   await runDB(
@@ -54,7 +53,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await UsersServiceInstance.clear();
+  await usersService.clear();
 });
 
 afterAll(async () => {
@@ -71,7 +70,7 @@ describe("Users API", () => {
   beforeEach(async () => {
     // Создаем тестовых пользователей
     for (const user of testUsers) {
-      await UsersServiceInstance.create(user);
+      await usersService.create(user);
     }
   });
 
@@ -443,7 +442,7 @@ describe("Users API", () => {
         email: "delete@example.com",
         password: "qwerty123",
       };
-      userId = await UsersServiceInstance.create(inputData);
+      userId = await usersService.create(inputData);
     });
 
     describe("Positive scenarios", () => {

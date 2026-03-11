@@ -1,6 +1,5 @@
-import { Filter, ObjectId } from "mongodb";
+import { Collection, Filter, ObjectId } from "mongodb";
 import { Result } from "../../core/types/result-object-type";
-import { commentsCollection } from "../../db/mongo.db";
 import { ResultStatus } from "../../core/enums/result-statuses";
 import { CommentViewModel } from "../routers/outputTypes/comment-view-model";
 import { mapToCommentViewModel } from "../mappers/map-to-comment-view-model";
@@ -8,9 +7,11 @@ import { CommentListWithPagination } from "../routers/outputTypes/comment-list-w
 import { CommentsQueryInput } from "../routers/inputTypes/comments-query-input";
 import { CommentMongoModel } from "./types/comment-mongo-model";
 
-export const commentsQueryRepository = {
+export class CommentsQueryRepository {
+  constructor(private collection: Collection<CommentMongoModel>) {}
+
   async getById(commentId: string): Promise<Result<CommentViewModel | null>> {
-    const comment = await commentsCollection.findOne({
+    const comment = await this.collection.findOne({
       _id: new ObjectId(commentId),
     });
     return {
@@ -26,7 +27,7 @@ export const commentsQueryRepository = {
           ],
       data: comment ? mapToCommentViewModel(comment) : null,
     };
-  },
+  }
 
   async getCommentsByPost(
     postId: string,
@@ -38,20 +39,20 @@ export const commentsQueryRepository = {
 
     filter.postId = postId;
 
-    const items = await commentsCollection
+    const items = await this.collection
       .find(filter)
       .sort({ [sortBy]: sortDirection })
       .skip(skip)
       .limit(pageSize)
       .toArray();
-    const totalCount = await commentsCollection.countDocuments(filter);
+    const totalCount = await this.collection.countDocuments(filter);
 
     const commentList = {
       page: queryInput.pageNumber,
       pageSize: queryInput.pageSize,
       pagesCount: Math.ceil(totalCount / queryInput.pageSize),
       totalCount: totalCount,
-      items: items.map(mapToCommentViewModel)
+      items: items.map(mapToCommentViewModel),
     };
 
     return {
@@ -60,5 +61,5 @@ export const commentsQueryRepository = {
       extensions: [],
       data: commentList,
     };
-  },
-};
+  }
+}

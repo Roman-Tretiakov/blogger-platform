@@ -3,9 +3,8 @@ import { BcryptService } from "../adapters/bcrypt.service";
 import { Result } from "../../core/types/result-object-type";
 import { PairTokensViewModel } from "../routers/outputTypes/pair-tokens-view-model";
 import { ResultStatus } from "../../core/enums/result-statuses";
-import { jwtService } from "../adapters/jwt.service";
+import { JwtService } from "../adapters/jwt.service";
 import { User } from "../../users/BLL/user-entity";
-import { nodemailerService } from "../adapters/emailSendler/nodemailer.service";
 import { MailServices } from "../adapters/enums/mail-services";
 import { UsersRepository } from "../../users/repositories/users.repository";
 import { emailExamples } from "../adapters/emailSendler/emailExamples";
@@ -13,10 +12,21 @@ import { randomUUID } from "crypto";
 import { TokensTypes } from "../adapters/enums/tokens-types";
 import { UserIdModel } from "../types/userId-model";
 import { AuthDevicesSessions } from "../../securityDevices/BLL/types/auth-devices-sessions.interface";
-import { authDevicesRepository } from "../../securityDevices/repositories/authDevices.repository";
-import { authDevicesQueryRepository } from "../../securityDevices/repositories/authDevices.query-repository";
+import { NodemailerService } from "../adapters/emailSendler/nodemailer.service";
+import { AuthDevicesQueryRepository } from "../../securityDevices/repositories/authDevices.query-repository";
+import { AuthDevicesRepository } from "../../securityDevices/repositories/authDevices.repository";
 
-export const authService = {
+export class AuthService {
+  constructor(
+    private usersQueryRepository: UsersQueryRepository,
+    private usersRepository: UsersRepository,
+    private bcryptService: BcryptService,
+    private jwtService: JwtService,
+    private nodemailerService: NodemailerService,
+    private authDevicesRepository: AuthDevicesRepository,
+    private authDevicesQueryRepository: AuthDevicesQueryRepository,
+  ) {}
+
   async registerUser(
     login: string,
     email: string,
@@ -25,7 +35,7 @@ export const authService = {
     const result = await this.checkLoginAndPassword([login, email], password);
 
     if (result) {
-      const user = await UsersQueryRepository.getUserById(result);
+      const user = await this.usersQueryRepository.getUserById(result);
       const loginMatch = user.login === login;
       const emailMatch = user.email === email;
       let field: string;
@@ -49,11 +59,11 @@ export const authService = {
       };
     }
 
-    const passwordHash = await BcryptService.generateHash(password);
+    const passwordHash = await this.bcryptService.generateHash(password);
     const newUser = new User(login, email, passwordHash);
     newUser.generateNewConfirmationCode().emailConfirmed(false);
 
-    await UsersRepository.create(newUser).catch(() => {
+    await this.usersRepository.create(newUser).catch(() => {
       return {
         status: ResultStatus.Failure,
         errorMessage: "Something went wrong during user creation!",
@@ -62,14 +72,14 @@ export const authService = {
       };
     });
 
-    nodemailerService
+    this.nodemailerService
       .sendEmail(
         MailServices.MAIL_RU,
         email,
         newUser.confirmationCode!,
         emailExamples.registrationEmail,
       )
-      .catch((e) => {
+      .catch((e: any) => {
         console.error("Failed to send confirmation email:", e);
       });
 
@@ -79,10 +89,11 @@ export const authService = {
       extensions: [],
       data: null,
     };
-  },
+  }
 
   async confirmEmail(code: string): Promise<Result> {
-    const user = await UsersQueryRepository.findUserByConfirmationCode(code);
+    const user =
+      await this.usersQueryRepository.findUserByConfirmationCode(code);
     if (!user) {
       return {
         status: ResultStatus.BadRequest,
@@ -124,16 +135,18 @@ export const authService = {
       }
 
       user.isConfirmed = true;
-      await UsersRepository.update(user._id.toString(), {
-        ...user,
-      }).catch(() => {
-        return {
-          status: ResultStatus.Failure,
-          errorMessage: "Something went wrong during email confirmation!",
-          extensions: [],
-          data: null,
-        };
-      });
+      await this.usersRepository
+        .update(user._id.toString(), {
+          ...user,
+        })
+        .catch(() => {
+          return {
+            status: ResultStatus.Failure,
+            errorMessage: "Something went wrong during email confirmation!",
+            extensions: [],
+            data: null,
+          };
+        });
     }
 
     return {
@@ -142,10 +155,10 @@ export const authService = {
       extensions: [],
       data: null,
     };
-  },
+  }
 
   async resendEmail(email: string): Promise<Result> {
-    const user = await UsersQueryRepository.findByLoginOrEmail([email]);
+    const user = await this.usersQueryRepository.findByLoginOrEmail([email]);
     if (!user) {
       return {
         status: ResultStatus.BadRequest,
@@ -175,18 +188,18 @@ export const authService = {
 
     user.isConfirmed = false;
     user.confirmationCode = randomUUID();
-    nodemailerService
+    this.nodemailerService
       .sendEmail(
         MailServices.MAIL_RU,
         email,
         user.confirmationCode,
         emailExamples.registrationEmail,
       )
-      .catch((e) => {
+      .catch((e: any) => {
         console.error("Failed to send confirmation email:", e);
       });
 
-    await UsersRepository.update(user._id.toString(), {
+    await this.usersRepository.update(user._id.toString(), {
       ...user,
     });
 
@@ -196,7 +209,7 @@ export const authService = {
       extensions: [],
       data: null,
     };
-  },
+  }
 
   async loginUser(
     loginOrEmail: string,
@@ -214,8 +227,8 @@ export const authService = {
       };
     }
 
-    const accessToken = jwtService.createToken(userId, TokensTypes.AT);
-    const refreshToken = jwtService.createToken(
+    const accessToken = this.jwtService.createToken(userId, TokensTypes.AT);
+    const refreshToken = this.jwtService.createToken(
       userId,
       TokensTypes.RT,
       deviceId,
@@ -231,18 +244,19 @@ export const authService = {
         refreshToken: refreshToken,
       },
     };
-  },
+  }
 
   async checkLoginAndPassword(
     loginAndEmail: string[],
     password: string,
   ): Promise<string | null> {
-    const user = await UsersQueryRepository.findByLoginOrEmail(loginAndEmail);
+    const user =
+      await this.usersQueryRepository.findByLoginOrEmail(loginAndEmail);
     if (!user) {
       return null;
     }
 
-    const isPasswordCorrect = await BcryptService.checkPassword(
+    const isPasswordCorrect = await this.bcryptService.checkPassword(
       password,
       user!.password,
     );
@@ -251,13 +265,14 @@ export const authService = {
     }
 
     return user._id.toString();
-  },
+  }
 
   async rotateTokensPair(
     deviceId: string,
     userId: string,
   ): Promise<Result<PairTokensViewModel | null>> {
-    const session = await authDevicesQueryRepository.findByDeviceId(deviceId);
+    const session =
+      await this.authDevicesQueryRepository.findByDeviceId(deviceId);
     if (!session) {
       return {
         status: ResultStatus.Failure,
@@ -267,15 +282,18 @@ export const authService = {
       };
     }
 
-    const refreshToken = jwtService.createToken(
+    const refreshToken = this.jwtService.createToken(
       userId,
       TokensTypes.RT,
       deviceId,
     );
-    const accessToken = jwtService.createToken(userId, TokensTypes.AT);
+    const accessToken = this.jwtService.createToken(userId, TokensTypes.AT);
 
-    const decoded = jwtService.verifyToken(refreshToken, TokensTypes.RT);
-    await authDevicesRepository.updateLastActiveDate(deviceId, decoded!.iat!);
+    const decoded = this.jwtService.verifyToken(refreshToken, TokensTypes.RT);
+    await this.authDevicesRepository.updateLastActiveDate(
+      deviceId,
+      decoded!.iat!,
+    );
 
     return {
       status: ResultStatus.Success,
@@ -286,10 +304,11 @@ export const authService = {
         refreshToken: refreshToken,
       },
     };
-  },
+  }
 
   async deleteSession(deviceId: string): Promise<Result> {
-    const deleteCount = await authDevicesRepository.deleteByDeviceId(deviceId);
+    const deleteCount =
+      await this.authDevicesRepository.deleteByDeviceId(deviceId);
     if (deleteCount < 1) {
       return {
         status: ResultStatus.Failure,
@@ -304,23 +323,27 @@ export const authService = {
       extensions: [],
       data: null,
     };
-  },
+  }
 
   async createAuthDeviceSession(session: AuthDevicesSessions): Promise<void> {
-    await authDevicesRepository.create(session);
-  },
+    await this.authDevicesRepository.create(session);
+  }
 
   async deleteAllSessionsExceptCurrent(
     userId: string,
     currentDeviceId: string,
   ): Promise<void> {
-    await authDevicesRepository.deleteAllExceptCurrent(userId, currentDeviceId);
-  },
+    await this.authDevicesRepository.deleteAllExceptCurrent(
+      userId,
+      currentDeviceId,
+    );
+  }
 
   async findSessionByDeviceId(
     deviceId: string,
   ): Promise<Result<AuthDevicesSessions | null>> {
-    const session = await authDevicesQueryRepository.findByDeviceId(deviceId);
+    const session =
+      await this.authDevicesQueryRepository.findByDeviceId(deviceId);
     if (!session) {
       return {
         status: ResultStatus.NotFound,
@@ -336,5 +359,5 @@ export const authService = {
       extensions: [],
       data: session,
     };
-  },
-};
+  }
+}

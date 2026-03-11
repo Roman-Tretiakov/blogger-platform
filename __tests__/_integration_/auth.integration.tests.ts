@@ -1,5 +1,5 @@
-import { nodemailerService } from "../../src/auth/adapters/emailSendler/nodemailer.service";
-import { authService } from "../../src/auth/BLL/auth.service";
+import { NodemailerService } from "../../src/auth/adapters/emailSendler/nodemailer.service";
+import { AuthService } from "../../src/auth/BLL/auth.service";
 //@ts-ignore
 import { testSeeder } from "./test.seeder";
 import { ResultStatus } from "../../src/core/enums/result-statuses";
@@ -7,8 +7,12 @@ import { setupApp } from "../../src/setup-app";
 import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
 import express from "express";
 import { UsersService } from "../../src/users/BLL/users.service";
+import { iocContainer } from "../../src/composition-root";
 
 let app: any;
+const usersService = iocContainer.resolve(UsersService);
+const nodemailerService = iocContainer.resolve(NodemailerService);
+const authService = iocContainer.resolve(AuthService);
 
 describe("AUTH-INTEGRATION", () => {
   beforeAll(async () => {
@@ -20,7 +24,7 @@ describe("AUTH-INTEGRATION", () => {
   });
 
   beforeEach(async () => {
-    await UsersService.clear();
+    await usersService.clear();
   });
 
   afterAll(async () => {

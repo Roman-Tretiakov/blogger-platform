@@ -64,20 +64,6 @@ export async function runDB(url: string): Promise<void> {
   }
 }
 
-// export async function runTokensDB(url: string): Promise<void> {
-//   tokensDbClient = new MongoClient(url);
-//   const rtDb: Db = tokensDbClient.db(TokensDBName);
-//
-//   try {
-//     await tokensDbClient.connect();
-//     await rtDb.command({ ping: 1 });
-//     console.log(`✅ Connected to the database ${TokensDBName} for tokens`);
-//   } catch (e) {
-//     await tokensDbClient.close();
-//     throw new Error(`❌ Database not connected for tokens: ${e}`);
-//   }
-// }
-
 export async function closeDBConnection(client: MongoClient): Promise<void> {
   await client.close();
 }

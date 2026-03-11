@@ -1,17 +1,22 @@
 import { BlogPostInputModel, PostInputModel } from "./dto/post-input-dto";
-import { postsRepository } from "../repositories/posts.repository";
+import { PostsRepository } from "../repositories/posts.repository";
 import { mapToPostMongoModel } from "../mappers/map-to-post-mongo-model";
-import { blogsRepository } from "../../blogs/repositories/blogs.repository";
+import { BlogsRepository } from "../../blogs/repositories/blogs.repository";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { CustomError } from "../../core/errorClasses/CustomError";
 import { HttpStatus } from "../../core/enums/http-status";
 
-export const postsService = {
+export class PostsService {
+  constructor(
+    private blogsRepository: BlogsRepository,
+    private postsRepository: PostsRepository,
+  ) {}
+
   async create(
     inputModel: PostInputModel | BlogPostInputModel,
     blogId?: string,
   ): Promise<string> {
-    const blog = await blogsRepository.findById(
+    const blog = await this.blogsRepository.findById(
       blogId ?? (inputModel as PostInputModel).blogId,
     );
     if (blog === null) {
@@ -24,11 +29,11 @@ export const postsService = {
       id: blog._id.toString(),
       blogName: blog.name,
     });
-    return await postsRepository.create(mongoMappedModel);
-  },
+    return await this.postsRepository.create(mongoMappedModel);
+  }
 
   async update(id: string, updateModel: PostInputModel): Promise<void> {
-    const blog = await blogsRepository.findById(updateModel.blogId);
+    const blog = await this.blogsRepository.findById(updateModel.blogId);
     if (blog === null) {
       throw new CustomError(
         `No blog found by id: ${updateModel.blogId} for post`,
@@ -36,14 +41,14 @@ export const postsService = {
         HttpStatus.NotFound,
       );
     }
-    await postsRepository.update(id, updateModel);
-  },
+    await this.postsRepository.update(id, updateModel);
+  }
 
   async deleteById(id: string): Promise<void> {
-    await postsRepository.delete(id);
-  },
+    await this.postsRepository.delete(id);
+  }
 
   async clear(): Promise<void> {
-    await postsRepository.clear();
-  },
-};
+    await this.postsRepository.clear();
+  }
+}

@@ -3,20 +3,16 @@ import { superAdminGuard } from "../../auth/middlewares/guards/super-admin.guard
 import { EndpointList } from "../../core/constants/endpoint-list";
 import { paramIdValidationMiddleware } from "../../core/middlewares/params-id-validation.middleware";
 import { inputValidationResultMiddleware } from "../../core/middlewares/input-validation-result.middleware";
-import { getPostListHandler } from "./handlers/get-post-list.handler";
-import { getPostHandler } from "./handlers/get-post.handler";
-import { createPostHandler } from "./handlers/create-post.handler";
-import { updatePostHandler } from "./handlers/update-post.handler";
-import { deletePostHandler } from "./handlers/delete-post.handler";
 import { createPostsBodyValidationMiddleware } from "../middlewares/create-posts-body-validation-middleware";
 import { paginationAndSortingValidation } from "../../core/middlewares/pagination-sorting-validation.middleware";
 import { PostSortFields } from "./inputTypes/post-sort-fields";
 import { accessTokenGuard } from "../../auth/middlewares/guards/access-token.guard";
-import { createCommentByPostHandler } from "./handlers/create-comment-by-post.handler";
 import { createCommentsBodyValidationMiddleware } from "../middlewares/create-comments-body-validation.middleware";
 import { CommentsSortFields } from "../../comments/routers/inputTypes/comments-sort-fields";
-import { getCommentsByPostListHandler } from "./handlers/get-comments-by-post-list.handler";
+import { iocContainer } from "../../composition-root";
+import { PostsController } from "./posts.controller";
 
+const postsController = iocContainer.resolve(PostsController);
 export const postsRouter = Router({});
 
 postsRouter
@@ -26,40 +22,33 @@ postsRouter
     paramIdValidationMiddleware,
     createCommentsBodyValidationMiddleware,
     inputValidationResultMiddleware,
-    createCommentByPostHandler,
+    postsController.createCommentByPost.bind(postsController),
   )
   .get(
     EndpointList.COMMENTS_BY_POST_ID,
     paramIdValidationMiddleware,
     paginationAndSortingValidation(CommentsSortFields),
     inputValidationResultMiddleware,
-    getCommentsByPostListHandler,
+    postsController.getCommentsByPostList.bind(postsController),
   )
   .get(
     EndpointList.EMPTY_PATH,
     paginationAndSortingValidation(PostSortFields),
     inputValidationResultMiddleware,
-    getPostListHandler,
+    postsController.getList.bind(postsController),
   )
   .get(
     EndpointList.BY_ID,
     paramIdValidationMiddleware,
     inputValidationResultMiddleware,
-    getPostHandler,
-  ) // сюда добавляем мидлвэры на валидацию перед обработчиками
+    postsController.get.bind(postsController),
+  )
   .post(
     EndpointList.EMPTY_PATH,
     superAdminGuard,
     createPostsBodyValidationMiddleware(),
     inputValidationResultMiddleware,
-    createPostHandler,
-  ) // сюда добавляем мидлвэры на валидацию перед обработчиками
-  .post(
-    EndpointList.EMPTY_PATH,
-    superAdminGuard,
-    createPostsBodyValidationMiddleware(),
-    inputValidationResultMiddleware,
-    createPostHandler,
+    postsController.createPost.bind(postsController),
   )
   .put(
     EndpointList.BY_ID,
@@ -67,12 +56,12 @@ postsRouter
     paramIdValidationMiddleware,
     createPostsBodyValidationMiddleware(),
     inputValidationResultMiddleware,
-    updatePostHandler,
-  ) // сюда добавляем мидлвэры на валидацию перед обработчиками
+    postsController.update.bind(postsController),
+  )
   .delete(
     EndpointList.BY_ID,
     superAdminGuard,
     paramIdValidationMiddleware,
     inputValidationResultMiddleware,
-    deletePostHandler,
-  ); // сюда добавляем мидлвэры на валидацию перед обработчиками
+    postsController.delete.bind(postsController),
+  );

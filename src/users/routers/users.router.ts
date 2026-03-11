@@ -4,12 +4,12 @@ import { paginationAndSortingValidation } from "../../core/middlewares/paginatio
 import { UserSortFields } from "./inputTypes/user-sort-fields";
 import { inputValidationResultMiddleware } from "../../core/middlewares/input-validation-result.middleware";
 import { createUsersBodyValidation } from "../middlewares/create-users-body-validation.middleware";
-import { createUserHandler } from "./handlers/create-users.handler";
-import { getUserListHandler } from "./handlers/get-user-list.handler";
 import { superAdminGuard } from "../../auth/middlewares/guards/super-admin.guard";
 import { paramIdValidationMiddleware } from "../../core/middlewares/params-id-validation.middleware";
-import { deleteUserHandler } from "./handlers/delete-users.handler";
+import { iocContainer } from "../../composition-root";
+import { UsersController } from "./users.controller";
 
+const usersController = iocContainer.resolve(UsersController);
 export const usersRouter = Router({});
 
 usersRouter
@@ -18,19 +18,19 @@ usersRouter
     superAdminGuard,
     paginationAndSortingValidation(UserSortFields),
     inputValidationResultMiddleware,
-    getUserListHandler,
+    usersController.getList.bind(usersController),
   )
   .post(
     EndpointList.EMPTY_PATH,
     superAdminGuard,
     createUsersBodyValidation,
     inputValidationResultMiddleware,
-    createUserHandler,
+    usersController.create.bind(usersController),
   )
   .delete(
     EndpointList.BY_ID,
     superAdminGuard,
     paramIdValidationMiddleware,
     inputValidationResultMiddleware,
-    deleteUserHandler,
-  )
+    usersController.delete.bind(usersController),
+  );

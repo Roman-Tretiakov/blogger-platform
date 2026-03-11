@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
-import { jwtService } from "../../adapters/jwt.service";
+import { JwtService } from "../../adapters/jwt.service";
 import { TokensTypes } from "../../adapters/enums/tokens-types";
 
 export const accessTokenGuard = (
@@ -21,7 +21,7 @@ export const accessTokenGuard = (
       .send("Header authorization must be in format 'Bearer ...'");
   }
 
-  const verifiedData = jwtService.verifyToken(token, TokensTypes.AT);
+  const verifiedData = JwtService.verifyToken(token, TokensTypes.AT);
   if (!verifiedData) {
     return res.sendStatus(HttpStatus.Unauthorized);
   }

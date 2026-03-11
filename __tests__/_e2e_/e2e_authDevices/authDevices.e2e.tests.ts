@@ -10,8 +10,9 @@ import {
   runDB,
 } from "../../../src/db/mongo.db";
 import { UsersService } from "../../../src/users/BLL/users.service";
-import { authDevicesRepository } from "../../../src/securityDevices/repositories/authDevices.repository";
+import { AuthDevicesRepository } from "../../../src/securityDevices/repositories/authDevices.repository";
 import { deviceViewModel } from "../../../src/securityDevices/types/dto/device-view-model.dto";
+import { iocContainer } from "../../../src/composition-root";
 
 // ─────────────────────────────────────────────
 // Хелперы
@@ -56,6 +57,9 @@ const testUserEmail = "test@example.com";
 const testUserPassword = "password123";
 const credentials = { loginOrEmail: testUserLogin, password: testUserPassword };
 
+const authDevicesRepository = iocContainer.resolve(AuthDevicesRepository);
+const usersService = iocContainer.resolve(UsersService);
+
 let testUserId: string;
 
 // Токены четырёх устройств
@@ -73,11 +77,11 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await UsersService.clear();
+  await usersService.clear();
   await authDevicesRepository.clear();
   await rateLimitsCollection.deleteMany({});
 
-  testUserId = await UsersService.create({
+  testUserId = await usersService.create({
     login: testUserLogin,
     email: testUserEmail,
     password: testUserPassword,
@@ -273,7 +277,7 @@ describe("Security Devices API End-to-End Tests", () => {
 
       test("Should return 403 when trying to delete someone else's session", async () => {
         // Создаём второго пользователя
-        const otherUserId = await UsersService.create({
+        const otherUserId = await usersService.create({
           login: "otheruser",
           email: "other@example.com",
           password: "password123",
@@ -406,7 +410,7 @@ describe("Security Devices API End-to-End Tests", () => {
   // ─────────────────────────────────────────────
   describe("Additional edge cases", () => {
     test("Should isolate sessions between different users", async () => {
-      await UsersService.create({
+      await usersService.create({
         login: "otheruser",
         email: "other@example.com",
         password: "password123",

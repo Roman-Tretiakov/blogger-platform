@@ -5,7 +5,7 @@ import { blogsRouter } from "./blogs/routers/blogs.router";
 import { testingRouter } from "./testing/routers/testing.router";
 import { setupSwagger } from "./core/swagger/setup-swagger";
 import { postsRouter } from "./posts/routers/posts.router";
-import { usersRouter } from "./users/routers/usersRouter";
+import { usersRouter } from "./users/routers/users.router";
 import { authRouter } from "./auth/routers/auth.router";
 import { commentsRouter } from "./comments/routers/comments.router";
 import cookieParser from "cookie-parser";

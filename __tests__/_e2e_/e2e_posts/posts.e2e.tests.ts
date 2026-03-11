@@ -10,13 +10,16 @@ import { getBasicAuthToken } from "../../utils/get-basic-auth-token";
 import { client, closeDBConnection, runDB } from "../../../src/db/mongo.db";
 //@ts-ignore
 import { BlogInputModel } from "../../../src/blogs/BLL/dto/blog-input-dto";
-import { postsService } from "../../../src/posts/BLL/posts.service";
+import { PostsService } from "../../../src/posts/BLL/posts.service";
+import { iocContainer } from "../../../src/composition-root";
 
 let app: Express;
 let blog_id: string;
 const authToken: string = getBasicAuthToken();
 let validPostBody: PostInputModel;
 let createdBlog: BlogInputModel;
+
+const postsService = iocContainer.resolve(PostsService);
 
 describe("Posts API tests", () => {
   validPostBody = {

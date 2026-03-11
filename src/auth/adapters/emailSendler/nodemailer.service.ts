@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 import { appConfig } from "../../../core/config/appConfig";
 import { MailServices } from "../enums/mail-services";
 
-export const nodemailerService = {
+export class NodemailerService {
   async sendEmail(
     provider: MailServices,
     email: string,
@@ -33,5 +33,5 @@ export const nodemailerService = {
       console.error("Failed to send email to %s:", email, error);
       return false;
     }
-  },
-};
+  }
+}

@@ -1,6 +1,9 @@
 import { randomUUID } from "crypto";
 import { add } from "date-fns/add";
 import { UsersRepository } from "../../src/users/repositories/users.repository";
+import { iocContainer } from "../../src/composition-root";
+
+const usersRepository = iocContainer.resolve(UsersRepository);
 
 type RegisterUserPayloadType = {
   login: string;
@@ -30,6 +33,7 @@ export const testSeeder = {
       pass: "123456789",
     };
   },
+
   createUserDtos(count: number) {
     const users = [];
 
@@ -42,6 +46,7 @@ export const testSeeder = {
     }
     return users;
   },
+
   async insertUser({
     login,
     pass,
@@ -63,7 +68,7 @@ export const testSeeder = {
         }).toISOString(),
       isConfirmed: isConfirmed ?? false,
     };
-    const res = await UsersRepository.create(newUser);
+    const res = await usersRepository.create(newUser);
     return {
       id: res,
       ...newUser,

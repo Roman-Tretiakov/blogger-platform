@@ -2,20 +2,16 @@ import { Router } from "express";
 import { EndpointList } from "../../core/constants/endpoint-list";
 import { authBodyValidationMiddleware } from "../middlewares/auth-body-validation.middleware";
 import { inputValidationResultMiddleware } from "../../core/middlewares/input-validation-result.middleware";
-import { loginHandler } from "./handlers/login.handler";
 import { accessTokenGuard } from "../middlewares/guards/access-token.guard";
-import { getLoggedUserHandler } from "./handlers/get-me.handler";
-import { registrationHandler } from "./handlers/registration.handler";
-import { registrationConfirmationHandler } from "./handlers/registration-confirmation.handler";
-import { registrationEmailResending } from "./handlers/registration-email-resending";
 import { createUsersBodyValidation } from "../../users/middlewares/create-users-body-validation.middleware";
 import { registrationConfirmationBodyValidation } from "../middlewares/registration-confirmation-body.validation";
 import { emailResendingValidationMiddleware } from "../middlewares/email-resending-validation.middleware";
 import { refreshTokenGuard } from "../middlewares/guards/refresh-token.guard";
-import { updateTokensHandler } from "./handlers/update-tokens.handler";
-import { logoutHandler } from "./handlers/logout.handler";
 import { rateLimitsMiddleware } from "../../core/middlewares/rateLimiter/rate-limits.middleware";
+import { iocContainer } from "../../composition-root";
+import { AuthController } from "./auth.controller";
 
+const authController = iocContainer.resolve(AuthController);
 export const authRouter = Router();
 
 authRouter.post(
@@ -23,7 +19,7 @@ authRouter.post(
   rateLimitsMiddleware,
   createUsersBodyValidation,
   inputValidationResultMiddleware,
-  registrationHandler,
+  authController.registration.bind(authController),
 );
 
 authRouter.post(
@@ -31,7 +27,7 @@ authRouter.post(
   rateLimitsMiddleware,
   registrationConfirmationBodyValidation,
   inputValidationResultMiddleware,
-  registrationConfirmationHandler,
+  authController.registrationConfirmation.bind(authController),
 );
 
 authRouter.post(
@@ -39,7 +35,7 @@ authRouter.post(
   rateLimitsMiddleware,
   emailResendingValidationMiddleware,
   inputValidationResultMiddleware,
-  registrationEmailResending,
+  authController.registrationEmailResending.bind(authController),
 );
 
 authRouter.post(
@@ -47,15 +43,23 @@ authRouter.post(
   rateLimitsMiddleware,
   authBodyValidationMiddleware,
   inputValidationResultMiddleware,
-  loginHandler,
+  authController.login.bind(authController),
 );
 
 authRouter.post(
   EndpointList.REFRESH_TOKEN_PATH,
   refreshTokenGuard,
-  updateTokensHandler,
+  authController.updateTokens.bind(authController),
 );
 
-authRouter.post(EndpointList.LOGOUT_PATH, refreshTokenGuard, logoutHandler);
+authRouter.post(
+  EndpointList.LOGOUT_PATH,
+  refreshTokenGuard,
+  authController.logout.bind(authController),
+);
 
-authRouter.get(EndpointList.ME_PATH, accessTokenGuard, getLoggedUserHandler);
+authRouter.get(
+  EndpointList.ME_PATH,
+  accessTokenGuard,
+  authController.getLoggedUser.bind(authController),
+);

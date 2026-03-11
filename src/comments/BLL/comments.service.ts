@@ -1,12 +1,18 @@
 import { Result } from "../../core/types/result-object-type";
-import { postsQueryRepository } from "../../posts/repositories/posts.query-repository";
+import { PostsQueryRepository } from "../../posts/repositories/posts.query-repository";
 import { ResultStatus } from "../../core/enums/result-statuses";
-import { commentsRepository } from "../repositories/comments.repository";
+import { CommentsRepository } from "../repositories/comments.repository";
 import { CommentMongoModel } from "../repositories/types/comment-mongo-model";
-import { commentsQueryRepository } from "../repositories/comments.query-repository";
+import { CommentsQueryRepository } from "../repositories/comments.query-repository";
 import { CommentInputModel } from "../routers/inputTypes/comment-input-model";
 
-export const commentsService = {
+export class CommentsService {
+  constructor(
+    private commentsRepository: CommentsRepository,
+    private commentsQueryRepository: CommentsQueryRepository,
+    private postsQueryRepository: PostsQueryRepository,
+  ) {}
+
   async createCommentByPostId(
     postId: string,
     content: string,
@@ -14,7 +20,7 @@ export const commentsService = {
     login: string,
   ): Promise<Result<string | null>> {
     try {
-      await postsQueryRepository.getPostById(postId);
+      await this.postsQueryRepository.getPostById(postId);
     } catch (e) {
       return {
         status: ResultStatus.NotFound,
@@ -34,21 +40,24 @@ export const commentsService = {
       createdAt: new Date().toISOString(),
     };
 
-    return await commentsRepository.create(comment);
-  },
+    return await this.commentsRepository.create(comment);
+  }
 
   async updateCommentById(
     commentId: string,
     userId: string,
-    content: CommentInputModel
-  ): Promise<Result>{
+    content: CommentInputModel,
+  ): Promise<Result> {
     let resultStatus: ResultStatus;
     let errMessage: string | null = null;
 
-    const comment = await commentsQueryRepository.getById(commentId);
+    const comment = await this.commentsQueryRepository.getById(commentId);
     if (comment.status === ResultStatus.Success) {
       if (comment.data!.commentatorInfo.userId === userId) {
-        const updateResult = await commentsRepository.update(commentId, content);
+        const updateResult = await this.commentsRepository.update(
+          commentId,
+          content,
+        );
         resultStatus = updateResult.status;
       } else {
         resultStatus = ResultStatus.Forbidden;
@@ -62,16 +71,16 @@ export const commentsService = {
       extensions: [],
       data: null,
     };
-  },
+  }
 
   async deleteCommentById(commentId: string, userId: string): Promise<Result> {
     let resultStatus: ResultStatus;
     let errMessage: string | null = null;
 
-    const comment = await commentsQueryRepository.getById(commentId);
+    const comment = await this.commentsQueryRepository.getById(commentId);
     if (comment.status === ResultStatus.Success) {
       if (comment.data!.commentatorInfo.userId === userId) {
-        const deleteResult = await commentsRepository.delete(commentId);
+        const deleteResult = await this.commentsRepository.delete(commentId);
         resultStatus = deleteResult.status;
       } else {
         resultStatus = ResultStatus.Forbidden;
@@ -83,7 +92,7 @@ export const commentsService = {
       status: resultStatus,
       errorMessage: errMessage ?? comment.errorMessage,
       extensions: [],
-      data: null
-    }
-  },
-};
+      data: null,
+    };
+  }
+}

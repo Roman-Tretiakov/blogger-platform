@@ -5,7 +5,7 @@ import { EndpointList } from "../../../src/core/constants/endpoint-list";
 import { HttpStatus } from "../../../src/core/enums/http-status";
 import { ErrorNames } from "../../../src/core/enums/error-names";
 import { BlogInputModel } from "../../../src/blogs/BLL/dto/blog-input-dto";
-import { blogsService } from "../../../src/blogs/BLL/blogs.service";
+import { BlogsService } from "../../../src/blogs/BLL/blogs.service";
 import { client, closeDBConnection } from "../../../src/db/mongo.db";
 
 describe("Blog body validation tests", () => {
@@ -24,7 +24,7 @@ describe("Blog body validation tests", () => {
   };
 
   beforeEach(async () => {
-    await blogsService.clear();
+    await BlogsService.clear();
   });
 
   afterAll(async () => {

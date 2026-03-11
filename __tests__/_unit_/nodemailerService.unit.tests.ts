@@ -1,6 +1,9 @@
-import { nodemailerService } from "../../src/auth/adapters/emailSendler/nodemailer.service";
+import { NodemailerService } from "../../src/auth/adapters/emailSendler/nodemailer.service";
 import { MailServices } from "../../src/auth/adapters/enums/mail-services";
 import { emailExamples } from "../../src/auth/adapters/emailSendler/emailExamples";
+import { iocContainer } from "../../src/composition-root";
+
+const nodemailerService = iocContainer.resolve(NodemailerService);
 
 describe("nodemailerService test", () => {
   test("should send an email successfully", async () => {

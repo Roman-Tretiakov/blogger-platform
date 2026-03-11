@@ -4,10 +4,10 @@ import { paramIdValidationMiddleware } from "../../core/middlewares/params-id-va
 import { inputValidationResultMiddleware } from "../../core/middlewares/input-validation-result.middleware";
 import { accessTokenGuard } from "../../auth/middlewares/guards/access-token.guard";
 import { createCommentsBodyValidationMiddleware } from "../../posts/middlewares/create-comments-body-validation.middleware";
-import { getCommentByIdHandler } from "./handlers/get-comment.handler";
-import { deleteCommentByIdHandler } from "./handlers/delete-comment.handler";
-import { updateCommentByIdHandler } from "./handlers/update-comment.handler";
+import { iocContainer } from "../../composition-root";
+import { CommentsController } from "./comments.controller";
 
+const commentsController = iocContainer.resolve(CommentsController);
 export const commentsRouter = Router({});
 
 commentsRouter
@@ -15,14 +15,14 @@ commentsRouter
     EndpointList.BY_ID,
     paramIdValidationMiddleware,
     inputValidationResultMiddleware,
-    getCommentByIdHandler,
+    commentsController.get.bind(commentsController),
   )
   .delete(
     EndpointList.BY_ID,
     accessTokenGuard,
     paramIdValidationMiddleware,
     inputValidationResultMiddleware,
-    deleteCommentByIdHandler,
+    commentsController.delete.bind(commentsController),
   )
   .put(
     EndpointList.BY_ID,
@@ -30,5 +30,5 @@ commentsRouter
     paramIdValidationMiddleware,
     createCommentsBodyValidationMiddleware,
     inputValidationResultMiddleware,
-    updateCommentByIdHandler
+    commentsController.update.bind(commentsController),
   );

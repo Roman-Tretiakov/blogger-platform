@@ -10,8 +10,9 @@ import {
   runDB,
 } from "../../../src/db/mongo.db";
 import { UsersService } from "../../../src/users/BLL/users.service";
-import { authDevicesRepository } from "../../../src/securityDevices/repositories/authDevices.repository";
-import { authDevicesQueryRepository } from "../../../src/securityDevices/repositories/authDevices.query-repository";
+import { AuthDevicesRepository } from "../../../src/securityDevices/repositories/authDevices.repository";
+import { AuthDevicesQueryRepository } from "../../../src/securityDevices/repositories/authDevices.query-repository";
+import { iocContainer } from "../../../src/composition-root";
 
 // Хелпер: достаём значение refreshToken из Set-Cookie заголовка
 const extractRefreshToken = (
@@ -31,6 +32,13 @@ let app: any;
 const testUserLogin = "testuser";
 const testUserEmail = "thalamus@smart.twc1.net";
 const testUserPassword = "password123";
+
+const usersService = iocContainer.resolve(UsersService);
+const authDevicesRepository = iocContainer.resolve(AuthDevicesRepository);
+const authDevicesQueryRepository = iocContainer.resolve(
+  AuthDevicesQueryRepository,
+);
+
 let accessToken: string;
 let refreshToken: string;
 let testUserId: string;
@@ -45,11 +53,11 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   // Очищаем пользователей и сессии перед каждым тестом
-  await UsersService.clear();
+  await usersService.clear();
   await authDevicesRepository.clear();
   await rateLimitsCollection.deleteMany({});
 
-  testUserId = await UsersService.create({
+  testUserId = await usersService.create({
     login: testUserLogin,
     email: testUserEmail,
     password: testUserPassword,

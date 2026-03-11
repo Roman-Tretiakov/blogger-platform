@@ -10,9 +10,10 @@ import {
 } from "../../../src/db/mongo.db";
 import { UsersService } from "../../../src/users/BLL/users.service";
 import { ObjectId } from "mongodb";
-import { commentsRepository } from "../../../src/comments/repositories/comments.repository";
-import { postsRepository } from "../../../src/posts/repositories/posts.repository";
-import { blogsRepository } from "../../../src/blogs/repositories/blogs.repository";
+import { CommentsRepository } from "../../../src/comments/repositories/comments.repository";
+import { PostsRepository } from "../../../src/posts/repositories/posts.repository";
+import { BlogsRepository } from "../../../src/blogs/repositories/blogs.repository";
+import { iocContainer } from "../../../src/composition-root";
 
 let app: any;
 let testUserLogin = "testuser";
@@ -24,6 +25,11 @@ let testBlogId: string;
 let testPostId: string;
 let testCommentId: string | null;
 
+const usersService = iocContainer.resolve(UsersService);
+const commentsRepository = iocContainer.resolve(CommentsRepository);
+const postsRepository = iocContainer.resolve(PostsRepository);
+const blogsRepository = iocContainer.resolve(BlogsRepository);
+
 beforeAll(async () => {
   await runDB(
     "mongodb+srv://Vercel-Admin-blogger-platform-mongoDB:hwkJaIheLnRD6J9c@blogger-platform-mongod.13rbnz7.mongodb.net/?retryWrites=true&w=majority",
@@ -32,7 +38,7 @@ beforeAll(async () => {
   setupApp(app);
 
   // Создаем тестового пользователя
-  testUserId = await UsersService.create({
+  testUserId = await usersService.create({
     login: testUserLogin,
     email: testUserEmail,
     password: testUserPassword,
@@ -122,7 +128,7 @@ describe("PUT /api/comments/{commentId}", () => {
 
       test("Should return 403 when trying to update another user comment", async () => {
         // Создаем другого пользователя
-        await UsersService.create({
+        await usersService.create({
           login: "new" + testUserLogin,
           email: "new" + testUserEmail,
           password: testUserPassword,
@@ -238,7 +244,7 @@ describe("PUT /api/comments/{commentId}", () => {
 
       test("Should return 403 when trying to delete another user comment", async () => {
         // Создаем другого пользователя
-        await UsersService.create({
+        await usersService.create({
           login: "new" + testUserLogin,
           email: "new" + testUserEmail,
           password: testUserPassword,

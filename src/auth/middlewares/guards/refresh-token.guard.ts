@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
-import { jwtService } from "../../adapters/jwt.service";
+import { JwtService } from "../../adapters/jwt.service";
 import { TokensTypes } from "../../adapters/enums/tokens-types";
 import { authDevicesQueryRepository } from "../../../securityDevices/repositories/authDevices.query-repository";
-import { authDevicesRepository } from "../../../securityDevices/repositories/authDevices.repository";
+import { AuthDevicesRepository } from "../../../securityDevices/repositories/authDevices.repository";
 
 export const refreshTokenGuard = async (
   req: Request,
@@ -18,7 +18,7 @@ export const refreshTokenGuard = async (
         .send("Refresh token is missing");
     }
 
-    const payload = jwtService.verifyToken(refreshToken, TokensTypes.RT);
+    const payload = JwtService.verifyToken(refreshToken, TokensTypes.RT);
     if (!payload || !payload.deviceId) {
       return res
         .status(HttpStatus.Unauthorized)
@@ -34,7 +34,7 @@ export const refreshTokenGuard = async (
         .send("Session not found for the provided device id");
     }
     if (session.expireAt < new Date()) {
-      await authDevicesRepository.deleteByDeviceId(payload.deviceId);
+      await AuthDevicesRepository.deleteByDeviceId(payload.deviceId);
       return res.status(HttpStatus.Unauthorized).send("Session has expired");
     }
     if (session.refreshTokenVersion !== payload.iat) {

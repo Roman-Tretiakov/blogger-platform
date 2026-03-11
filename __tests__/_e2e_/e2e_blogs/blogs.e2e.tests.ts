@@ -8,10 +8,13 @@ import { EndpointList } from "../../../src/core/constants/endpoint-list";
 import { getBasicAuthToken } from "../../utils/get-basic-auth-token";
 import { client, closeDBConnection, runDB } from "../../../src/db/mongo.db";
 //@ts-ignore
-import { blogsService } from "../../../src/blogs/BLL/blogs.service";
+import { BlogsService } from "../../../src/blogs/BLL/blogs.service";
+import { iocContainer } from "../../../src/composition-root";
 
 let app: any;
 const authToken: string = getBasicAuthToken();
+
+const blogsService = iocContainer.resolve(BlogsService);
 
 beforeAll(async () => {
   await runDB(
