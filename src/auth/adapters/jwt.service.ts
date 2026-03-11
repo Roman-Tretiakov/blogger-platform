@@ -7,7 +7,7 @@ const JWT_RT_SECRET: string = appConfig.RT_TOKEN_SECRET;
 const JWT_AT_EXPIRES_IN: number = appConfig.AT_TOKEN_TIME;
 const JWT_RT_EXPIRES_IN: number = appConfig.RT_TOKEN_TIME;
 
-export const jwtService = {
+export class jwtService {
   createToken(userId: string, type: TokensTypes, deviceId?: string): string {
     const payload: Record<string, string> = { userId: userId };
     if (type === TokensTypes.RT) {
@@ -24,16 +24,7 @@ export const jwtService = {
           expiresIn: JWT_RT_EXPIRES_IN,
         });
     }
-  },
-
-  decodeToken(userId: string): string | JwtPayload | null {
-    try {
-      return jwt.decode(userId);
-    } catch (err) {
-      console.error("Token decode some error: ", err);
-      return null; // Невалидный токен
-    }
-  },
+  }
 
   verifyToken(
     token: string,
@@ -60,5 +51,5 @@ export const jwtService = {
       }
       return null; // Невалидный токен
     }
-  },
-};
+  }
+}

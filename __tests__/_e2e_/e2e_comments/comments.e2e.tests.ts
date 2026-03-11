@@ -8,7 +8,7 @@ import {
   commentsCollection,
   runDB,
 } from "../../../src/db/mongo.db";
-import { usersService } from "../../../src/users/BLL/users.service";
+import { UsersService } from "../../../src/users/BLL/users.service";
 import { ObjectId } from "mongodb";
 import { commentsRepository } from "../../../src/comments/repositories/comments.repository";
 import { postsRepository } from "../../../src/posts/repositories/posts.repository";
@@ -32,7 +32,7 @@ beforeAll(async () => {
   setupApp(app);
 
   // Создаем тестового пользователя
-  testUserId = await usersService.create({
+  testUserId = await UsersService.create({
     login: testUserLogin,
     email: testUserEmail,
     password: testUserPassword,
@@ -122,7 +122,7 @@ describe("PUT /api/comments/{commentId}", () => {
 
       test("Should return 403 when trying to update another user comment", async () => {
         // Создаем другого пользователя
-        await usersService.create({
+        await UsersService.create({
           login: "new" + testUserLogin,
           email: "new" + testUserEmail,
           password: testUserPassword,
@@ -238,7 +238,7 @@ describe("PUT /api/comments/{commentId}", () => {
 
       test("Should return 403 when trying to delete another user comment", async () => {
         // Создаем другого пользователя
-        await usersService.create({
+        await UsersService.create({
           login: "new" + testUserLogin,
           email: "new" + testUserEmail,
           password: testUserPassword,

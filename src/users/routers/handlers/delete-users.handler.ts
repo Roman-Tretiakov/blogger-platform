@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
-import { usersService } from "../../BLL/users.service";
+import { UsersService } from "../../BLL/users.service";
 import { errorsHandler } from "../../../core/utils/errors-hundler";
+import { iocContainer } from "../../../composition-root";
 
 export async function deleteUserHandler(
   req: Request,
@@ -9,7 +10,7 @@ export async function deleteUserHandler(
 ): Promise<void> {
   const id: string = req.params.id;
   try {
-    await usersService.deleteById(id);
+    await iocContainer.getInstance(UsersService).deleteById(id);
     res
       .status(HttpStatus.NoContent)
       .send(`User with id: ${id} was deleted successfully.`);

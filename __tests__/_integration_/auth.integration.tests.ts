@@ -6,7 +6,7 @@ import { ResultStatus } from "../../src/core/enums/result-statuses";
 import { setupApp } from "../../src/setup-app";
 import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
 import express from "express";
-import { usersService } from "../../src/users/BLL/users.service";
+import { UsersService } from "../../src/users/BLL/users.service";
 
 let app: any;
 
@@ -20,7 +20,7 @@ describe("AUTH-INTEGRATION", () => {
   });
 
   beforeEach(async () => {
-    await usersService.clear();
+    await UsersService.clear();
   });
 
   afterAll(async () => {

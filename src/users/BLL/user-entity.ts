@@ -12,7 +12,7 @@ export class User {
     public isConfirmed: boolean = true,
   ) {}
 
-  public get isEmailConfirmationCodeExpired(): boolean {
+  public isEmailConfirmationCodeExpired(): boolean {
     return this.expirationDate
       ? new Date(this.expirationDate!) < new Date()
       : false;

@@ -1,9 +1,13 @@
 import { Request, Response } from "express";
 import { UserInputModel } from "../../types/inputTypes/user-input-model";
 import { errorsHandler } from "../../../core/utils/errors-hundler";
-import { usersService } from "../../BLL/users.service";
+import { UsersService } from "../../BLL/users.service";
 import { HttpStatus } from "../../../core/enums/http-status";
-import { usersQueryRepository } from "../../repositories/users.query-repository";
+import { UsersQueryRepository } from "../../repositories/users.query-repository";
+import { iocContainer } from "../../../composition-root";
+
+const usersServiceInstance =
+  iocContainer.getInstance<UsersService>(UsersService);
 
 export async function createUserHandler(
   req: Request<{}, {}, UserInputModel>,
@@ -11,7 +15,7 @@ export async function createUserHandler(
 ): Promise<void> {
   try {
     const inputData = req.body;
-    const createdUserId: string = await usersService.create(inputData);
+    const createdUserId: string = await usersServiceInstance.create(inputData);
 
     let createdUser = null;
     let attempts = 0;
@@ -19,7 +23,9 @@ export async function createUserHandler(
     while (attempts < maxAttempts && createdUser === null) {
       attempts++;
       try {
-        createdUser = await usersQueryRepository.getUserById(createdUserId);
+        createdUser = await iocContainer
+          .getInstance<UsersQueryRepository>(UsersQueryRepository)
+          .getUserById(createdUserId);
       } catch (e) {
         if (attempts === maxAttempts) {
           console.log("2nd attempt to get user by id failed");

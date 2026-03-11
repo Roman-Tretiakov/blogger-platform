@@ -1,18 +1,24 @@
 import { UserInputModel } from "../types/inputTypes/user-input-model";
-import { usersRepository } from "../repositories/users.repository";
-import { bcryptService } from "../../auth/adapters/bcrypt.service";
+import { UsersRepository } from "../repositories/users.repository";
+import { BcryptService } from "../../auth/adapters/bcrypt.service";
 import { CustomError } from "../../core/errorClasses/CustomError";
 import { DeleteResult } from "mongodb";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
-import { usersQueryRepository } from "../repositories/users.query-repository";
+import { UsersQueryRepository } from "../repositories/users.query-repository";
 import { HttpStatus } from "../../core/enums/http-status";
 import { User } from "./user-entity";
 
-export const usersService = {
+export class UsersService {
+  constructor(
+    private repository: UsersRepository,
+    private queryRepository: UsersQueryRepository,
+    private cryptoService: BcryptService,
+  ) {}
+
   async create(inputData: UserInputModel): Promise<string> {
     const { login, password, email } = inputData;
 
-    const existedLoginOrEmail = await usersQueryRepository.findByLoginOrEmail([
+    const existedLoginOrEmail = await this.queryRepository.findByLoginOrEmail([
       login,
       email,
     ]);
@@ -28,7 +34,7 @@ export const usersService = {
       throw new CustomError(message, field, HttpStatus.BadRequest);
     }
 
-    const passwordHash = await bcryptService.generateHash(password);
+    const passwordHash = await this.cryptoService.generateHash(password);
     const newUser = new User(
       login,
       email,
@@ -36,18 +42,18 @@ export const usersService = {
       new Date().toISOString(),
     );
 
-    return await usersRepository.create(newUser);
-  },
+    return await this.repository.create(newUser);
+  }
 
   async deleteById(id: string): Promise<void> {
-    const result: DeleteResult = await usersRepository.delete(id);
+    const result: DeleteResult = await this.repository.delete(id);
 
     if (result.deletedCount < 1) {
       throw new NotFoundError(`User with id ${id} not found`, "id");
     }
-  },
+  }
 
   async clear(): Promise<void> {
-    await usersRepository.clear();
-  },
-};
+    await this.repository.clear();
+  }
+}

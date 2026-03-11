@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { add } from "date-fns/add";
-import { usersRepository } from "../../src/users/repositories/users.repository";
+import { UsersRepository } from "../../src/users/repositories/users.repository";
 
 type RegisterUserPayloadType = {
   login: string;
@@ -63,7 +63,7 @@ export const testSeeder = {
         }).toISOString(),
       isConfirmed: isConfirmed ?? false,
     };
-    const res = await usersRepository.create(newUser);
+    const res = await UsersRepository.create(newUser);
     return {
       id: res,
       ...newUser,

@@ -3,8 +3,13 @@ import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { HttpStatus } from "../../../src/core/enums/http-status";
 import { EndpointList } from "../../../src/core/constants/endpoint-list";
-import { client, closeDBConnection, runDB } from "../../../src/db/mongo.db";
-import { usersService } from "../../../src/users/BLL/users.service";
+import {
+  client,
+  closeDBConnection,
+  rateLimitsCollection,
+  runDB,
+} from "../../../src/db/mongo.db";
+import { UsersService } from "../../../src/users/BLL/users.service";
 import { authDevicesRepository } from "../../../src/securityDevices/repositories/authDevices.repository";
 import { deviceViewModel } from "../../../src/securityDevices/types/dto/device-view-model.dto";
 
@@ -68,10 +73,11 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await usersService.clear();
+  await UsersService.clear();
   await authDevicesRepository.clear();
+  await rateLimitsCollection.deleteMany({});
 
-  testUserId = await usersService.create({
+  testUserId = await UsersService.create({
     login: testUserLogin,
     email: testUserEmail,
     password: testUserPassword,
@@ -267,7 +273,7 @@ describe("Security Devices API End-to-End Tests", () => {
 
       test("Should return 403 when trying to delete someone else's session", async () => {
         // Создаём второго пользователя
-        const otherUserId = await usersService.create({
+        const otherUserId = await UsersService.create({
           login: "otheruser",
           email: "other@example.com",
           password: "password123",
@@ -400,7 +406,7 @@ describe("Security Devices API End-to-End Tests", () => {
   // ─────────────────────────────────────────────
   describe("Additional edge cases", () => {
     test("Should isolate sessions between different users", async () => {
-      await usersService.create({
+      await UsersService.create({
         login: "otheruser",
         email: "other@example.com",
         password: "password123",

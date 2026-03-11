@@ -1,5 +1,5 @@
-import { usersQueryRepository } from "../../users/repositories/users.query-repository";
-import { bcryptService } from "../adapters/bcrypt.service";
+import { UsersQueryRepository } from "../../users/repositories/users.query-repository";
+import { BcryptService } from "../adapters/bcrypt.service";
 import { Result } from "../../core/types/result-object-type";
 import { PairTokensViewModel } from "../routers/outputTypes/pair-tokens-view-model";
 import { ResultStatus } from "../../core/enums/result-statuses";
@@ -7,7 +7,7 @@ import { jwtService } from "../adapters/jwt.service";
 import { User } from "../../users/BLL/user-entity";
 import { nodemailerService } from "../adapters/emailSendler/nodemailer.service";
 import { MailServices } from "../adapters/enums/mail-services";
-import { usersRepository } from "../../users/repositories/users.repository";
+import { UsersRepository } from "../../users/repositories/users.repository";
 import { emailExamples } from "../adapters/emailSendler/emailExamples";
 import { randomUUID } from "crypto";
 import { TokensTypes } from "../adapters/enums/tokens-types";
@@ -25,7 +25,7 @@ export const authService = {
     const result = await this.checkLoginAndPassword([login, email], password);
 
     if (result) {
-      const user = await usersQueryRepository.getUserById(result);
+      const user = await UsersQueryRepository.getUserById(result);
       const loginMatch = user.login === login;
       const emailMatch = user.email === email;
       let field: string;
@@ -49,11 +49,11 @@ export const authService = {
       };
     }
 
-    const passwordHash = await bcryptService.generateHash(password);
+    const passwordHash = await BcryptService.generateHash(password);
     const newUser = new User(login, email, passwordHash);
     newUser.generateNewConfirmationCode().emailConfirmed(false);
 
-    await usersRepository.create(newUser).catch(() => {
+    await UsersRepository.create(newUser).catch(() => {
       return {
         status: ResultStatus.Failure,
         errorMessage: "Something went wrong during user creation!",
@@ -82,7 +82,7 @@ export const authService = {
   },
 
   async confirmEmail(code: string): Promise<Result> {
-    const user = await usersQueryRepository.findUserByConfirmationCode(code);
+    const user = await UsersQueryRepository.findUserByConfirmationCode(code);
     if (!user) {
       return {
         status: ResultStatus.BadRequest,
@@ -124,18 +124,16 @@ export const authService = {
       }
 
       user.isConfirmed = true;
-      await usersRepository
-        .update(user._id.toString(), {
-          ...user,
-        })
-        .catch(() => {
-          return {
-            status: ResultStatus.Failure,
-            errorMessage: "Something went wrong during email confirmation!",
-            extensions: [],
-            data: null,
-          };
-        });
+      await UsersRepository.update(user._id.toString(), {
+        ...user,
+      }).catch(() => {
+        return {
+          status: ResultStatus.Failure,
+          errorMessage: "Something went wrong during email confirmation!",
+          extensions: [],
+          data: null,
+        };
+      });
     }
 
     return {
@@ -147,7 +145,7 @@ export const authService = {
   },
 
   async resendEmail(email: string): Promise<Result> {
-    const user = await usersQueryRepository.findByLoginOrEmail([email]);
+    const user = await UsersQueryRepository.findByLoginOrEmail([email]);
     if (!user) {
       return {
         status: ResultStatus.BadRequest,
@@ -188,7 +186,7 @@ export const authService = {
         console.error("Failed to send confirmation email:", e);
       });
 
-    await usersRepository.update(user._id.toString(), {
+    await UsersRepository.update(user._id.toString(), {
       ...user,
     });
 
@@ -239,12 +237,12 @@ export const authService = {
     loginAndEmail: string[],
     password: string,
   ): Promise<string | null> {
-    const user = await usersQueryRepository.findByLoginOrEmail(loginAndEmail);
+    const user = await UsersQueryRepository.findByLoginOrEmail(loginAndEmail);
     if (!user) {
       return null;
     }
 
-    const isPasswordCorrect = await bcryptService.checkPassword(
+    const isPasswordCorrect = await BcryptService.checkPassword(
       password,
       user!.password,
     );

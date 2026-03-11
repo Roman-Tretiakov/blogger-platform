@@ -3,8 +3,13 @@ import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { HttpStatus } from "../../../src/core/enums/http-status";
 import { EndpointList } from "../../../src/core/constants/endpoint-list";
-import { client, closeDBConnection, runDB } from "../../../src/db/mongo.db";
-import { usersService } from "../../../src/users/BLL/users.service";
+import {
+  client,
+  closeDBConnection,
+  rateLimitsCollection,
+  runDB,
+} from "../../../src/db/mongo.db";
+import { UsersService } from "../../../src/users/BLL/users.service";
 import { authDevicesRepository } from "../../../src/securityDevices/repositories/authDevices.repository";
 import { authDevicesQueryRepository } from "../../../src/securityDevices/repositories/authDevices.query-repository";
 
@@ -40,10 +45,11 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   // Очищаем пользователей и сессии перед каждым тестом
-  await usersService.clear();
+  await UsersService.clear();
   await authDevicesRepository.clear();
+  await rateLimitsCollection.deleteMany({});
 
-  testUserId = await usersService.create({
+  testUserId = await UsersService.create({
     login: testUserLogin,
     email: testUserEmail,
     password: testUserPassword,

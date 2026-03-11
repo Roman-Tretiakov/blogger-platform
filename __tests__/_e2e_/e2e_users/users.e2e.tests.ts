@@ -12,9 +12,10 @@ import {
   runDB,
   usersCollection,
 } from "../../../src/db/mongo.db";
-import { usersService } from "../../../src/users/BLL/users.service";
+import { UsersService } from "../../../src/users/BLL/users.service";
 import { UserInputModel } from "../../../src/users/types/inputTypes/user-input-model";
 import { ObjectId } from "mongodb";
+import { iocContainer } from "../../../src/core/utils/ioc-container";
 
 let app: any;
 const authToken: string = getBasicAuthToken();
@@ -41,6 +42,9 @@ const testUsers: UserInputModel[] = [
   },
 ];
 
+const UsersServiceInstance =
+  iocContainer.getInstance<UsersService>(UsersService);
+
 beforeAll(async () => {
   await runDB(
     "mongodb+srv://Vercel-Admin-blogger-platform-mongoDB:hwkJaIheLnRD6J9c@blogger-platform-mongod.13rbnz7.mongodb.net/?retryWrites=true&w=majority",
@@ -50,7 +54,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  await usersService.clear();
+  await UsersServiceInstance.clear();
 });
 
 afterAll(async () => {
@@ -67,7 +71,7 @@ describe("Users API", () => {
   beforeEach(async () => {
     // Создаем тестовых пользователей
     for (const user of testUsers) {
-      await usersService.create(user);
+      await UsersServiceInstance.create(user);
     }
   });
 
@@ -439,7 +443,7 @@ describe("Users API", () => {
         email: "delete@example.com",
         password: "qwerty123",
       };
-      userId = await usersService.create(inputData);
+      userId = await UsersServiceInstance.create(inputData);
     });
 
     describe("Positive scenarios", () => {

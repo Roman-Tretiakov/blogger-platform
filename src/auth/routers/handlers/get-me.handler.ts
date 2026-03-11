@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express";
 import { IdType } from "../../../core/types/id-type";
 import { RequestWithUserData } from "../../../core/types/request-types";
 import { HttpStatus } from "../../../core/enums/http-status";
-import { usersQueryRepository } from "../../../users/repositories/users.query-repository";
+import { UsersQueryRepository } from "../../../users/repositories/users.query-repository";
 
 export async function getLoggedUserHandler(
   req: RequestWithUserData<IdType>,
@@ -17,7 +17,7 @@ export async function getLoggedUserHandler(
   }
 
   try {
-    const me = await usersQueryRepository.getMe(userId);
+    const me = await UsersQueryRepository.getMe(userId);
     res.status(HttpStatus.Ok).send(me);
   } catch (e) {
     next(e);

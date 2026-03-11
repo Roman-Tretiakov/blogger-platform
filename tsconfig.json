@@ -2,7 +2,7 @@
   "compilerOptions": {
     "typeRoots": [
       "./node_modules/@types",
-      "./src/core/types"  // Указываем папку с декларативными файлами
+      "./src/core/types" // Указываем папку с декларативными файлами
     ],
     "target": "es2016",
     "module": "commonjs",
@@ -12,7 +12,9 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": [
     "src/**/*",
