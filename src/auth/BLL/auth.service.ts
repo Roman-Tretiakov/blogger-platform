@@ -70,7 +70,7 @@ export class AuthService {
 
     const passwordHash = await this.bcryptService.generateHash(password);
     const newUser = new User(login, email, passwordHash);
-    newUser.generateNewConfirmationCode().emailConfirmed(false);
+    newUser.generateNewConfirmationCode().isEmailConfirmed(false);
 
     await this.usersRepository.create(newUser).catch(() => {
       return {
@@ -301,7 +301,7 @@ export class AuthService {
     const decoded = this.jwtService.verifyToken(refreshToken, TokensTypes.RT);
     await this.authDevicesRepository.updateLastActiveDate(
       deviceId,
-      decoded!.iat!,
+      decoded!.jti!,
     );
 
     return {

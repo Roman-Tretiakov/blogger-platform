@@ -1,5 +1,4 @@
 export const DBName = "blogger-platform-db";
-export const TokensDBName = "blogger-platform-tokens-db";
 
 export const DBCollectionNames = {
   BLOGS: "blogs",

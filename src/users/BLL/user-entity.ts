@@ -18,7 +18,7 @@ export class User {
       : false;
   }
 
-  public emailConfirmed(value: boolean) {
+  public isEmailConfirmed(value: boolean) {
     this.isConfirmed = value;
 
     return this;

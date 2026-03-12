@@ -3,16 +3,12 @@ import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { HttpStatus } from "../../../src/core/enums/http-status";
 import { EndpointList } from "../../../src/core/constants/endpoint-list";
-import {
-  client,
-  closeDBConnection,
-  rateLimitsCollection,
-  runDB,
-} from "../../../src/db/mongo.db";
+import { client, closeDBConnection, runDB } from "../../../src/db/mongo.db";
 import { UsersService } from "../../../src/users/BLL/users.service";
 import { AuthDevicesRepository } from "../../../src/securityDevices/repositories/authDevices.repository";
 import { AuthDevicesQueryRepository } from "../../../src/securityDevices/repositories/authDevices.query-repository";
 import { iocContainer } from "../../../src/composition-root";
+import { RateLimiter } from "../../../src/core/coreClasses/rateLimiter";
 
 // Хелпер: достаём значение refreshToken из Set-Cookie заголовка
 const extractRefreshToken = (
@@ -38,6 +34,7 @@ const authDevicesRepository = iocContainer.resolve(AuthDevicesRepository);
 const authDevicesQueryRepository = iocContainer.resolve(
   AuthDevicesQueryRepository,
 );
+const rateLimiter = iocContainer.resolve(RateLimiter);
 
 let accessToken: string;
 let refreshToken: string;
@@ -55,7 +52,7 @@ beforeEach(async () => {
   // Очищаем пользователей и сессии перед каждым тестом
   await usersService.clear();
   await authDevicesRepository.clear();
-  await rateLimitsCollection.deleteMany({});
+  await rateLimiter.clear();
 
   testUserId = await usersService.create({
     login: testUserLogin,

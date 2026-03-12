@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { appConfig } from "../../core/config/appConfig";
 import { TokensTypes } from "./enums/tokens-types";
 import { injectable } from "inversify";
+import { randomUUID } from "crypto";
 
 const JWT_AT_SECRET: string = appConfig.AT_TOKEN_SECRET;
 const JWT_RT_SECRET: string = appConfig.RT_TOKEN_SECRET;
@@ -11,7 +12,10 @@ const JWT_RT_EXPIRES_IN: number = appConfig.RT_TOKEN_TIME;
 @injectable()
 export class JwtService {
   createToken(userId: string, type: TokensTypes, deviceId?: string): string {
-    const payload: Record<string, string> = { userId: userId };
+    const payload: Record<string, string> = {
+      userId: userId,
+      jti: randomUUID(),
+    };
     if (type === TokensTypes.RT) {
       payload.deviceId = deviceId as string;
     }
@@ -31,7 +35,7 @@ export class JwtService {
   verifyToken(
     token: string,
     type: TokensTypes,
-  ): { userId: string; deviceId?: string; iat?: number } | null {
+  ): { userId: string; deviceId?: string; iat?: number; jti?: string } | null {
     try {
       switch (type) {
         case TokensTypes.AT:

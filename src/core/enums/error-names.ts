@@ -24,7 +24,6 @@ export enum ErrorNames {
   BLOGID_TYPE_ERROR = "Blog id must be string",
 
   BODY_MISSING_ERROR = "Request body is required",
-  QUERY_MISSING_ERROR = "Query parameters is required",
 
   ID_MISSING_ERROR = "ID is required",
   ID_TYPE_ERROR = "ID must be a string",

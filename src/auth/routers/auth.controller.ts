@@ -77,7 +77,7 @@ export class AuthController {
 
     await this.authService.createAuthDeviceSession({
       userId: result.data!.userId,
-      refreshTokenVersion: decoded!.iat!,
+      refreshTokenVersion: decoded!.jti!,
       deviceInfo: {
         deviceId: deviceId,
         title: req.headers["user-agent"] || "unknown",

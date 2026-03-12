@@ -2,12 +2,14 @@ import { NextFunction, Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { JwtService } from "../../adapters/jwt.service";
 import { TokensTypes } from "../../adapters/enums/tokens-types";
+import { iocContainer } from "../../../composition-root";
 
 export const accessTokenGuard = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
+  const jwtService = iocContainer.resolve(JwtService);
   const authHeader = req.headers["authorization"] as string;
   if (!authHeader)
     return res
@@ -21,7 +23,7 @@ export const accessTokenGuard = (
       .send("Header authorization must be in format 'Bearer ...'");
   }
 
-  const verifiedData = JwtService.verifyToken(token, TokensTypes.AT);
+  const verifiedData = jwtService.verifyToken(token, TokensTypes.AT);
   if (!verifiedData) {
     return res.sendStatus(HttpStatus.Unauthorized);
   }

@@ -2,14 +2,20 @@ import { NextFunction, Request, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { JwtService } from "../../adapters/jwt.service";
 import { TokensTypes } from "../../adapters/enums/tokens-types";
-import { authDevicesQueryRepository } from "../../../securityDevices/repositories/authDevices.query-repository";
+import { AuthDevicesQueryRepository } from "../../../securityDevices/repositories/authDevices.query-repository";
 import { AuthDevicesRepository } from "../../../securityDevices/repositories/authDevices.repository";
+import { iocContainer } from "../../../composition-root";
 
 export const refreshTokenGuard = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
+  const jwtService = iocContainer.resolve(JwtService);
+  const authDevicesRepository = iocContainer.resolve(AuthDevicesRepository);
+  const authDevicesQueryRepository = iocContainer.resolve(
+    AuthDevicesQueryRepository,
+  );
   try {
     const refreshToken: string | undefined = req.cookies.refreshToken;
     if (!refreshToken) {
@@ -18,7 +24,7 @@ export const refreshTokenGuard = async (
         .send("Refresh token is missing");
     }
 
-    const payload = JwtService.verifyToken(refreshToken, TokensTypes.RT);
+    const payload = jwtService.verifyToken(refreshToken, TokensTypes.RT);
     if (!payload || !payload.deviceId) {
       return res
         .status(HttpStatus.Unauthorized)
@@ -34,10 +40,10 @@ export const refreshTokenGuard = async (
         .send("Session not found for the provided device id");
     }
     if (session.expireAt < new Date()) {
-      await AuthDevicesRepository.deleteByDeviceId(payload.deviceId);
+      await authDevicesRepository.deleteByDeviceId(payload.deviceId);
       return res.status(HttpStatus.Unauthorized).send("Session has expired");
     }
-    if (session.refreshTokenVersion !== payload.iat) {
+    if (session.refreshTokenVersion !== payload.jti) {
       return res
         .status(HttpStatus.Unauthorized)
         .send("Refresh token is outdated");

@@ -30,6 +30,6 @@ export class UsersRepository {
   }
 
   async clear(): Promise<void> {
-    await usersCollection.drop();
+    await usersCollection.deleteMany({});
   }
 }

@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { RateLimiter } from "../../coreClasses/rateLimiter";
-import { rateLimitsCollection } from "../../../db/mongo.db";
 import { appConfig } from "../../config/appConfig";
 import { HttpStatus } from "../../enums/http-status";
 
@@ -13,7 +12,7 @@ export const rateLimitsMiddleware = async (
   const url = req.originalUrl;
   const maxRequests = appConfig.RATE_LIMIT_MAX_REQUESTS;
 
-  const rateLimiter = new RateLimiter(rateLimitsCollection);
+  const rateLimiter = new RateLimiter();
   try {
     await rateLimiter.addDocument(ip, url);
     const rateCount = await rateLimiter.getDocumentsCount(ip, url);
