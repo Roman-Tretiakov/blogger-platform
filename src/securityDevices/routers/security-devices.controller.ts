@@ -6,8 +6,9 @@ import { HttpStatus } from "../../core/enums/http-status";
 import { AuthService } from "../../auth/BLL/auth.service";
 import { resultStatusToHttpStatusMapper } from "../../core/utils/result-code-to-http-status.mapper";
 import { ResultStatus } from "../../core/enums/result-statuses";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class SecurityDevicesController {
   constructor(
     @inject(AuthDevicesQueryRepository)

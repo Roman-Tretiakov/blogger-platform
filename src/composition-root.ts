@@ -25,6 +25,7 @@ import { PostsController } from "./posts/routers/posts.controller";
 import { SecurityDevicesController } from "./securityDevices/routers/security-devices.controller";
 import { TestingController } from "./testing/routers/testing.controller";
 import { JwtService } from "./auth/adapters/jwt.service";
+import { RateLimiter } from "./core/coreClasses/rateLimiter";
 
 export const iocContainer = new Container();
 
@@ -60,6 +61,7 @@ iocContainer.bind(PostsService).to(PostsService);
 iocContainer.bind(PostsController).to(PostsController);
 
 iocContainer.bind(TestingController).to(TestingController);
+iocContainer.bind(RateLimiter).to(RateLimiter);
 
 //===== самописный ioc контейнер =====
 

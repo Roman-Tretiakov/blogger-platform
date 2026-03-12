@@ -18,8 +18,9 @@ import { CommentsQueryInput } from "../../comments/routers/inputTypes/comments-q
 import { matchedData } from "express-validator";
 import { setDefaultSortAndPaginationIfNotExist } from "../../core/utils/sort-and-pagination.utils";
 import { PostQueryInput } from "./inputTypes/post-query-input";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class PostsController {
   constructor(
     @inject(PostsService)

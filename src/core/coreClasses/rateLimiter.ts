@@ -1,5 +1,6 @@
 import { Collection } from "mongodb";
 import { appConfig } from "../config/appConfig";
+import { injectable } from "inversify";
 
 export interface RateLimiterDocument {
   ip: string;
@@ -8,6 +9,7 @@ export interface RateLimiterDocument {
   expireAt: Date;
 }
 
+@injectable()
 export class RateLimiter {
   constructor(private collection: Collection<RateLimiterDocument>) {
     this.collection = collection;
@@ -40,5 +42,9 @@ export class RateLimiter {
       url,
       date: { $gte: since },
     });
+  }
+
+  async clear(): Promise<void> {
+    await this.collection.deleteMany({});
   }
 }

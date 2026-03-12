@@ -17,8 +17,9 @@ import { appConfig } from "../../core/config/appConfig";
 import { CookieNames } from "../../core/constants/cookie-names";
 import { UserInputModel } from "../../users/types/inputTypes/user-input-model";
 import { createErrorMessages } from "../../core/utils/error.utils";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class AuthController {
   constructor(
     @inject(AuthService)

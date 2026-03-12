@@ -9,8 +9,9 @@ import { ResultStatus } from "../../core/enums/result-statuses";
 import { resultStatusToHttpStatusMapper } from "../../core/utils/result-code-to-http-status.mapper";
 import { HttpStatus } from "../../core/enums/http-status";
 import { CommentInputModel } from "./inputTypes/comment-input-model";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class CommentsController {
   constructor(
     @inject(CommentsService)

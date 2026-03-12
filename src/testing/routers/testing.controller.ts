@@ -5,8 +5,10 @@ import { UsersRepository } from "../../users/repositories/users.repository";
 import { CommentsRepository } from "../../comments/repositories/comments.repository";
 import { AuthDevicesRepository } from "../../securityDevices/repositories/authDevices.repository";
 import { HttpStatus } from "../../core/enums/http-status";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
+import { RateLimiter } from "../../core/coreClasses/rateLimiter";
 
+@injectable()
 export class TestingController {
   constructor(
     @inject(PostsRepository)
@@ -19,6 +21,8 @@ export class TestingController {
     private commentsRepository: CommentsRepository,
     @inject(AuthDevicesRepository)
     private authDevicesRepository: AuthDevicesRepository,
+    @inject(RateLimiter)
+    private rateLimiter: RateLimiter,
   ) {}
 
   async clearAllData(req: Request, res: Response): Promise<void> {
@@ -27,7 +31,8 @@ export class TestingController {
     await this.usersRepository.clear();
     await this.commentsRepository.clear();
     await this.authDevicesRepository.clear();
+    await this.rateLimiter.clear();
 
-    res.status(HttpStatus.NotFound).send("All data deleted");
+    res.status(HttpStatus.NoContent).send("All data deleted");
   }
 }
