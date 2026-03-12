@@ -29,71 +29,57 @@ import { RateLimiter } from "./core/coreClasses/rateLimiter";
 
 export const iocContainer = new Container();
 
-iocContainer.bind(NodemailerService).to(NodemailerService);
-iocContainer.bind(JwtService).to(JwtService);
-iocContainer.bind(BcryptService).to(BcryptService);
+iocContainer.bind(NodemailerService).to(NodemailerService).inSingletonScope();
+iocContainer.bind(JwtService).to(JwtService).inSingletonScope();
+iocContainer.bind(BcryptService).to(BcryptService).inSingletonScope();
 
-iocContainer.bind(AuthDevicesRepository).to(AuthDevicesRepository);
-iocContainer.bind(AuthDevicesQueryRepository).to(AuthDevicesQueryRepository);
-iocContainer.bind(SecurityDevicesController).to(SecurityDevicesController);
+iocContainer
+  .bind(AuthDevicesRepository)
+  .to(AuthDevicesRepository)
+  .inSingletonScope();
+iocContainer
+  .bind(AuthDevicesQueryRepository)
+  .to(AuthDevicesQueryRepository)
+  .inSingletonScope();
+iocContainer
+  .bind(SecurityDevicesController)
+  .to(SecurityDevicesController)
+  .inSingletonScope();
 
-iocContainer.bind(AuthService).to(AuthService);
-iocContainer.bind(AuthController).to(AuthController);
+iocContainer.bind(AuthService).to(AuthService).inSingletonScope();
+iocContainer.bind(AuthController).to(AuthController).inSingletonScope();
 
-iocContainer.bind(UsersRepository).to(UsersRepository);
-iocContainer.bind(UsersQueryRepository).to(UsersQueryRepository);
-iocContainer.bind(UsersService).to(UsersService);
-iocContainer.bind(UsersController).to(UsersController);
+iocContainer.bind(UsersRepository).to(UsersRepository).inSingletonScope();
+iocContainer
+  .bind(UsersQueryRepository)
+  .to(UsersQueryRepository)
+  .inSingletonScope();
+iocContainer.bind(UsersService).to(UsersService).inSingletonScope();
+iocContainer.bind(UsersController).to(UsersController).inSingletonScope();
 
-iocContainer.bind(BlogsQueryRepository).to(BlogsQueryRepository);
-iocContainer.bind(BlogsRepository).to(BlogsRepository);
-iocContainer.bind(BlogsService).to(BlogsService);
-iocContainer.bind(BlogsController).to(BlogsController);
+iocContainer
+  .bind(BlogsQueryRepository)
+  .to(BlogsQueryRepository)
+  .inSingletonScope();
+iocContainer.bind(BlogsRepository).to(BlogsRepository).inSingletonScope();
+iocContainer.bind(BlogsService).to(BlogsService).inSingletonScope();
+iocContainer.bind(BlogsController).to(BlogsController).inSingletonScope();
 
-iocContainer.bind(CommentsRepository).to(CommentsRepository);
-iocContainer.bind(CommentsQueryRepository).to(CommentsQueryRepository);
-iocContainer.bind(CommentsService).to(CommentsService);
-iocContainer.bind(CommentsController).to(CommentsController);
+iocContainer.bind(CommentsRepository).to(CommentsRepository).inSingletonScope();
+iocContainer
+  .bind(CommentsQueryRepository)
+  .to(CommentsQueryRepository)
+  .inSingletonScope();
+iocContainer.bind(CommentsService).to(CommentsService).inSingletonScope();
+iocContainer.bind(CommentsController).to(CommentsController).inSingletonScope();
 
-iocContainer.bind(PostsRepository).to(PostsRepository);
-iocContainer.bind(PostsQueryRepository).to(PostsQueryRepository);
-iocContainer.bind(PostsService).to(PostsService);
-iocContainer.bind(PostsController).to(PostsController);
+iocContainer.bind(PostsRepository).to(PostsRepository).inSingletonScope();
+iocContainer
+  .bind(PostsQueryRepository)
+  .to(PostsQueryRepository)
+  .inSingletonScope();
+iocContainer.bind(PostsService).to(PostsService).inSingletonScope();
+iocContainer.bind(PostsController).to(PostsController).inSingletonScope();
 
-iocContainer.bind(TestingController).to(TestingController);
-iocContainer.bind(RateLimiter).to(RateLimiter);
-
-//===== самописный ioc контейнер =====
-
-// const instances: any[] = [];
-//
-// const nodemailerService = new NodemailerService();
-// instances.push(nodemailerService);
-//
-// const authDevicesRepository = new AuthDevicesRepository(authDevicesCollection);
-// instances.push(authDevicesRepository);
-//
-// const usersRepository = new UsersRepository(usersCollection);
-// instances.push(usersRepository);
-//
-// const usersQueryRepository = new UsersQueryRepository(usersCollection);
-// instances.push(usersQueryRepository);
-//
-// const bcryptService = new BcryptService();
-// instances.push(bcryptService);
-//
-// const usersService = new UsersService(
-//   usersRepository,
-//   usersQueryRepository,
-//   bcryptService,
-// );
-// instances.push(usersService);
-//
-// const usersController = new UsersController(usersService, usersQueryRepository);
-// instances.push(usersController);
-//
-// export const iocContainer = {
-//   getInstance<T>(ClassType: any): T {
-//     return instances.find((inst) => inst instanceof ClassType);
-//   },
-// };
+iocContainer.bind(TestingController).to(TestingController).inSingletonScope();
+iocContainer.bind(RateLimiter).to(RateLimiter).inSingletonScope();
