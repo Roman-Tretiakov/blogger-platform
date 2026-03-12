@@ -1,17 +1,18 @@
 import { Request, Response } from "express";
 import { AuthDevicesQueryRepository } from "../repositories/authDevices.query-repository";
-import { AuthDevicesRepository } from "../repositories/authDevices.repository";
 import { RequestWithUserData } from "../../core/types/request-types";
 import { IdType } from "../../core/types/id-type";
 import { HttpStatus } from "../../core/enums/http-status";
 import { AuthService } from "../../auth/BLL/auth.service";
 import { resultStatusToHttpStatusMapper } from "../../core/utils/result-code-to-http-status.mapper";
 import { ResultStatus } from "../../core/enums/result-statuses";
+import { inject } from "inversify";
 
 export class SecurityDevicesController {
   constructor(
-    private authDevicesRepository: AuthDevicesRepository,
+    @inject(AuthDevicesQueryRepository)
     private authDevicesQueryRepository: AuthDevicesQueryRepository,
+    @inject(AuthService)
     private authService: AuthService,
   ) {}
 

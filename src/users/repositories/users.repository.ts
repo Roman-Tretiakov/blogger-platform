@@ -1,13 +1,14 @@
 import { UserMongoModel } from "./type/user-mongo-model";
-import { Collection, DeleteResult, InsertOneResult, ObjectId } from "mongodb";
+import { DeleteResult, InsertOneResult, ObjectId } from "mongodb";
 import { DomainError } from "../../core/errorClasses/DomainError";
+import { injectable } from "inversify";
+import { usersCollection } from "../../db/mongo.db";
 
+@injectable()
 export class UsersRepository {
-  constructor(private collection: Collection<UserMongoModel>) {}
-
   async create(userData: UserMongoModel): Promise<string> {
     const newUser: InsertOneResult<UserMongoModel> =
-      await this.collection.insertOne(userData);
+      await usersCollection.insertOne(userData);
     if (!newUser.acknowledged) {
       throw new DomainError("Failed to insert user");
     }
@@ -15,11 +16,11 @@ export class UsersRepository {
   }
 
   async delete(userId: string): Promise<DeleteResult> {
-    return await this.collection.deleteOne({ _id: new ObjectId(userId) });
+    return await usersCollection.deleteOne({ _id: new ObjectId(userId) });
   }
 
   async update(userId: string, userData: UserMongoModel): Promise<void> {
-    const updateResult = await this.collection.updateOne(
+    const updateResult = await usersCollection.updateOne(
       { _id: new ObjectId(userId) },
       { $set: userData },
     );
@@ -29,6 +30,6 @@ export class UsersRepository {
   }
 
   async clear(): Promise<void> {
-    await this.collection.drop();
+    await usersCollection.drop();
   }
 }

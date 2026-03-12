@@ -15,15 +15,24 @@ import { AuthDevicesSessions } from "../../securityDevices/BLL/types/auth-device
 import { NodemailerService } from "../adapters/emailSendler/nodemailer.service";
 import { AuthDevicesQueryRepository } from "../../securityDevices/repositories/authDevices.query-repository";
 import { AuthDevicesRepository } from "../../securityDevices/repositories/authDevices.repository";
+import { injectable, inject } from "inversify";
 
+@injectable()
 export class AuthService {
   constructor(
+    @inject(UsersQueryRepository)
     private usersQueryRepository: UsersQueryRepository,
+    @inject(UsersRepository)
     private usersRepository: UsersRepository,
+    @inject(BcryptService)
     private bcryptService: BcryptService,
+    @inject(JwtService)
     private jwtService: JwtService,
+    @inject(NodemailerService)
     private nodemailerService: NodemailerService,
+    @inject(AuthDevicesRepository)
     private authDevicesRepository: AuthDevicesRepository,
+    @inject(AuthDevicesQueryRepository)
     private authDevicesQueryRepository: AuthDevicesQueryRepository,
   ) {}
 

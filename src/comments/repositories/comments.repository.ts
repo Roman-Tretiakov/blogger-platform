@@ -1,14 +1,15 @@
 import { CommentMongoModel } from "./types/comment-mongo-model";
 import { Result } from "../../core/types/result-object-type";
 import { ResultStatus } from "../../core/enums/result-statuses";
-import { Collection, ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
 import { CommentInputModel } from "../routers/inputTypes/comment-input-model";
+import { injectable } from "inversify";
+import { commentsCollection } from "../../db/mongo.db";
 
+@injectable()
 export class CommentsRepository {
-  constructor(private collection: Collection<CommentMongoModel>) {}
-
   async create(inputModel: CommentMongoModel): Promise<Result<string | null>> {
-    const result = await this.collection.insertOne(inputModel);
+    const result = await commentsCollection.insertOne(inputModel);
     return {
       status: result.acknowledged ? ResultStatus.Created : ResultStatus.Failure,
       errorMessage: result.acknowledged
@@ -20,7 +21,7 @@ export class CommentsRepository {
   }
 
   async delete(commentId: string): Promise<Result> {
-    const result = await this.collection.deleteOne({
+    const result = await commentsCollection.deleteOne({
       _id: new ObjectId(commentId),
     });
     return {
@@ -37,7 +38,7 @@ export class CommentsRepository {
     commentId: string,
     inputModel: CommentInputModel,
   ): Promise<Result> {
-    const result = await this.collection.updateOne(
+    const result = await commentsCollection.updateOne(
       { _id: new ObjectId(commentId) },
       { $set: inputModel },
     );
@@ -52,6 +53,6 @@ export class CommentsRepository {
   }
 
   async clear(): Promise<void> {
-    await this.collection.drop();
+    await commentsCollection.drop();
   }
 }

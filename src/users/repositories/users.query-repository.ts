@@ -1,4 +1,4 @@
-import { Collection, Filter, ObjectId, WithId } from "mongodb";
+import { Filter, ObjectId, WithId } from "mongodb";
 import { UserMongoModel } from "./type/user-mongo-model";
 import { UserListWithPagination } from "../routers/outputTypes/user-list-with-pagination";
 import { UserQueryInput } from "../routers/inputTypes/user-query-input";
@@ -6,16 +6,17 @@ import { mapToUserViewModel } from "../mappers/map-to-user-view-model";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { UserViewModel } from "../types/outputTypes/user-view-model";
 import { MeViewModel } from "../../auth/routers/outputTypes/me-view-model";
+import { injectable } from "inversify";
+import { usersCollection } from "../../db/mongo.db";
 
+@injectable()
 export class UsersQueryRepository {
-  constructor(private collection: Collection<UserMongoModel>) {}
-
   async getUserById(id: string): Promise<UserViewModel> {
     if (!ObjectId.isValid(id)) {
       throw new NotFoundError(`User with id: ${id} not found`, "id");
     }
 
-    const user = await this.collection.findOne({ _id: new ObjectId(id) });
+    const user = await usersCollection.findOne({ _id: new ObjectId(id) });
     if (user === null) {
       throw new NotFoundError(`User with id: ${id} not found`, "id");
     }
@@ -25,7 +26,7 @@ export class UsersQueryRepository {
   async findByLoginOrEmail(
     loginOrEmail: string[],
   ): Promise<WithId<UserMongoModel> | null> {
-    return this.collection.findOne({
+    return usersCollection.findOne({
       $or: [{ login: { $in: loginOrEmail } }, { email: { $in: loginOrEmail } }],
     });
   }
@@ -33,7 +34,7 @@ export class UsersQueryRepository {
   async findUserByConfirmationCode(
     code: string,
   ): Promise<WithId<UserMongoModel> | null> {
-    return this.collection.findOne({
+    return usersCollection.findOne({
       confirmationCode: code,
     });
   }
@@ -70,7 +71,7 @@ export class UsersQueryRepository {
       filter.$or = conditions;
     }
 
-    const items = await this.collection
+    const items = await usersCollection
       .find(filter) // Используем единый фильтр
       .sort({
         [queryParams.sortBy]: queryParams.sortDirection === "asc" ? 1 : -1,
@@ -79,7 +80,7 @@ export class UsersQueryRepository {
       .limit(queryParams.pageSize)
       .toArray();
 
-    const totalCount = await this.collection.countDocuments(filter);
+    const totalCount = await usersCollection.countDocuments(filter);
 
     return {
       page: queryParams.pageNumber,

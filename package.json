@@ -29,7 +29,7 @@
     "dotenv": "^17.2.3",
     "express": "^4.18.2",
     "express-validator": "^7.3.1",
-    "inversify": "5.0.5",
+    "inversify": "^6.2.2",
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.0.0",
     "nodemailer": "^8.0.1",

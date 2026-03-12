@@ -1,12 +1,14 @@
 import jwt from "jsonwebtoken";
 import { appConfig } from "../../core/config/appConfig";
 import { TokensTypes } from "./enums/tokens-types";
+import { injectable } from "inversify";
 
 const JWT_AT_SECRET: string = appConfig.AT_TOKEN_SECRET;
 const JWT_RT_SECRET: string = appConfig.RT_TOKEN_SECRET;
 const JWT_AT_EXPIRES_IN: number = appConfig.AT_TOKEN_TIME;
 const JWT_RT_EXPIRES_IN: number = appConfig.RT_TOKEN_TIME;
 
+@injectable()
 export class JwtService {
   createToken(userId: string, type: TokensTypes, deviceId?: string): string {
     const payload: Record<string, string> = { userId: userId };

@@ -7,10 +7,13 @@ import { setDefaultSortAndPaginationIfNotExist } from "../../core/utils/sort-and
 import { HttpStatus } from "../../core/enums/http-status";
 import { errorsHandler } from "../../core/utils/errors-hundler";
 import { UserInputModel } from "../types/inputTypes/user-input-model";
+import { inject } from "inversify";
 
 export class UsersController {
   constructor(
+    @inject(UsersService)
     private usersService: UsersService,
+    @inject(UsersQueryRepository)
     private usersQueryRepository: UsersQueryRepository,
   ) {}
 

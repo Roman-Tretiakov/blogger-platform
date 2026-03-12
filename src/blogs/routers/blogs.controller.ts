@@ -8,10 +8,13 @@ import { BlogViewModel } from "../BLL/dto/blog-view-model-type";
 import { BlogQueryInput } from "./inputTypes/blog-query-input";
 import { matchedData } from "express-validator";
 import { setDefaultSortAndPaginationIfNotExist } from "../../core/utils/sort-and-pagination.utils";
+import { inject } from "inversify";
 
 export class BlogsController {
   constructor(
+    @inject(BlogsService)
     private blogsService: BlogsService,
+    @inject(BlogsQueryRepository)
     private blogsQueryRepository: BlogsQueryRepository,
   ) {}
 

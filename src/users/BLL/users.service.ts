@@ -7,11 +7,16 @@ import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { UsersQueryRepository } from "../repositories/users.query-repository";
 import { HttpStatus } from "../../core/enums/http-status";
 import { User } from "./user-entity";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class UsersService {
   constructor(
+    @inject(UsersRepository)
     private repository: UsersRepository,
+    @inject(UsersQueryRepository)
     private queryRepository: UsersQueryRepository,
+    @inject(BcryptService)
     private cryptoService: BcryptService,
   ) {}
 

@@ -5,11 +5,16 @@ import { CommentsRepository } from "../repositories/comments.repository";
 import { CommentMongoModel } from "../repositories/types/comment-mongo-model";
 import { CommentsQueryRepository } from "../repositories/comments.query-repository";
 import { CommentInputModel } from "../routers/inputTypes/comment-input-model";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class CommentsService {
   constructor(
+    @inject(CommentsRepository)
     private commentsRepository: CommentsRepository,
+    @inject(CommentsQueryRepository)
     private commentsQueryRepository: CommentsQueryRepository,
+    @inject(PostsQueryRepository)
     private postsQueryRepository: PostsQueryRepository,
   ) {}
 

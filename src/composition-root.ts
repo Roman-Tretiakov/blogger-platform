@@ -24,10 +24,12 @@ import { PostsService } from "./posts/BLL/posts.service";
 import { PostsController } from "./posts/routers/posts.controller";
 import { SecurityDevicesController } from "./securityDevices/routers/security-devices.controller";
 import { TestingController } from "./testing/routers/testing.controller";
+import { JwtService } from "./auth/adapters/jwt.service";
 
 export const iocContainer = new Container();
 
 iocContainer.bind(NodemailerService).to(NodemailerService);
+iocContainer.bind(JwtService).to(JwtService);
 iocContainer.bind(BcryptService).to(BcryptService);
 
 iocContainer.bind(AuthDevicesRepository).to(AuthDevicesRepository);

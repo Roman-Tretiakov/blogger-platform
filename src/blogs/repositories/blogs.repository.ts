@@ -1,25 +1,16 @@
 import { BlogViewModel } from "../BLL/dto/blog-view-model-type";
-import {
-  Collection,
-  InsertOneResult,
-  ObjectId,
-  UpdateResult,
-  WithId,
-} from "mongodb";
+import { InsertOneResult, ObjectId, UpdateResult, WithId } from "mongodb";
 import { BlogMongoModel } from "../BLL/dto/blog-mongo-model";
 import { BlogInputModel } from "../BLL/dto/blog-input-dto";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { DomainError } from "../../core/errorClasses/DomainError";
+import { blogsCollection } from "../../db/mongo.db";
+import { injectable } from "inversify";
 
+@injectable()
 export class BlogsRepository {
-  constructor(private collection: Collection<BlogMongoModel>) {}
-
-  async findAll(): Promise<WithId<BlogMongoModel>[]> {
-    return this.collection.find().toArray();
-  }
-
   async findById(id: string): Promise<WithId<BlogMongoModel>> {
-    const blog = await this.collection.findOne({ _id: new ObjectId(id) });
+    const blog = await blogsCollection.findOne({ _id: new ObjectId(id) });
     if (blog === null) {
       throw new NotFoundError(`Blog with id: ${id} not found`, "id");
     }
@@ -28,7 +19,7 @@ export class BlogsRepository {
 
   async create(blog: BlogMongoModel): Promise<string> {
     const newBlog: InsertOneResult<BlogMongoModel> =
-      await this.collection.insertOne(blog);
+      await blogsCollection.insertOne(blog);
     if (!newBlog.acknowledged) {
       throw new DomainError("Failed to insert blog");
     }
@@ -37,7 +28,7 @@ export class BlogsRepository {
 
   async update(id: string, updateModel: BlogInputModel): Promise<void> {
     const updateResult: UpdateResult<BlogViewModel> =
-      await this.collection.updateOne(
+      await blogsCollection.updateOne(
         { _id: new ObjectId(id) },
         { $set: updateModel },
       );
@@ -48,7 +39,7 @@ export class BlogsRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const deleteResult = await this.collection.deleteOne({
+    const deleteResult = await blogsCollection.deleteOne({
       _id: new ObjectId(id),
     });
     if (deleteResult.deletedCount < 1) {
@@ -58,6 +49,6 @@ export class BlogsRepository {
   }
 
   async clear(): Promise<void> {
-    await this.collection.drop();
+    await blogsCollection.drop();
   }
 }

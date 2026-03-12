@@ -1,15 +1,16 @@
 import { PostViewModel } from "../BLL/dto/post-view-model-type";
-import { Collection, ObjectId, UpdateResult } from "mongodb";
+import { ObjectId, UpdateResult } from "mongodb";
 import { PostMongoModel } from "../BLL/dto/post-mongo-model";
 import { PostInputModel } from "../BLL/dto/post-input-dto";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { DomainError } from "../../core/errorClasses/DomainError";
+import { injectable } from "inversify";
+import { postsCollection } from "../../db/mongo.db";
 
+@injectable()
 export class PostsRepository {
-  constructor(private collection: Collection<PostMongoModel>) {}
-
   async create(post: PostMongoModel): Promise<string> {
-    const newPost = await this.collection.insertOne(post);
+    const newPost = await postsCollection.insertOne(post);
     if (!newPost.acknowledged) {
       throw new DomainError("Failed to insert post");
     }
@@ -17,7 +18,7 @@ export class PostsRepository {
   }
 
   async update(id: string, updateModel: PostInputModel): Promise<void> {
-    const post: UpdateResult<PostViewModel> = await this.collection.updateOne(
+    const post: UpdateResult<PostViewModel> = await postsCollection.updateOne(
       { _id: new ObjectId(id) },
       { $set: updateModel },
     );
@@ -28,7 +29,7 @@ export class PostsRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const result = await this.collection.deleteOne({ _id: new ObjectId(id) });
+    const result = await postsCollection.deleteOne({ _id: new ObjectId(id) });
 
     if (result.deletedCount < 1) {
       throw new NotFoundError(`Post with id ${id} not found`, "id");
@@ -37,6 +38,6 @@ export class PostsRepository {
   }
 
   async clear(): Promise<void> {
-    await this.collection.drop();
+    await postsCollection.drop();
   }
 }

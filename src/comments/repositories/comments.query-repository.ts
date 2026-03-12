@@ -1,4 +1,4 @@
-import { Collection, Filter, ObjectId } from "mongodb";
+import { Filter, ObjectId } from "mongodb";
 import { Result } from "../../core/types/result-object-type";
 import { ResultStatus } from "../../core/enums/result-statuses";
 import { CommentViewModel } from "../routers/outputTypes/comment-view-model";
@@ -6,12 +6,13 @@ import { mapToCommentViewModel } from "../mappers/map-to-comment-view-model";
 import { CommentListWithPagination } from "../routers/outputTypes/comment-list-with-pagination";
 import { CommentsQueryInput } from "../routers/inputTypes/comments-query-input";
 import { CommentMongoModel } from "./types/comment-mongo-model";
+import { injectable } from "inversify";
+import { commentsCollection } from "../../db/mongo.db";
 
+@injectable()
 export class CommentsQueryRepository {
-  constructor(private collection: Collection<CommentMongoModel>) {}
-
   async getById(commentId: string): Promise<Result<CommentViewModel | null>> {
-    const comment = await this.collection.findOne({
+    const comment = await commentsCollection.findOne({
       _id: new ObjectId(commentId),
     });
     return {
@@ -39,13 +40,13 @@ export class CommentsQueryRepository {
 
     filter.postId = postId;
 
-    const items = await this.collection
+    const items = await commentsCollection
       .find(filter)
       .sort({ [sortBy]: sortDirection })
       .skip(skip)
       .limit(pageSize)
       .toArray();
-    const totalCount = await this.collection.countDocuments(filter);
+    const totalCount = await commentsCollection.countDocuments(filter);
 
     const commentList = {
       page: queryInput.pageNumber,

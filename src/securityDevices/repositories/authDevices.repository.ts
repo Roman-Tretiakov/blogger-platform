@@ -1,12 +1,12 @@
-import { Collection } from "mongodb";
 import { AuthDevicesSessions } from "../BLL/types/auth-devices-sessions.interface";
+import { injectable } from "inversify";
+import { authDevicesCollection } from "../../db/mongo.db";
 
+@injectable()
 export class AuthDevicesRepository {
-  constructor(private authDevicesCollection: Collection<AuthDevicesSessions>) {}
-
   async create(session: AuthDevicesSessions): Promise<void> {
     try {
-      await this.authDevicesCollection.insertOne(session);
+      await authDevicesCollection.insertOne(session);
     } catch (error: any) {
       console.error("Failed to create auth device session:", error.message);
     }
@@ -14,14 +14,14 @@ export class AuthDevicesRepository {
 
   // При ротации токенов — обновляем lastActiveDate в существующей записи и версию токена в БД, а не создаем новую запись
   async updateLastActiveDate(deviceId: string, iat: number): Promise<void> {
-    await this.authDevicesCollection.updateOne(
+    await authDevicesCollection.updateOne(
       { "deviceInfo.deviceId": deviceId },
       { $set: { lastActiveDate: new Date(), refreshTokenVersion: iat } },
     );
   }
 
   async deleteByDeviceId(deviceId: string): Promise<number> {
-    const result = await this.authDevicesCollection.deleteOne({
+    const result = await authDevicesCollection.deleteOne({
       "deviceInfo.deviceId": deviceId,
     });
     return result.deletedCount;
@@ -31,13 +31,13 @@ export class AuthDevicesRepository {
     userId: string,
     currentDeviceId: string,
   ): Promise<void> {
-    await this.authDevicesCollection.deleteMany({
+    await authDevicesCollection.deleteMany({
       userId,
       "deviceInfo.deviceId": { $ne: currentDeviceId },
     });
   }
 
   async clear(): Promise<void> {
-    await this.authDevicesCollection.deleteMany({});
+    await authDevicesCollection.deleteMany({});
   }
 }

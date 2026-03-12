@@ -1,9 +1,14 @@
 import { BlogsRepository } from "../repositories/blogs.repository";
 import { mapToBlogMongoModel } from "../mappers/map-to-blog-mongo-model";
 import { BlogInputModel } from "./dto/blog-input-dto";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class BlogsService {
-  constructor(private blogsRepository: BlogsRepository) {}
+  constructor(
+    @inject(BlogsRepository)
+    private blogsRepository: BlogsRepository,
+  ) {}
 
   async create(blog: BlogInputModel): Promise<string> {
     const mongoMappedModel = mapToBlogMongoModel(blog);
