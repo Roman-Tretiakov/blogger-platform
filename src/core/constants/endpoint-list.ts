@@ -10,6 +10,8 @@ export const EndpointList = {
   USERS_PATH: "/api/users",
   AUTH_PATH: "/api/auth",
   LOGIN_PATH: "/login",
+  PASSWORD_RECOVERY_PATH: "/password-recovery",
+  NEW_PASSWORD_PATH: "/new-password",
   ME_PATH: "/me",
   COMMENTS_PATH: "/api/comments",
   COMMENTS_BY_POST_ID: "/:id/comments",

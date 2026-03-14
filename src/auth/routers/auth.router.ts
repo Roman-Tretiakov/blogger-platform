@@ -10,56 +10,66 @@ import { refreshTokenGuard } from "../middlewares/guards/refresh-token.guard";
 import { rateLimitsMiddleware } from "../../core/middlewares/rateLimiter/rate-limits.middleware";
 import { iocContainer } from "../../composition-root";
 import { AuthController } from "./auth.controller";
+import { newPasswordBodyValidation } from "../middlewares/new-password-body-validation.middleware";
 
 const authController = iocContainer.resolve(AuthController);
 export const authRouter = Router();
 
-authRouter.post(
-  EndpointList.REGISTRATION_PATH,
-  rateLimitsMiddleware,
-  createUsersBodyValidation,
-  inputValidationResultMiddleware,
-  authController.registration.bind(authController),
-);
-
-authRouter.post(
-  EndpointList.REGISTRATION_CONFIRMATION_PATH,
-  rateLimitsMiddleware,
-  registrationConfirmationBodyValidation,
-  inputValidationResultMiddleware,
-  authController.registrationConfirmation.bind(authController),
-);
-
-authRouter.post(
-  EndpointList.REGISTRATION_EMAIL_RESENDING_PATH,
-  rateLimitsMiddleware,
-  emailResendingValidationMiddleware,
-  inputValidationResultMiddleware,
-  authController.registrationEmailResending.bind(authController),
-);
-
-authRouter.post(
-  EndpointList.LOGIN_PATH,
-  rateLimitsMiddleware,
-  authBodyValidationMiddleware,
-  inputValidationResultMiddleware,
-  authController.login.bind(authController),
-);
-
-authRouter.post(
-  EndpointList.REFRESH_TOKEN_PATH,
-  refreshTokenGuard,
-  authController.updateTokens.bind(authController),
-);
-
-authRouter.post(
-  EndpointList.LOGOUT_PATH,
-  refreshTokenGuard,
-  authController.logout.bind(authController),
-);
-
-authRouter.get(
-  EndpointList.ME_PATH,
-  accessTokenGuard,
-  authController.getLoggedUser.bind(authController),
-);
+authRouter
+  .post(
+    EndpointList.REGISTRATION_PATH,
+    rateLimitsMiddleware,
+    createUsersBodyValidation,
+    inputValidationResultMiddleware,
+    authController.registration.bind(authController),
+  )
+  .post(
+    EndpointList.REGISTRATION_CONFIRMATION_PATH,
+    rateLimitsMiddleware,
+    registrationConfirmationBodyValidation,
+    inputValidationResultMiddleware,
+    authController.registrationConfirmation.bind(authController),
+  )
+  .post(
+    EndpointList.REGISTRATION_EMAIL_RESENDING_PATH,
+    rateLimitsMiddleware,
+    emailResendingValidationMiddleware,
+    inputValidationResultMiddleware,
+    authController.registrationEmailResending.bind(authController),
+  )
+  .post(
+    EndpointList.LOGIN_PATH,
+    rateLimitsMiddleware,
+    authBodyValidationMiddleware,
+    inputValidationResultMiddleware,
+    authController.login.bind(authController),
+  )
+  .post(
+    EndpointList.PASSWORD_RECOVERY_PATH,
+    rateLimitsMiddleware,
+    emailResendingValidationMiddleware,
+    inputValidationResultMiddleware,
+    authController.passwordRecovery.bind(authController),
+  )
+  .post(
+    EndpointList.NEW_PASSWORD_PATH,
+    rateLimitsMiddleware,
+    newPasswordBodyValidation,
+    inputValidationResultMiddleware,
+    authController.newPassword.bind(authController),
+  )
+  .post(
+    EndpointList.REFRESH_TOKEN_PATH,
+    refreshTokenGuard,
+    authController.updateTokens.bind(authController),
+  )
+  .post(
+    EndpointList.LOGOUT_PATH,
+    refreshTokenGuard,
+    authController.logout.bind(authController),
+  )
+  .get(
+    EndpointList.ME_PATH,
+    accessTokenGuard,
+    authController.getLoggedUser.bind(authController),
+  );

@@ -369,4 +369,74 @@ export class AuthService {
       data: session,
     };
   }
+
+  async recoverPassword(email: string): Promise<Result> {
+    const user = await this.usersQueryRepository.findByLoginOrEmail([email]);
+    if (user) {
+      const code = randomUUID();
+      await this.usersRepository.update(user._id.toString(), {
+        ...user,
+        confirmationCode: code,
+        expirationDate: new Date(Date.now() + 3600000).toISOString(), // 1 hour
+      });
+
+      this.nodemailerService
+        .sendEmail(
+          MailServices.MAIL_RU,
+          email,
+          code,
+          emailExamples.passwordRecoveryEmail,
+        )
+        .catch((e: any) => {
+          console.error("Failed to send password recovery to email: ", e);
+        });
+    }
+
+    return {
+      status: ResultStatus.NoContent,
+      errorMessage: "",
+      extensions: [],
+      data: null,
+    };
+  }
+
+  async newPassword(
+    newPassword: string,
+    recoveryCode: string,
+  ): Promise<Result> {
+    const user =
+      await this.usersQueryRepository.findUserByConfirmationCode(recoveryCode);
+    if (!user) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: "Wrong recovery code!",
+        extensions: [],
+        data: null,
+      };
+    } else {
+      if (new Date(user.expirationDate!) < new Date()) {
+        return {
+          status: ResultStatus.BadRequest,
+          errorMessage: "Wrong recovery code!",
+          extensions: [],
+          data: null,
+        };
+      }
+
+      const passwordHash = await this.bcryptService.generateHash(newPassword);
+      await this.usersRepository.update(user._id.toString(), {
+        ...user,
+        password: passwordHash,
+        confirmationCode: null,
+        expirationDate: null,
+      });
+
+      return {
+        status: ResultStatus.Success,
+        errorMessage: "",
+        extensions: [],
+        data: null,
+      };
+    }
+  }
 }

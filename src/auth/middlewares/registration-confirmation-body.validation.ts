@@ -8,5 +8,8 @@ export const registrationConfirmationBodyValidation = [
     .exists()
     .withMessage("Code is required")
     .isString()
-    .withMessage(ErrorNames.FIELD_NOT_STRING),
+    .withMessage(ErrorNames.FIELD_NOT_STRING)
+    .trim()
+    .notEmpty({ ignore_whitespace: true })
+    .withMessage("Code cannot be empty"),
 ];

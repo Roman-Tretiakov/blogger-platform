@@ -194,4 +194,34 @@ export class AuthController {
       })
       .send({ accessToken: result.data!.accessToken });
   }
+
+  async passwordRecovery(
+    req: RequestWithBody<{ email: string }>,
+    res: Response,
+  ): Promise<void> {
+    const { email } = req.body;
+    await this.authService.recoverPassword(email);
+
+    res.status(HttpStatus.NoContent).send();
+  }
+
+  async newPassword(
+    req: RequestWithBody<{ newPassword: string; recoveryCode: string }>,
+    res: Response,
+  ): Promise<void> {
+    const { newPassword, recoveryCode } = req.body;
+    const result = await this.authService.newPassword(
+      newPassword,
+      recoveryCode,
+    );
+
+    if (result.status !== ResultStatus.Success) {
+      res
+        .status(resultStatusToHttpStatusMapper(result.status))
+        .send(createErrorMessages(result.extensions));
+      return;
+    }
+
+    res.status(HttpStatus.NoContent).send();
+  }
 }
