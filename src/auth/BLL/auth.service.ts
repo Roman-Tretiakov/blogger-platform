@@ -376,8 +376,10 @@ export class AuthService {
       const code = randomUUID();
       await this.usersRepository.update(user._id.toString(), {
         ...user,
-        confirmationCode: code,
-        expirationDate: new Date(Date.now() + 3600000).toISOString(), // 1 hour
+        passwordRecoveryCode: code,
+        passwordRecoveryExpiration: new Date(
+          Date.now() + 3600000,
+        ).toISOString(), // 1 hour
       });
 
       this.nodemailerService
@@ -405,7 +407,9 @@ export class AuthService {
     recoveryCode: string,
   ): Promise<Result> {
     const user =
-      await this.usersQueryRepository.findUserByConfirmationCode(recoveryCode);
+      await this.usersQueryRepository.findUserByPasswordRecoveryCode(
+        recoveryCode,
+      );
     if (!user) {
       return {
         status: ResultStatus.BadRequest,
@@ -414,7 +418,7 @@ export class AuthService {
         data: null,
       };
     } else {
-      if (new Date(user.expirationDate!) < new Date()) {
+      if (new Date(user.passwordRecoveryExpiration!) < new Date()) {
         return {
           status: ResultStatus.BadRequest,
           errorMessage: "Wrong recovery code!",
@@ -427,8 +431,8 @@ export class AuthService {
       await this.usersRepository.update(user._id.toString(), {
         ...user,
         password: passwordHash,
-        confirmationCode: null,
-        expirationDate: null,
+        passwordRecoveryCode: null,
+        passwordRecoveryExpiration: null,
       });
 
       return {

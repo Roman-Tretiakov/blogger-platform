@@ -39,6 +39,14 @@ export class UsersQueryRepository {
     });
   }
 
+  async findUserByPasswordRecoveryCode(
+    code: string,
+  ): Promise<WithId<UserMongoModel> | null> {
+    return usersCollection.findOne({
+      passwordRecoveryCode: code,
+    });
+  }
+
   async getAllUsersWithPagination(
     queryParams: UserQueryInput,
   ): Promise<UserListWithPagination> {

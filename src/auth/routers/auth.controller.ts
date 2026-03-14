@@ -18,6 +18,8 @@ import { CookieNames } from "../../core/constants/cookie-names";
 import { UserInputModel } from "../../users/types/inputTypes/user-input-model";
 import { createErrorMessages } from "../../core/utils/error.utils";
 import { inject, injectable } from "inversify";
+import { NewPasswordRecoveryInputModel } from "../types/new-password-recovery-input-model";
+import { PasswordRecoveryInputModel } from "../types/password-recovery-input-model";
 
 @injectable()
 export class AuthController {
@@ -196,17 +198,19 @@ export class AuthController {
   }
 
   async passwordRecovery(
-    req: RequestWithBody<{ email: string }>,
+    req: RequestWithBody<PasswordRecoveryInputModel>,
     res: Response,
   ): Promise<void> {
     const { email } = req.body;
-    await this.authService.recoverPassword(email);
+    try {
+      await this.authService.recoverPassword(email);
+    } catch (e: any) {}
 
     res.status(HttpStatus.NoContent).send();
   }
 
   async newPassword(
-    req: RequestWithBody<{ newPassword: string; recoveryCode: string }>,
+    req: RequestWithBody<NewPasswordRecoveryInputModel>,
     res: Response,
   ): Promise<void> {
     const { newPassword, recoveryCode } = req.body;
@@ -216,9 +220,7 @@ export class AuthController {
     );
 
     if (result.status !== ResultStatus.Success) {
-      res
-        .status(resultStatusToHttpStatusMapper(result.status))
-        .send(createErrorMessages(result.extensions));
+      res.status(resultStatusToHttpStatusMapper(result.status)).send();
       return;
     }
 
