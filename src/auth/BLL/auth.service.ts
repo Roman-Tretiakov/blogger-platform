@@ -414,7 +414,12 @@ export class AuthService {
       return {
         status: ResultStatus.BadRequest,
         errorMessage: "Wrong recovery code!",
-        extensions: [],
+        extensions: [
+          {
+            field: "recoveryCode",
+            message: "Recovery code is incorrect!",
+          },
+        ],
         data: null,
       };
     } else {

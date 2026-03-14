@@ -220,7 +220,9 @@ export class AuthController {
     );
 
     if (result.status !== ResultStatus.Success) {
-      res.status(resultStatusToHttpStatusMapper(result.status)).send();
+      res
+        .status(resultStatusToHttpStatusMapper(result.status))
+        .send(createErrorMessages(result.extensions));
       return;
     }
 
