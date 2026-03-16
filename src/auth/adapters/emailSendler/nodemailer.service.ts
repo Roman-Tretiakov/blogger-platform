@@ -4,7 +4,7 @@ import { MailServices } from "../enums/mail-services";
 import { injectable } from "inversify";
 
 @injectable()
-export class NodemailerService {
+export class NodemailerService implements IEmailService {
   async sendEmail(
     provider: MailServices,
     email: string,

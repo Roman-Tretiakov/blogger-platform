@@ -26,10 +26,14 @@ import { SecurityDevicesController } from "./securityDevices/routers/security-de
 import { TestingController } from "./testing/routers/testing.controller";
 import { JwtService } from "./auth/adapters/jwt.service";
 import { RateLimiter } from "./core/coreClasses/rateLimiter";
+import { emailServiceToken } from "./auth/adapters/emailSendler/email-service.token";
 
 export const iocContainer = new Container();
 
-iocContainer.bind(NodemailerService).to(NodemailerService).inSingletonScope();
+iocContainer
+  .bind<IEmailService>(emailServiceToken)
+  .to(NodemailerService)
+  .inSingletonScope();
 iocContainer.bind(JwtService).to(JwtService).inSingletonScope();
 iocContainer.bind(BcryptService).to(BcryptService).inSingletonScope();
 

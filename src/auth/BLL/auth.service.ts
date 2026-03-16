@@ -12,10 +12,10 @@ import { randomUUID } from "crypto";
 import { TokensTypes } from "../adapters/enums/tokens-types";
 import { UserIdModel } from "../types/userId-model";
 import { AuthDevicesSessions } from "../../securityDevices/BLL/types/auth-devices-sessions.interface";
-import { NodemailerService } from "../adapters/emailSendler/nodemailer.service";
 import { AuthDevicesQueryRepository } from "../../securityDevices/repositories/authDevices.query-repository";
 import { AuthDevicesRepository } from "../../securityDevices/repositories/authDevices.repository";
 import { injectable, inject } from "inversify";
+import { emailServiceToken } from "../adapters/emailSendler/email-service.token";
 
 @injectable()
 export class AuthService {
@@ -28,8 +28,8 @@ export class AuthService {
     private bcryptService: BcryptService,
     @inject(JwtService)
     private jwtService: JwtService,
-    @inject(NodemailerService)
-    private nodemailerService: NodemailerService,
+    @inject(emailServiceToken)
+    private emailService: IEmailService,
     @inject(AuthDevicesRepository)
     private authDevicesRepository: AuthDevicesRepository,
     @inject(AuthDevicesQueryRepository)
@@ -81,7 +81,7 @@ export class AuthService {
       };
     });
 
-    this.nodemailerService
+    this.emailService
       .sendEmail(
         MailServices.MAIL_RU,
         email,
@@ -197,7 +197,7 @@ export class AuthService {
 
     user.isConfirmed = false;
     user.confirmationCode = randomUUID();
-    this.nodemailerService
+    this.emailService
       .sendEmail(
         MailServices.MAIL_RU,
         email,
@@ -382,7 +382,7 @@ export class AuthService {
         ).toISOString(), // 1 hour
       });
 
-      this.nodemailerService
+      this.emailService
         .sendEmail(
           MailServices.MAIL_RU,
           email,

@@ -574,9 +574,14 @@ describe("Auth API End-to-End Tests", () => {
 
         const response = await request(app)
           .post(EndpointList.AUTH_PATH + EndpointList.NEW_PASSWORD_PATH)
-          .send({ newPassword: "abc", recoveryCode });
+          .send({ newPassword: "short", recoveryCode });
 
         expect(response.status).toBe(HttpStatus.BadRequest);
+        expect(response.body.errorsMessages).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ field: "newPassword" }),
+          ]),
+        );
       });
 
       test("Should return 400 when newPassword is too long (> 20 chars)", async () => {
@@ -600,6 +605,11 @@ describe("Auth API End-to-End Tests", () => {
           .send({ recoveryCode });
 
         expect(response.status).toBe(HttpStatus.BadRequest);
+        expect(response.body.errorsMessages).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ field: "newPassword" }),
+          ]),
+        );
       });
 
       test("Should return 400 when recoveryCode is missing", async () => {
