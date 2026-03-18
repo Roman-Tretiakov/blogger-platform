@@ -5,16 +5,12 @@ import { HttpStatus } from "../../../src/core/enums/http-status";
 import { EndpointList } from "../../../src/core/constants/endpoint-list";
 //@ts-ignore
 import { getBasicAuthToken } from "../../utils/get-basic-auth-token";
-import {
-  client,
-  closeDBConnection,
-  runDB,
-  usersCollection,
-} from "../../../src/db/mongo.db";
+import { closeDBConnection, runDB } from "../../../src/db/mongo.db";
 import { UsersService } from "../../../src/users/BLL/users.service";
 import { UserInputModel } from "../../../src/users/types/inputTypes/user-input-model";
 import { ObjectId } from "mongodb";
 import { iocContainer } from "../../../src/composition-root";
+import { UserModel } from "../../../src/users/repositories/schemas/user.schema";
 
 let app: any;
 const authToken: string = getBasicAuthToken();
@@ -57,7 +53,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   try {
-    await closeDBConnection(client);
+    await closeDBConnection();
   } catch (error) {
     console.error("Error closing DB connection:", error);
     // Можно не бросать ошибку дальше, чтобы не влиять на результат тестов
@@ -275,7 +271,7 @@ describe("Users API", () => {
         expect(response.body.createdAt).toBeDefined();
 
         // Проверяем, что пользователь действительно создан
-        const userInDb = await usersCollection.findOne({
+        const userInDb = await UserModel.findOne({
           email: validUserInput.email,
         });
         expect(userInDb).toBeDefined();
@@ -453,7 +449,7 @@ describe("Users API", () => {
         expect(response.status).toBe(204);
 
         // Проверяем, что пользователь удален
-        const userInDb = await usersCollection.findOne({
+        const userInDb = await UserModel.findOne({
           _id: new ObjectId(userId),
         });
         expect(userInDb).toBeNull();

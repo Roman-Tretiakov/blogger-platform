@@ -1,26 +1,25 @@
 import { UserMongoModel } from "./type/user-mongo-model";
-import { DeleteResult, InsertOneResult, ObjectId } from "mongodb";
+import { DeleteResult, ObjectId } from "mongodb";
 import { DomainError } from "../../core/errorClasses/DomainError";
 import { injectable } from "inversify";
-import { usersCollection } from "../../db/mongo.db";
+import { UserModel } from "./schemas/user.schema";
 
 @injectable()
 export class UsersRepository {
   async create(userData: UserMongoModel): Promise<string> {
-    const newUser: InsertOneResult<UserMongoModel> =
-      await usersCollection.insertOne(userData);
-    if (!newUser.acknowledged) {
+    const newUser = await UserModel.create(userData);
+    if (!newUser) {
       throw new DomainError("Failed to insert user");
     }
-    return newUser.insertedId.toString();
+    return newUser._id.toString();
   }
 
   async delete(userId: string): Promise<DeleteResult> {
-    return await usersCollection.deleteOne({ _id: new ObjectId(userId) });
+    return UserModel.deleteOne({ _id: new ObjectId(userId) });
   }
 
   async update(userId: string, userData: UserMongoModel): Promise<void> {
-    const updateResult = await usersCollection.updateOne(
+    const updateResult = await UserModel.updateOne(
       { _id: new ObjectId(userId) },
       { $set: userData },
     );
@@ -30,6 +29,6 @@ export class UsersRepository {
   }
 
   async clear(): Promise<void> {
-    await usersCollection.deleteMany({});
+    await UserModel.deleteMany({});
   }
 }

@@ -1,5 +1,4 @@
-import { Filter, ObjectId } from "mongodb";
-import { PostMongoModel } from "../BLL/dto/post-mongo-model";
+import { ObjectId } from "mongodb";
 import { PostQueryInput } from "../routers/inputTypes/post-query-input";
 import { PostViewModel } from "../BLL/dto/post-view-model-type";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
@@ -7,7 +6,7 @@ import { mapToPostViewModel } from "../mappers/map-to-post-view-model";
 import { BlogsQueryRepository } from "../../blogs/repositories/blogs.query-repository";
 import { PostListWithPagination } from "../routers/outputTypes/post-list-with-pagination";
 import { inject, injectable } from "inversify";
-import { postsCollection } from "../../db/mongo.db";
+import { PostModel } from "./schemas/post.schema";
 
 @injectable()
 export class PostsQueryRepository {
@@ -17,7 +16,7 @@ export class PostsQueryRepository {
   ) {}
 
   async getPostById(id: string): Promise<PostViewModel> {
-    const post = await postsCollection.findOne({ _id: new ObjectId(id) });
+    const post = await PostModel.findOne({ _id: new ObjectId(id) });
     if (post === null) {
       throw new NotFoundError(`Post with id: ${id} not found`, "id");
     }
@@ -31,7 +30,7 @@ export class PostsQueryRepository {
     const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } =
       queryInput;
     const skip: number = (pageNumber - 1) * pageSize;
-    const filter: Filter<PostMongoModel> = {};
+    const filter: Record<string, any> = {};
 
     if (blogId) {
       if ((await this.blogsQueryRepository.getBlogById(blogId)) === null) {
@@ -47,14 +46,13 @@ export class PostsQueryRepository {
       filter.title = { $regex: searchNameTerm, $options: "i" };
     }
 
-    const items = await postsCollection
-      .find(filter)
+    const items = await PostModel.find(filter)
       .sort({ [sortBy]: sortDirection })
       .skip(skip)
       .limit(pageSize)
-      .toArray();
+      .lean();
 
-    const totalCount = await postsCollection.countDocuments(filter);
+    const totalCount = await PostModel.countDocuments(filter);
     return {
       page: queryInput.pageNumber,
       pageSize: queryInput.pageSize,

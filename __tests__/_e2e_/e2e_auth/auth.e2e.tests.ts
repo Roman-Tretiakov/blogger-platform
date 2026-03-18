@@ -3,13 +3,13 @@ import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { HttpStatus } from "../../../src/core/enums/http-status";
 import { EndpointList } from "../../../src/core/constants/endpoint-list";
-import { client, closeDBConnection, runDB } from "../../../src/db/mongo.db";
-import { usersCollection } from "../../../src/db/mongo.db";
+import { closeDBConnection, runDB } from "../../../src/db/mongo.db";
 import { UsersService } from "../../../src/users/BLL/users.service";
 import { AuthDevicesRepository } from "../../../src/securityDevices/repositories/authDevices.repository";
 import { AuthDevicesQueryRepository } from "../../../src/securityDevices/repositories/authDevices.query-repository";
 import { iocContainer } from "../../../src/composition-root";
 import { RateLimiter } from "../../../src/core/coreClasses/rateLimiter";
+import { UserModel } from "../../../src/users/repositories/schemas/user.schema";
 
 // Хелпер: достаём значение refreshToken из Set-Cookie заголовка
 const extractRefreshToken = (
@@ -64,7 +64,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   try {
-    await closeDBConnection(client);
+    await closeDBConnection();
   } catch (error) {
     console.error("Error closing DB connection:", error);
   }
@@ -403,16 +403,16 @@ describe("Auth API End-to-End Tests", () => {
           .send({ email: testUserEmail });
 
         // Recovery код сохраняется в поле passwordRecoveryCode пользователя
-        const userInDb = await usersCollection.findOne({
+        const userInDb = await UserModel.findOne({
           email: testUserEmail,
         });
         expect(userInDb).not.toBeNull();
-        expect(userInDb!.passwordRecoveryCode).toBeDefined();
-        expect(typeof userInDb!.passwordRecoveryCode).toBe("string");
+        expect(userInDb!.passwordRecovery.recoveryCode).toBeDefined();
+        expect(typeof userInDb!.passwordRecovery.recoveryCode).toBe("string");
         // Поле passwordRecoveryExpiration должно быть обновлено (через ~1 час от текущего момента)
-        expect(userInDb!.passwordRecoveryExpiration).toBeDefined();
+        expect(userInDb!.passwordRecovery.expirationDate).toBeDefined();
         expect(
-          new Date(userInDb!.passwordRecoveryExpiration!).getTime(),
+          new Date(userInDb!.passwordRecovery.expirationDate!).getTime(),
         ).toBeGreaterThan(Date.now());
       });
     });
@@ -475,8 +475,8 @@ describe("Auth API End-to-End Tests", () => {
         .post(EndpointList.AUTH_PATH + EndpointList.PASSWORD_RECOVERY_PATH)
         .send({ email });
 
-      const userInDb = await usersCollection.findOne({ email });
-      return userInDb!.passwordRecoveryCode as string;
+      const userInDb = await UserModel.findOne({ email });
+      return userInDb!.passwordRecovery.recoveryCode as string;
     };
 
     describe("Positive scenarios", () => {
@@ -547,7 +547,7 @@ describe("Auth API End-to-End Tests", () => {
 
       test("Should return 400 for expired recoveryCode", async () => {
         // Записываем просроченный код прямо в БД
-        await usersCollection.updateOne(
+        await UserModel.updateOne(
           { email: testUserEmail },
           {
             $set: {

@@ -1,4 +1,4 @@
-import { Filter, ObjectId, WithId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { UserMongoModel } from "./type/user-mongo-model";
 import { UserListWithPagination } from "../routers/outputTypes/user-list-with-pagination";
 import { UserQueryInput } from "../routers/inputTypes/user-query-input";
@@ -7,7 +7,7 @@ import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { UserViewModel } from "../types/outputTypes/user-view-model";
 import { MeViewModel } from "../../auth/routers/outputTypes/me-view-model";
 import { injectable } from "inversify";
-import { usersCollection } from "../../db/mongo.db";
+import { UserModel } from "./schemas/user.schema";
 
 @injectable()
 export class UsersQueryRepository {
@@ -16,7 +16,7 @@ export class UsersQueryRepository {
       throw new NotFoundError(`User with id: ${id} not found`, "id");
     }
 
-    const user = await usersCollection.findOne({ _id: new ObjectId(id) });
+    const user = await UserModel.findOne({ _id: new ObjectId(id) });
     if (user === null) {
       throw new NotFoundError(`User with id: ${id} not found`, "id");
     }
@@ -26,7 +26,7 @@ export class UsersQueryRepository {
   async findByLoginOrEmail(
     loginOrEmail: string[],
   ): Promise<WithId<UserMongoModel> | null> {
-    return usersCollection.findOne({
+    return UserModel.findOne({
       $or: [{ login: { $in: loginOrEmail } }, { email: { $in: loginOrEmail } }],
     });
   }
@@ -34,7 +34,7 @@ export class UsersQueryRepository {
   async findUserByConfirmationCode(
     code: string,
   ): Promise<WithId<UserMongoModel> | null> {
-    return usersCollection.findOne({
+    return UserModel.findOne({
       confirmationCode: code,
     });
   }
@@ -42,7 +42,7 @@ export class UsersQueryRepository {
   async findUserByPasswordRecoveryCode(
     code: string,
   ): Promise<WithId<UserMongoModel> | null> {
-    return usersCollection.findOne({
+    return UserModel.findOne({
       passwordRecoveryCode: code,
     });
   }
@@ -53,7 +53,7 @@ export class UsersQueryRepository {
     const skip = (queryParams.pageNumber - 1) * queryParams.pageSize;
 
     // Создаем фильтр с логикой OR
-    const filter: Filter<UserMongoModel> = {};
+    const filter: Record<string, any> = {};
     const conditions = [];
 
     if (queryParams.searchLoginTerm) {
@@ -79,16 +79,14 @@ export class UsersQueryRepository {
       filter.$or = conditions;
     }
 
-    const items = await usersCollection
-      .find(filter) // Используем единый фильтр
+    const items = await UserModel.find(filter) // Используем единый фильтр
       .sort({
         [queryParams.sortBy]: queryParams.sortDirection === "asc" ? 1 : -1,
       })
       .skip(skip)
-      .limit(queryParams.pageSize)
-      .toArray();
+      .limit(queryParams.pageSize);
 
-    const totalCount = await usersCollection.countDocuments(filter);
+    const totalCount = await UserModel.countDocuments(filter);
 
     return {
       page: queryParams.pageNumber,

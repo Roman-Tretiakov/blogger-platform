@@ -3,16 +3,12 @@ import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { HttpStatus } from "../../../src/core/enums/http-status";
 import { EndpointList } from "../../../src/core/constants/endpoint-list";
-import {
-  client,
-  closeDBConnection,
-  rateLimitsCollection,
-  runDB,
-} from "../../../src/db/mongo.db";
+import { closeDBConnection, runDB } from "../../../src/db/mongo.db";
 import { UsersService } from "../../../src/users/BLL/users.service";
 import { AuthDevicesRepository } from "../../../src/securityDevices/repositories/authDevices.repository";
 import { deviceViewModel } from "../../../src/securityDevices/types/dto/device-view-model.dto";
 import { iocContainer } from "../../../src/composition-root";
+import { RateLimiterModel } from "../../../src/rateLimiter/schemas/rate-limiter.schemas";
 
 // ─────────────────────────────────────────────
 // Хелперы
@@ -79,7 +75,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   await usersService.clear();
   await authDevicesRepository.clear();
-  await rateLimitsCollection.deleteMany({});
+  await RateLimiterModel.deleteMany({});
 
   testUserId = await usersService.create({
     login: testUserLogin,
@@ -96,7 +92,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   try {
-    await closeDBConnection(client);
+    await closeDBConnection();
   } catch (error) {
     console.error("Error closing DB connection:", error);
   }

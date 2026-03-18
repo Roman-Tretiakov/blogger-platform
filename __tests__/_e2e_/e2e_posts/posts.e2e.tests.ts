@@ -6,7 +6,7 @@ import { EndpointList } from "../../../src/core/constants/endpoint-list";
 import { PostInputModel } from "../../../src/posts/BLL/dto/post-input-dto";
 //@ts-ignore
 import { getBasicAuthToken } from "../../utils/get-basic-auth-token";
-import { client, closeDBConnection, runDB } from "../../../src/db/mongo.db";
+import { closeDBConnection, runDB } from "../../../src/db/mongo.db";
 //@ts-ignore
 import { BlogInputModel } from "../../../src/blogs/BLL/dto/blog-input-dto";
 import { PostsService } from "../../../src/posts/BLL/posts.service";
@@ -56,7 +56,7 @@ describe("Posts API tests", () => {
 
   afterAll(async () => {
     try {
-      await closeDBConnection(client);
+      await closeDBConnection();
     } catch (error) {
       console.error("Error closing DB connection:", error);
       // Можно не бросать ошибку дальше, чтобы не влиять на результат тестов

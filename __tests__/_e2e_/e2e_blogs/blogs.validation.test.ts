@@ -6,7 +6,8 @@ import { HttpStatus } from "../../../src/core/enums/http-status";
 import { ErrorNames } from "../../../src/core/enums/error-names";
 import { BlogInputModel } from "../../../src/blogs/BLL/dto/blog-input-dto";
 import { BlogsService } from "../../../src/blogs/BLL/blogs.service";
-import { client, closeDBConnection } from "../../../src/db/mongo.db";
+import { closeDBConnection } from "../../../src/db/mongo.db";
+import { iocContainer } from "../../../src/composition-root";
 
 describe("Blog body validation tests", () => {
   const app = express();
@@ -23,13 +24,15 @@ describe("Blog body validation tests", () => {
     websiteUrl: "https://example.com",
   };
 
+  const blogsService = iocContainer.resolve(BlogsService);
+
   beforeEach(async () => {
-    await BlogsService.clear();
+    await blogsService.clear();
   });
 
   afterAll(async () => {
     try {
-      await closeDBConnection(client);
+      await closeDBConnection();
     } catch (error) {
       console.error("Error closing DB connection:", error);
       // Можно не бросать ошибку дальше, чтобы не влиять на результат тестов

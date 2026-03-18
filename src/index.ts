@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import express from "express";
 import dotenv from "dotenv";
 import { setupApp } from "./setup-app";
@@ -20,12 +21,18 @@ const bootstrap = async () => {
 
   // запуск приложения
   const server = app.listen(PORT, () => {
-    console.log(`Example app listening on port ${PORT}`);
+    console.log(`App listening on port ${PORT}`);
   });
 
   server.keepAliveTimeout = 120000;
   server.headersTimeout = 121000;
   server.timeout = 120000;
+
+  // Graceful shutdown — закрываем соединение при остановке
+  process.on("SIGTERM", async () => {
+    await mongoose.disconnect();
+    server.close();
+  });
 };
 
 bootstrap().catch(console.error);

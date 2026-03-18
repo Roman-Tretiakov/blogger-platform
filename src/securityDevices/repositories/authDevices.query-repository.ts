@@ -1,16 +1,16 @@
 import { AuthDevicesSessions } from "../BLL/types/auth-devices-sessions.interface";
 import { injectable } from "inversify";
-import { authDevicesCollection } from "../../db/mongo.db";
+import { AuthDeviceModel } from "./schemas/device.schema";
 
 @injectable()
 export class AuthDevicesQueryRepository {
   async findByDeviceId(deviceId: string): Promise<AuthDevicesSessions | null> {
-    return authDevicesCollection.findOne({
+    return AuthDeviceModel.findOne({
       "deviceInfo.deviceId": deviceId,
     });
   }
 
   async findAllByUserId(userId: string): Promise<AuthDevicesSessions[]> {
-    return authDevicesCollection.find({ userId }).toArray();
+    return AuthDeviceModel.find({ userId }).lean();
   }
 }

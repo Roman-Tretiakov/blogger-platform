@@ -6,7 +6,7 @@ import { HttpStatus } from "../../../src/core/enums/http-status";
 import { EndpointList } from "../../../src/core/constants/endpoint-list";
 //@ts-ignore
 import { getBasicAuthToken } from "../../utils/get-basic-auth-token";
-import { client, closeDBConnection, runDB } from "../../../src/db/mongo.db";
+import { closeDBConnection, runDB } from "../../../src/db/mongo.db";
 //@ts-ignore
 import { BlogsService } from "../../../src/blogs/BLL/blogs.service";
 import { iocContainer } from "../../../src/composition-root";
@@ -30,7 +30,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   try {
-    await closeDBConnection(client);
+    await closeDBConnection();
   } catch (error) {
     console.error("Error closing DB connection:", error);
     // Можно не бросать ошибку дальше, чтобы не влиять на результат тестов

@@ -1,13 +1,6 @@
 import { appConfig } from "../config/appConfig";
 import { injectable } from "inversify";
-import { rateLimitsCollection } from "../../db/mongo.db";
-
-export interface RateLimiterDocument {
-  ip: string;
-  url: string;
-  date: Date;
-  expireAt: Date;
-}
+import { RateLimiterModel } from "../../rateLimiter/schemas/rate-limiter.schemas";
 
 @injectable()
 export class RateLimiter {
@@ -19,7 +12,7 @@ export class RateLimiter {
     const now = new Date();
     const expireAt = new Date(now.getTime() + ttlMs);
 
-    await rateLimitsCollection.insertOne({
+    await RateLimiterModel.create({
       ip,
       url,
       date: now,
@@ -33,7 +26,7 @@ export class RateLimiter {
     windowMs: number = appConfig.RATE_LIMITER_WINDOW_MS,
   ): Promise<number> {
     const since = new Date(Date.now() - windowMs);
-    return await rateLimitsCollection.countDocuments({
+    return RateLimiterModel.countDocuments({
       ip,
       url,
       date: { $gte: since },
@@ -41,6 +34,6 @@ export class RateLimiter {
   }
 
   async clear(): Promise<void> {
-    await rateLimitsCollection.deleteMany({});
+    await RateLimiterModel.deleteMany({});
   }
 }

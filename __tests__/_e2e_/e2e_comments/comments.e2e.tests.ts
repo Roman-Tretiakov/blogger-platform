@@ -2,18 +2,14 @@ import request from "supertest";
 import express from "express";
 import { setupApp } from "../../../src/setup-app";
 import { EndpointList } from "../../../src/core/constants/endpoint-list";
-import {
-  client,
-  closeDBConnection,
-  commentsCollection,
-  runDB,
-} from "../../../src/db/mongo.db";
+import { closeDBConnection, runDB } from "../../../src/db/mongo.db";
 import { UsersService } from "../../../src/users/BLL/users.service";
 import { ObjectId } from "mongodb";
 import { CommentsRepository } from "../../../src/comments/repositories/comments.repository";
 import { PostsRepository } from "../../../src/posts/repositories/posts.repository";
 import { BlogsRepository } from "../../../src/blogs/repositories/blogs.repository";
 import { iocContainer } from "../../../src/composition-root";
+import { CommentModel } from "../../../src/comments/repositories/schemas/comment.schema";
 
 let app: any;
 let testUserLogin = "testuser";
@@ -95,7 +91,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   try {
-    await closeDBConnection(client);
+    await closeDBConnection();
   } catch (error) {
     console.error("Error closing DB connection:", error);
     // Можно не бросать ошибку дальше, чтобы не влиять на результат тестов
@@ -475,7 +471,7 @@ describe("POST /api/posts/{postId}/comments", () => {
       });
 
       // Проверяем, что комментарий создан в БД
-      const createdComment = await commentsCollection.findOne({
+      const createdComment = await CommentModel.findOne({
         content: validCommentData.content,
       });
       expect(createdComment).toBeDefined();
