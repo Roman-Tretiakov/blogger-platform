@@ -2,7 +2,6 @@ import { UserInputModel } from "../types/inputTypes/user-input-model";
 import { UsersRepository } from "../repositories/users.repository";
 import { BcryptService } from "../../auth/adapters/bcrypt.service";
 import { CustomError } from "../../core/errorClasses/CustomError";
-import { DeleteResult } from "mongodb";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { UsersQueryRepository } from "../repositories/users.query-repository";
 import { HttpStatus } from "../../core/enums/http-status";
@@ -51,9 +50,8 @@ export class UsersService {
   }
 
   async deleteById(id: string): Promise<void> {
-    const result: DeleteResult = await this.repository.delete(id);
-
-    if (result.deletedCount < 1) {
+    const deleted = await this.repository.delete(id);
+    if (!deleted) {
       throw new NotFoundError(`User with id ${id} not found`, "id");
     }
   }

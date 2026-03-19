@@ -1,16 +1,14 @@
-import { BlogViewModel } from "../BLL/dto/blog-view-model-type";
-import { ObjectId, UpdateResult, WithId } from "mongodb";
 import { BlogMongoModel } from "../BLL/dto/blog-mongo-model";
 import { BlogInputModel } from "../BLL/dto/blog-input-dto";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { DomainError } from "../../core/errorClasses/DomainError";
 import { injectable } from "inversify";
-import { BlogModel } from "./schemas/blog.schema";
+import { BlogModel, LeanBlog } from "./schemas/blog.schema";
 
 @injectable()
 export class BlogsRepository {
-  async findById(id: string): Promise<WithId<BlogMongoModel>> {
-    const blog = await BlogModel.findById(id).lean();
+  async findById(id: string): Promise<LeanBlog> {
+    const blog = await BlogModel.findById(id).lean<LeanBlog>();
     if (blog === null) {
       throw new NotFoundError(`Blog with id: ${id} not found`, "id");
     }
@@ -26,21 +24,17 @@ export class BlogsRepository {
   }
 
   async update(id: string, updateModel: BlogInputModel): Promise<void> {
-    const updateResult: UpdateResult<BlogViewModel> = await BlogModel.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: updateModel },
-    );
-    if (updateResult.matchedCount < 1) {
+    const updateResult = await BlogModel.findByIdAndUpdate(id, {
+      $set: updateModel,
+    }).lean<LeanBlog>();
+    if (!updateResult) {
       throw new NotFoundError(`No blog found by id: ${id}`, "id");
     }
-    return;
   }
 
   async delete(id: string): Promise<void> {
-    const deleteResult = await BlogModel.deleteOne({
-      _id: new ObjectId(id),
-    });
-    if (deleteResult.deletedCount < 1) {
+    const deleteResult = await BlogModel.findByIdAndDelete(id).lean<LeanBlog>();
+    if (!deleteResult) {
       throw new NotFoundError(`No blog found by id: ${id}`, "id");
     }
     return;

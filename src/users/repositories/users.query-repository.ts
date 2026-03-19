@@ -1,5 +1,4 @@
-import { ObjectId, WithId } from "mongodb";
-import { UserMongoModel } from "./type/user-mongo-model";
+import { ObjectId } from "mongodb";
 import { UserListWithPagination } from "../routers/outputTypes/user-list-with-pagination";
 import { UserQueryInput } from "../routers/inputTypes/user-query-input";
 import { mapToUserViewModel } from "../mappers/map-to-user-view-model";
@@ -29,17 +28,13 @@ export class UsersQueryRepository {
     }).lean<LeanUser>();
   }
 
-  async findUserByConfirmationCode(
-    code: string,
-  ): Promise<WithId<UserMongoModel> | null> {
+  async findUserByConfirmationCode(code: string): Promise<LeanUser | null> {
     return UserModel.findOne({
       "emailConfirmation.confirmationCode": code,
     }).lean<LeanUser>();
   }
 
-  async findUserByPasswordRecoveryCode(
-    code: string,
-  ): Promise<WithId<UserMongoModel> | null> {
+  async findUserByPasswordRecoveryCode(code: string): Promise<LeanUser | null> {
     return UserModel.findOne({
       "passwordRecovery.recoveryCode": code,
     }).lean<LeanUser>();

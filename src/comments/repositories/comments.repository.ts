@@ -1,11 +1,9 @@
 import { CommentMongoModel } from "./types/comment-mongo-model";
 import { Result } from "../../core/types/result-object-type";
 import { ResultStatus } from "../../core/enums/result-statuses";
-import { DeleteResult, ObjectId } from "mongodb";
 import { CommentInputModel } from "../routers/inputTypes/comment-input-model";
 import { injectable } from "inversify";
-import { CommentModel } from "./schemas/comment.schema";
-import { UpdateWriteOpResult } from "mongoose";
+import { CommentModel, LeanComment } from "./schemas/comment.schema";
 
 @injectable()
 export class CommentsRepository {
@@ -22,14 +20,11 @@ export class CommentsRepository {
   }
 
   async delete(commentId: string): Promise<Result> {
-    const result: DeleteResult = await CommentModel.deleteOne({
-      _id: new ObjectId(commentId),
-    });
+    const result =
+      await CommentModel.findByIdAndDelete(commentId).lean<LeanComment>();
     return {
-      status: result.acknowledged
-        ? ResultStatus.Success
-        : ResultStatus.NotFound,
-      errorMessage: result.acknowledged ? "" : "Comment with this id not found",
+      status: result ? ResultStatus.Success : ResultStatus.NotFound,
+      errorMessage: result ? "" : "Comment with this id not found",
       extensions: [],
       data: null,
     };
@@ -39,15 +34,12 @@ export class CommentsRepository {
     commentId: string,
     inputModel: CommentInputModel,
   ): Promise<Result> {
-    const result: UpdateWriteOpResult = await CommentModel.updateOne(
-      { _id: new ObjectId(commentId) },
-      { $set: inputModel },
-    );
+    const result = await CommentModel.findByIdAndUpdate(commentId, {
+      $set: inputModel,
+    }).lean<LeanComment>();
     return {
-      status:
-        result.matchedCount < 1 ? ResultStatus.NotFound : ResultStatus.Success,
-      errorMessage:
-        result.matchedCount < 1 ? "Comment with this id not found" : "",
+      status: !result ? ResultStatus.NotFound : ResultStatus.Success,
+      errorMessage: !result ? "Comment with this id not found" : "",
       extensions: [],
       data: null,
     };

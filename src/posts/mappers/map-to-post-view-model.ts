@@ -1,8 +1,7 @@
-import { WithId } from "mongodb";
-import { PostMongoModel } from "../BLL/dto/post-mongo-model";
 import { PostViewModel } from "../BLL/dto/post-view-model-type";
+import { LeanPost } from "../repositories/schemas/post.schema";
 
-export function mapToPostViewModel(post: WithId<PostMongoModel>): PostViewModel{
+export function mapToPostViewModel(post: LeanPost): PostViewModel {
   return {
     id: post._id.toString(),
     title: post.title,
@@ -11,5 +10,5 @@ export function mapToPostViewModel(post: WithId<PostMongoModel>): PostViewModel{
     blogId: post.blogId,
     blogName: post.blogName,
     createdAt: post.createdAt,
-  }
+  };
 }

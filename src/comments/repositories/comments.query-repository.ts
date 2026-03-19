@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import { Result } from "../../core/types/result-object-type";
 import { ResultStatus } from "../../core/enums/result-statuses";
 import { CommentViewModel } from "../routers/outputTypes/comment-view-model";
@@ -11,9 +10,7 @@ import { CommentModel, LeanComment } from "./schemas/comment.schema";
 @injectable()
 export class CommentsQueryRepository {
   async getById(commentId: string): Promise<Result<CommentViewModel | null>> {
-    const comment = await CommentModel.findOne({
-      _id: new ObjectId(commentId),
-    }).lean<LeanComment>();
+    const comment = await CommentModel.findById(commentId).lean<LeanComment>();
     return {
       status: comment ? ResultStatus.Success : ResultStatus.NotFound,
       errorMessage: comment ? "" : "Comment not found by this id",

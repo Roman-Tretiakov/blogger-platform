@@ -5,10 +5,14 @@ import { BlogsRepository } from "../../blogs/repositories/blogs.repository";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { CustomError } from "../../core/errorClasses/CustomError";
 import { HttpStatus } from "../../core/enums/http-status";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class PostsService {
   constructor(
+    @inject(BlogsRepository)
     private blogsRepository: BlogsRepository,
+    @inject(PostsRepository)
     private postsRepository: PostsRepository,
   ) {}
 

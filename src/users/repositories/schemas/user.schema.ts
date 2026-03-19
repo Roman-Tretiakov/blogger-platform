@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Types, FlattenMaps } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IUser extends Document {
   login: string;
@@ -33,4 +33,4 @@ const UserSchema: Schema = new Schema<IUser>({
 });
 
 export const UserModel = mongoose.model<IUser>("User", UserSchema);
-export type LeanUser = FlattenMaps<IUser> & { _id: Types.ObjectId };
+export type LeanUser = IUser & { _id: Types.ObjectId };

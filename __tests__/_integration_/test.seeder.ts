@@ -60,18 +60,30 @@ export const testSeeder = {
       email,
       password: pass,
       createdAt: new Date().toISOString(),
-      confirmationCode: code ?? randomUUID(),
-      expirationDate:
-        expirationDate ??
-        add(new Date(), {
-          minutes: 30,
-        }).toISOString(),
-      isConfirmed: isConfirmed ?? false,
+      emailConfirmation: {
+        confirmationCode: code ?? randomUUID(),
+        expirationDate:
+          expirationDate ??
+          add(new Date(), {
+            minutes: 30,
+          }).toISOString(),
+        isConfirmed: isConfirmed ?? false,
+      },
+      passwordRecovery: {
+        recoveryCode: null,
+        expirationDate: null,
+      },
     };
     const res = await usersRepository.create(newUser);
     return {
       id: res,
-      ...newUser,
+      login: newUser.login,
+      email: newUser.email,
+      password: newUser.password,
+      createdAt: newUser.createdAt,
+      confirmationCode: newUser.emailConfirmation.confirmationCode,
+      expirationDate: newUser.emailConfirmation.expirationDate,
+      isConfirmed: newUser.emailConfirmation.isConfirmed,
     };
   },
 };

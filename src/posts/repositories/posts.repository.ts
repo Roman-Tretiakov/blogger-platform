@@ -1,5 +1,3 @@
-import { PostViewModel } from "../BLL/dto/post-view-model-type";
-import { ObjectId, UpdateResult } from "mongodb";
 import { PostMongoModel } from "../BLL/dto/post-mongo-model";
 import { PostInputModel } from "../BLL/dto/post-input-dto";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
@@ -18,23 +16,18 @@ export class PostsRepository {
   }
 
   async update(id: string, updateModel: PostInputModel): Promise<void> {
-    const post: UpdateResult<PostViewModel> = await PostModel.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: updateModel },
-    );
-    if (post.matchedCount < 1) {
+    const post = await PostModel.findByIdAndUpdate(id, { $set: updateModel });
+    if (!post) {
       throw new NotFoundError(`Post with id ${id} not found`, "id");
     }
-    return;
   }
 
   async delete(id: string): Promise<void> {
-    const result = await PostModel.deleteOne({ _id: new ObjectId(id) });
+    const result = await PostModel.findByIdAndDelete(id);
 
-    if (result.deletedCount < 1) {
+    if (!result) {
       throw new NotFoundError(`Post with id ${id} not found`, "id");
     }
-    return;
   }
 
   async clear(): Promise<void> {

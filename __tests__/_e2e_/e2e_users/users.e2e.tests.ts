@@ -8,7 +8,6 @@ import { getBasicAuthToken } from "../../utils/get-basic-auth-token";
 import { closeDBConnection, runDB } from "../../../src/db/mongo.db";
 import { UsersService } from "../../../src/users/BLL/users.service";
 import { UserInputModel } from "../../../src/users/types/inputTypes/user-input-model";
-import { ObjectId } from "mongodb";
 import { iocContainer } from "../../../src/composition-root";
 import { UserModel } from "../../../src/users/repositories/schemas/user.schema";
 
@@ -449,9 +448,7 @@ describe("Users API", () => {
         expect(response.status).toBe(204);
 
         // Проверяем, что пользователь удален
-        const userInDb = await UserModel.findOne({
-          _id: new ObjectId(userId),
-        });
+        const userInDb = await UserModel.findById(userId);
         expect(userInDb).toBeNull();
       });
     });

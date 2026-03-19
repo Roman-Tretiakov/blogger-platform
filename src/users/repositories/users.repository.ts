@@ -1,5 +1,4 @@
 import { UserMongoModel } from "./type/user-mongo-model";
-import { DeleteResult, ObjectId } from "mongodb";
 import { DomainError } from "../../core/errorClasses/DomainError";
 import { injectable } from "inversify";
 import { UserModel } from "./schemas/user.schema";
@@ -14,16 +13,16 @@ export class UsersRepository {
     return newUser._id.toString();
   }
 
-  async delete(userId: string): Promise<DeleteResult> {
-    return UserModel.deleteOne({ _id: new ObjectId(userId) });
+  async delete(userId: string): Promise<boolean> {
+    const result = UserModel.findByIdAndDelete(userId);
+    return result !== null;
   }
 
   async update(userId: string, userData: UserMongoModel): Promise<void> {
-    const updateResult = await UserModel.updateOne(
-      { _id: new ObjectId(userId) },
-      { $set: userData },
-    );
-    if (updateResult.matchedCount === 0) {
+    const updateResult = await UserModel.findByIdAndUpdate(userId, {
+      $set: userData,
+    });
+    if (!updateResult) {
       throw new DomainError(`No user found with id: ${userId}`);
     }
   }

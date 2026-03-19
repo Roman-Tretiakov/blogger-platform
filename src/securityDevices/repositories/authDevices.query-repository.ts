@@ -4,13 +4,14 @@ import { AuthDeviceModel, LeanAuthDevice } from "./schemas/device.schema";
 
 @injectable()
 export class AuthDevicesQueryRepository {
-  async findByDeviceId(deviceId: string): Promise<AuthDevicesSessions | null> {
+  async findByDeviceId(deviceId: string): Promise<LeanAuthDevice | null> {
     return AuthDeviceModel.findOne({
       "deviceInfo.deviceId": deviceId,
     }).lean<LeanAuthDevice>();
   }
 
   async findAllByUserId(userId: string): Promise<AuthDevicesSessions[]> {
-    return AuthDeviceModel.find({ userId }).lean();
+    const sessions = await AuthDeviceModel.find({ userId: userId }).lean();
+    return sessions as AuthDevicesSessions[];
   }
 }

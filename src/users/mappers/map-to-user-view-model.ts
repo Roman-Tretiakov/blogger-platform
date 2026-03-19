@@ -1,12 +1,11 @@
-import { WithId } from "mongodb";
 import { UserViewModel } from "../types/outputTypes/user-view-model";
-import { UserMongoModel } from "../repositories/type/user-mongo-model";
+import { LeanUser } from "../repositories/schemas/user.schema";
 
-export function mapToUserViewModel(user: WithId<UserMongoModel>): UserViewModel{
+export function mapToUserViewModel(user: LeanUser): UserViewModel {
   return {
     id: user._id.toString(),
     login: user.login,
     email: user.email,
     createdAt: user.createdAt,
-  }
+  };
 }
