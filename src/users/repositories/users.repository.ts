@@ -14,7 +14,7 @@ export class UsersRepository {
   }
 
   async delete(userId: string): Promise<boolean> {
-    const result = UserModel.findByIdAndDelete(userId);
+    const result = await UserModel.findByIdAndDelete(userId);
     return result !== null;
   }
 

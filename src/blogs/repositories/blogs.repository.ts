@@ -7,14 +7,6 @@ import { BlogModel, LeanBlog } from "./schemas/blog.schema";
 
 @injectable()
 export class BlogsRepository {
-  async findById(id: string): Promise<LeanBlog> {
-    const blog = await BlogModel.findById(id).lean<LeanBlog>();
-    if (blog === null) {
-      throw new NotFoundError(`Blog with id: ${id} not found`, "id");
-    }
-    return blog;
-  }
-
   async create(blog: BlogMongoModel): Promise<string> {
     const newBlog = await BlogModel.create(blog);
     if (!newBlog) {

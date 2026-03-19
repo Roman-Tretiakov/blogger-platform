@@ -11,7 +11,8 @@ export class AuthDevicesQueryRepository {
   }
 
   async findAllByUserId(userId: string): Promise<AuthDevicesSessions[]> {
-    const sessions = await AuthDeviceModel.find({ userId: userId }).lean();
-    return sessions as AuthDevicesSessions[];
+    return AuthDeviceModel.find({ userId: userId }).lean<
+      AuthDevicesSessions[]
+    >();
   }
 }

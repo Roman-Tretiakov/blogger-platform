@@ -22,13 +22,13 @@ const UserSchema: Schema = new Schema<IUser>({
   password: { type: String, required: true },
   createdAt: { type: String, required: true },
   emailConfirmation: {
-    confirmationCode: { type: String, default: null, required: true },
-    expirationDate: { type: String, default: null, required: true },
+    confirmationCode: { type: String, default: null },
+    expirationDate: { type: String, default: null },
     isConfirmed: { type: Boolean, default: false, required: true },
   },
   passwordRecovery: {
-    recoveryCode: { type: String, default: null, required: true },
-    expirationDate: { type: String, default: null, required: true },
+    recoveryCode: { type: String, default: null },
+    expirationDate: { type: String, default: null },
   },
 });
 

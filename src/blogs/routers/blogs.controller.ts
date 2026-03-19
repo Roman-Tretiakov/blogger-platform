@@ -4,7 +4,6 @@ import { BlogsService } from "../BLL/blogs.service";
 import { BlogInputModel } from "../BLL/dto/blog-input-dto";
 import { HttpStatus } from "../../core/enums/http-status";
 import { errorsHandler } from "../../core/utils/errors-hundler";
-import { BlogViewModel } from "../BLL/dto/blog-view-model-type";
 import { BlogQueryInput } from "./inputTypes/blog-query-input";
 import { matchedData } from "express-validator";
 import { setDefaultSortAndPaginationIfNotExist } from "../../core/utils/sort-and-pagination.utils";
@@ -23,16 +22,16 @@ export class BlogsController {
     req: Request<{}, {}, BlogInputModel>,
     res: Response,
   ): Promise<void> {
-    try {
-      const inputData = req.body;
-      const createdBlogId: string = await this.blogsService.create(inputData);
-      const createdBlog =
-        await this.blogsQueryRepository.getBlogById(createdBlogId);
+    const inputData = req.body;
+    const createdBlogId: string = await this.blogsService.create(inputData);
+    const createdBlog =
+      await this.blogsQueryRepository.getBlogById(createdBlogId);
 
-      res.status(HttpStatus.Created).send(createdBlog);
-    } catch (e: unknown) {
-      errorsHandler(e, res);
+    if (!createdBlog) {
+      res.status(HttpStatus.InternalServerError).send("No created blog found");
     }
+
+    res.status(HttpStatus.Created).send(createdBlog);
   }
 
   async delete(req: Request, res: Response) {
@@ -49,13 +48,11 @@ export class BlogsController {
 
   async get(req: Request, res: Response) {
     const id: string = req.params.id;
-    try {
-      const blog: BlogViewModel =
-        await this.blogsQueryRepository.getBlogById(id);
-      return res.status(HttpStatus.Ok).send(blog);
-    } catch (e: unknown) {
-      return errorsHandler(e, res);
+    const blog = await this.blogsQueryRepository.getBlogById(id);
+    if (!blog) {
+      return res.status(HttpStatus.NotFound).send();
     }
+    return res.status(HttpStatus.Ok).send(blog);
   }
 
   async getList(

@@ -1,17 +1,17 @@
 import { BlogPostInputModel, PostInputModel } from "./dto/post-input-dto";
 import { PostsRepository } from "../repositories/posts.repository";
 import { mapToPostMongoModel } from "../mappers/map-to-post-mongo-model";
-import { BlogsRepository } from "../../blogs/repositories/blogs.repository";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { CustomError } from "../../core/errorClasses/CustomError";
 import { HttpStatus } from "../../core/enums/http-status";
 import { inject, injectable } from "inversify";
+import { BlogsQueryRepository } from "../../blogs/repositories/blogs.query-repository";
 
 @injectable()
 export class PostsService {
   constructor(
-    @inject(BlogsRepository)
-    private blogsRepository: BlogsRepository,
+    @inject(BlogsQueryRepository)
+    private blogsQueryRepository: BlogsQueryRepository,
     @inject(PostsRepository)
     private postsRepository: PostsRepository,
   ) {}
@@ -20,7 +20,7 @@ export class PostsService {
     inputModel: PostInputModel | BlogPostInputModel,
     blogId?: string,
   ): Promise<string> {
-    const blog = await this.blogsRepository.findById(
+    const blog = await this.blogsQueryRepository.getBlogById(
       blogId ?? (inputModel as PostInputModel).blogId,
     );
     if (blog === null) {
@@ -30,14 +30,16 @@ export class PostsService {
       );
     }
     const mongoMappedModel = mapToPostMongoModel(inputModel, {
-      id: blog._id.toString(),
+      id: blog.id,
       blogName: blog.name,
     });
     return await this.postsRepository.create(mongoMappedModel);
   }
 
   async update(id: string, updateModel: PostInputModel): Promise<void> {
-    const blog = await this.blogsRepository.findById(updateModel.blogId);
+    const blog = await this.blogsQueryRepository.getBlogById(
+      updateModel.blogId,
+    );
     if (blog === null) {
       throw new CustomError(
         `No blog found by id: ${updateModel.blogId} for post`,
