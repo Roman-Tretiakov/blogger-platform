@@ -6,14 +6,14 @@ import { mapToCommentViewModel } from "../mappers/map-to-comment-view-model";
 import { CommentListWithPagination } from "../routers/outputTypes/comment-list-with-pagination";
 import { CommentsQueryInput } from "../routers/inputTypes/comments-query-input";
 import { injectable } from "inversify";
-import { CommentModel } from "./schemas/comment.schema";
+import { CommentModel, LeanComment } from "./schemas/comment.schema";
 
 @injectable()
 export class CommentsQueryRepository {
   async getById(commentId: string): Promise<Result<CommentViewModel | null>> {
     const comment = await CommentModel.findOne({
       _id: new ObjectId(commentId),
-    });
+    }).lean<LeanComment>();
     return {
       status: comment ? ResultStatus.Success : ResultStatus.NotFound,
       errorMessage: comment ? "" : "Comment not found by this id",

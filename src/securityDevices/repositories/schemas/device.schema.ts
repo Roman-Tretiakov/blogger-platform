@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IAuthDeviceSession extends Document {
   userId: string;
@@ -27,9 +27,9 @@ const DeviceSchema = new Schema<IAuthDeviceSession>({
 });
 
 DeviceSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
-console.log("✅ TTL index created on authDevices collection");
 
 export const AuthDeviceModel = mongoose.model<IAuthDeviceSession>(
-  "AuthDeviceModel",
+  "AuthDevice",
   DeviceSchema,
 );
+export type LeanAuthDevice = IAuthDeviceSession & { _id: Types.ObjectId };

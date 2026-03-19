@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IBlog extends Document {
   name: string;
@@ -17,3 +17,4 @@ const BlogSchema = new Schema<IBlog>({
 });
 
 export const BlogModel = mongoose.model<IBlog>("Blog", BlogSchema);
+export type LeanBlog = IBlog & { _id: Types.ObjectId };

@@ -70,7 +70,7 @@ export class AuthService {
 
     const passwordHash = await this.bcryptService.generateHash(password);
     const newUser = new User(login, email, passwordHash);
-    newUser.generateNewConfirmationCode().isEmailConfirmed(false);
+    newUser.generateNewEmailConfirmation().isEmailConfirmed(false);
 
     await this.usersRepository.create(newUser).catch(() => {
       return {
@@ -85,7 +85,7 @@ export class AuthService {
       .sendEmail(
         MailServices.MAIL_RU,
         email,
-        newUser.confirmationCode!,
+        newUser.emailConfirmation.confirmationCode,
         emailExamples.registrationEmail,
       )
       .catch((e: any) => {
@@ -116,7 +116,7 @@ export class AuthService {
         data: null,
       };
     } else {
-      if (new Date(user.expirationDate!) < new Date()) {
+      if (new Date(user.emailConfirmation.expirationDate!) < new Date()) {
         return {
           status: ResultStatus.BadRequest,
           errorMessage: "Wrong confirmation code!",
@@ -129,7 +129,7 @@ export class AuthService {
           data: null,
         };
       }
-      if (user.isConfirmed) {
+      if (user.emailConfirmation.isConfirmed) {
         return {
           status: ResultStatus.BadRequest,
           errorMessage: "Wrong confirmation code!",
@@ -143,7 +143,7 @@ export class AuthService {
         };
       }
 
-      user.isConfirmed = true;
+      user.emailConfirmation.isConfirmed = true;
       await this.usersRepository
         .update(user._id.toString(), {
           ...user,
@@ -181,7 +181,7 @@ export class AuthService {
         data: null,
       };
     }
-    if (user.isConfirmed) {
+    if (user.emailConfirmation.isConfirmed) {
       return {
         status: ResultStatus.BadRequest,
         errorMessage: "Email is already been applied!",
@@ -195,13 +195,13 @@ export class AuthService {
       };
     }
 
-    user.isConfirmed = false;
-    user.confirmationCode = randomUUID();
+    user.emailConfirmation.isConfirmed = false;
+    user.emailConfirmation.confirmationCode = randomUUID();
     this.emailService
       .sendEmail(
         MailServices.MAIL_RU,
         email,
-        user.confirmationCode,
+        user.emailConfirmation.confirmationCode,
         emailExamples.registrationEmail,
       )
       .catch((e: any) => {
@@ -376,10 +376,10 @@ export class AuthService {
       const code = randomUUID();
       await this.usersRepository.update(user._id.toString(), {
         ...user,
-        passwordRecoveryCode: code,
-        passwordRecoveryExpiration: new Date(
-          Date.now() + 3600000,
-        ).toISOString(), // 1 hour
+        passwordRecovery: {
+          recoveryCode: code,
+          expirationDate: new Date(Date.now() + 3600000).toISOString(), // 1 hour,
+        },
       });
 
       this.emailService
@@ -423,7 +423,7 @@ export class AuthService {
         data: null,
       };
     } else {
-      if (new Date(user.passwordRecoveryExpiration!) < new Date()) {
+      if (new Date(user.passwordRecovery.expirationDate!) < new Date()) {
         return {
           status: ResultStatus.BadRequest,
           errorMessage: "Wrong recovery code!",
@@ -436,8 +436,10 @@ export class AuthService {
       await this.usersRepository.update(user._id.toString(), {
         ...user,
         password: passwordHash,
-        passwordRecoveryCode: null,
-        passwordRecoveryExpiration: null,
+        passwordRecovery: {
+          recoveryCode: null,
+          expirationDate: null,
+        },
       });
 
       return {

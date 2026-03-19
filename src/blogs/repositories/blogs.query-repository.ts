@@ -1,16 +1,15 @@
 import { BlogQueryInput } from "../routers/inputTypes/blog-query-input";
-import { ObjectId } from "mongodb";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { BlogViewModel } from "../BLL/dto/blog-view-model-type";
 import { mapToBlogViewModel } from "../mappers/map-to-blog-view-model";
 import { BlogListWithPagination } from "../routers/outputTypes/blog-list-with-pagination";
 import { injectable } from "inversify";
-import { BlogModel } from "./schemas/blog.schema";
+import { BlogModel, LeanBlog } from "./schemas/blog.schema";
 
 @injectable()
 export class BlogsQueryRepository {
   async getBlogById(id: string): Promise<BlogViewModel> {
-    const blog = await BlogModel.findOne({ _id: new ObjectId(id) });
+    const blog = await BlogModel.findById(id).lean<LeanBlog>();
     if (blog === null) {
       throw new NotFoundError(`Blog with id: ${id} not found`, "id");
     }

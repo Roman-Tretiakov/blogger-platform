@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IComment extends Document {
   content: string;
@@ -21,3 +21,4 @@ const CommentSchema = new Schema<IComment>({
 });
 
 export const CommentModel = mongoose.model<IComment>("Comment", CommentSchema);
+export type LeanComment = IComment & { _id: Types.ObjectId };

@@ -4,7 +4,7 @@ import { AuthService } from "../../src/auth/BLL/auth.service";
 import { testSeeder } from "./test.seeder";
 import { ResultStatus } from "../../src/core/enums/result-statuses";
 import { setupApp } from "../../src/setup-app";
-import { client, closeDBConnection, runDB } from "../../src/db/mongo.db";
+import { closeDBConnection, runDB } from "../../src/db/mongo.db";
 import express from "express";
 import { UsersService } from "../../src/users/BLL/users.service";
 import { iocContainer } from "../../src/composition-root";
@@ -29,7 +29,7 @@ describe("AUTH-INTEGRATION", () => {
 
   afterAll(async () => {
     try {
-      await closeDBConnection(client);
+      await closeDBConnection();
     } catch (error) {
       console.error("Error closing DB connection:", error);
       // Можно не бросать ошибку дальше, чтобы не влиять на результат тестов

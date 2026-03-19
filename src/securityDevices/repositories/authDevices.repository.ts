@@ -6,7 +6,7 @@ import { AuthDeviceModel } from "./schemas/device.schema";
 export class AuthDevicesRepository {
   async create(session: AuthDevicesSessions): Promise<void> {
     try {
-      await AuthDeviceModel.insertOne(session);
+      await AuthDeviceModel.create(session);
     } catch (error: any) {
       console.error("Failed to create auth device session:", error.message);
     }

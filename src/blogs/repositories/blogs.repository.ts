@@ -10,7 +10,7 @@ import { BlogModel } from "./schemas/blog.schema";
 @injectable()
 export class BlogsRepository {
   async findById(id: string): Promise<WithId<BlogMongoModel>> {
-    const blog = await BlogModel.findOne({ _id: new ObjectId(id) });
+    const blog = await BlogModel.findById(id).lean();
     if (blog === null) {
       throw new NotFoundError(`Blog with id: ${id} not found`, "id");
     }

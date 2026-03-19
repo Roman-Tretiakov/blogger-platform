@@ -7,7 +7,7 @@ import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { UserViewModel } from "../types/outputTypes/user-view-model";
 import { MeViewModel } from "../../auth/routers/outputTypes/me-view-model";
 import { injectable } from "inversify";
-import { UserModel } from "./schemas/user.schema";
+import { LeanUser, UserModel } from "./schemas/user.schema";
 
 @injectable()
 export class UsersQueryRepository {
@@ -16,35 +16,33 @@ export class UsersQueryRepository {
       throw new NotFoundError(`User with id: ${id} not found`, "id");
     }
 
-    const user = await UserModel.findOne({ _id: new ObjectId(id) });
+    const user = await UserModel.findById(id).lean<LeanUser>();
     if (user === null) {
       throw new NotFoundError(`User with id: ${id} not found`, "id");
     }
     return mapToUserViewModel(user);
   }
 
-  async findByLoginOrEmail(
-    loginOrEmail: string[],
-  ): Promise<WithId<UserMongoModel> | null> {
+  async findByLoginOrEmail(loginOrEmail: string[]): Promise<LeanUser | null> {
     return UserModel.findOne({
       $or: [{ login: { $in: loginOrEmail } }, { email: { $in: loginOrEmail } }],
-    });
+    }).lean<LeanUser>();
   }
 
   async findUserByConfirmationCode(
     code: string,
   ): Promise<WithId<UserMongoModel> | null> {
     return UserModel.findOne({
-      confirmationCode: code,
-    });
+      "emailConfirmation.confirmationCode": code,
+    }).lean<LeanUser>();
   }
 
   async findUserByPasswordRecoveryCode(
     code: string,
   ): Promise<WithId<UserMongoModel> | null> {
     return UserModel.findOne({
-      passwordRecoveryCode: code,
-    });
+      "passwordRecovery.recoveryCode": code,
+    }).lean<LeanUser>();
   }
 
   async getAllUsersWithPagination(
@@ -84,7 +82,8 @@ export class UsersQueryRepository {
         [queryParams.sortBy]: queryParams.sortDirection === "asc" ? 1 : -1,
       })
       .skip(skip)
-      .limit(queryParams.pageSize);
+      .limit(queryParams.pageSize)
+      .lean();
 
     const totalCount = await UserModel.countDocuments(filter);
 

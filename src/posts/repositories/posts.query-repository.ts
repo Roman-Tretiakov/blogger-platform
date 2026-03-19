@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import { PostQueryInput } from "../routers/inputTypes/post-query-input";
 import { PostViewModel } from "../BLL/dto/post-view-model-type";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
@@ -6,7 +5,7 @@ import { mapToPostViewModel } from "../mappers/map-to-post-view-model";
 import { BlogsQueryRepository } from "../../blogs/repositories/blogs.query-repository";
 import { PostListWithPagination } from "../routers/outputTypes/post-list-with-pagination";
 import { inject, injectable } from "inversify";
-import { PostModel } from "./schemas/post.schema";
+import { LeanPost, PostModel } from "./schemas/post.schema";
 
 @injectable()
 export class PostsQueryRepository {
@@ -16,7 +15,7 @@ export class PostsQueryRepository {
   ) {}
 
   async getPostById(id: string): Promise<PostViewModel> {
-    const post = await PostModel.findOne({ _id: new ObjectId(id) });
+    const post = await PostModel.findById(id).lean<LeanPost>();
     if (post === null) {
       throw new NotFoundError(`Post with id: ${id} not found`, "id");
     }

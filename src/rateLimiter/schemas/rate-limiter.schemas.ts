@@ -15,7 +15,6 @@ const RateLimiterSchema = new Schema<IRateLimiter>({
 });
 
 RateLimiterSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
-console.log("✅ TTL index created on ratelimits collection");
 
 export const RateLimiterModel = mongoose.model<IRateLimiter>(
   "RateLimit",
