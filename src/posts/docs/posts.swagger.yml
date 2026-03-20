@@ -7,7 +7,8 @@ paths:
     get:
       summary: Returns comments for specified post
       tags: [ Posts ]
-      security: [ ]
+      security:
+        - bearerAuth: [ ]
       parameters:
         - in: path
           name: postId
@@ -297,6 +298,22 @@ components:
           format: date-time
           description: "Date and time when the comment was created"
           example: "2026-02-05T21:11:06.562Z"
+        likesInfo:
+          type: object
+          properties:
+            likesCount:
+              type: integer
+              description: "Total likes for parent item"
+              example: 10
+            dislikesCount:
+              type: integer
+              description: "Total dislikes for parent item"
+              example: 2
+            myStatus:
+              type: string
+              enum: [ None, Like, Dislike ]
+              description: "Your like status for this comment. None if you want to unlike\undislike"
+              example: "Like"
     CommentInputModel:
       type: object
       required:
