@@ -6,9 +6,7 @@ import { AuthDeviceModel } from "../securityDevices/repositories/schemas/device.
 // Подключения к бд
 export async function runDB(url: string): Promise<void> {
   try {
-    const db_name = { dbName: DBName };
-    await mongoose.connect(url, db_name);
-    await mongoose.connection.db!.command({ ping: 1 });
+    await mongoose.connect(url, { dbName: DBName });
     console.log(`✅ Connected to the database ${DBName}`);
 
     await Promise.all([
