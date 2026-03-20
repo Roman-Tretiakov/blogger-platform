@@ -7,8 +7,7 @@ paths:
     get:
       summary: Returns comments for specified post
       tags: [ Posts ]
-      security:
-        - bearerAuth: [ ]
+      security: [ ]
       parameters:
         - in: path
           name: postId
