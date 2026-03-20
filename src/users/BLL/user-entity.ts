@@ -3,14 +3,14 @@ import { appConfig } from "../../core/config/appConfig";
 
 export class User {
   public emailConfirmation = {
-    confirmationCode: "",
-    expirationDate: "",
+    confirmationCode: null as string | null,
+    expirationDate: null as string | null,
     isConfirmed: false,
   };
 
   public passwordRecovery = {
-    recoveryCode: "",
-    expirationDate: "",
+    recoveryCode: null as string | null,
+    expirationDate: null as string | null,
   };
 
   constructor(
@@ -18,7 +18,13 @@ export class User {
     public email: string,
     public password: string,
     public createdAt = new Date().toISOString(),
-  ) {}
+  ) {
+    this.emailConfirmation.confirmationCode = null;
+    this.emailConfirmation.expirationDate = null;
+    this.emailConfirmation.isConfirmed = false;
+    this.passwordRecovery.recoveryCode = null;
+    this.passwordRecovery.expirationDate = null;
+  }
 
   public isEmailConfirmationCodeExpired(): boolean {
     return this.emailConfirmation.expirationDate

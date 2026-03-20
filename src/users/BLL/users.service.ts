@@ -45,6 +45,7 @@ export class UsersService {
       passwordHash,
       new Date().toISOString(),
     );
+    newUser.isEmailConfirmed(true);
 
     return await this.repository.create(newUser);
   }
