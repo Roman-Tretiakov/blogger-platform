@@ -312,7 +312,7 @@ components:
             myStatus:
               type: string
               enum: [ None, Like, Dislike ]
-              description: "Your like status for this comment. None if you want to unlike\undislike"
+              description: "Your like status for this comment. None if you want to unlike or undislike"
               example: "Like"
     CommentInputModel:
       type: object
