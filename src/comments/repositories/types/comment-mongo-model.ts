@@ -1,3 +1,5 @@
+import { LikesInfoViewModel } from "./likes-info-view-model";
+
 export type CommentMongoModel = {
   content: string;
   postId: string;
@@ -6,4 +8,4 @@ export type CommentMongoModel = {
     userLogin: string;
   };
   createdAt: string;
-};
+} & Partial<LikesInfoViewModel>;
