@@ -13,6 +13,8 @@ import { CommentInputModel } from "./inputTypes/comment-input-model";
 import { inject, injectable } from "inversify";
 import { LikeInputModel } from "./inputTypes/like-input-model";
 import { IdType } from "../../core/types/id-type";
+import { createErrorMessages } from "../../core/utils/error.utils";
+import { mapToCommentViewModel } from "../mappers/map-to-comment-view-model";
 
 @injectable()
 export class CommentsController {
@@ -54,7 +56,9 @@ export class CommentsController {
       return;
     }
 
-    res.status(resultStatusToHttpStatusMapper(result.status)).send(result.data);
+    res
+      .status(resultStatusToHttpStatusMapper(result.status))
+      .send(mapToCommentViewModel(result.data!));
   }
 
   async update(
@@ -72,7 +76,9 @@ export class CommentsController {
     );
 
     if (result.status !== ResultStatus.Success) {
-      res.status(resultStatusToHttpStatusMapper(result.status)).send();
+      res
+        .status(resultStatusToHttpStatusMapper(result.status))
+        .send(createErrorMessages(result.extensions));
       return;
     }
 
@@ -91,10 +97,19 @@ export class CommentsController {
     const userId = req.userData!.userId;
     const status = req.body.likeStatus;
 
-    const result = this.commentsService.updateCommentByStatus(
+    const result = await this.commentsService.updateCommentByStatus(
       commentId,
       userId,
       status,
     );
+
+    if (result.status !== ResultStatus.Success) {
+      res
+        .status(resultStatusToHttpStatusMapper(result.status))
+        .send(createErrorMessages(result.extensions));
+      return;
+    }
+
+    res.status(HttpStatus.NoContent).send();
   }
 }

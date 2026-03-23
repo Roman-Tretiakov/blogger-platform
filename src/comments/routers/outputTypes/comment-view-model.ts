@@ -9,4 +9,5 @@ export type CommentViewModel = {
     userLogin: string;
   };
   createdAt: string;
-} & Partial<LikesInfoViewModel>;
+  likesInfo: LikesInfoViewModel;
+};

@@ -8,14 +8,16 @@ import { CommentModel, LeanComment } from "./schemas/comment.schema";
 @injectable()
 export class CommentsRepository {
   async create(inputModel: CommentMongoModel): Promise<Result<string | null>> {
-    const result = await CommentModel.create(inputModel);
+    const comment = await new CommentModel(inputModel).save();
+    const result = !!comment._id;
+
     return {
       status: result ? ResultStatus.Created : ResultStatus.Failure,
       errorMessage: result
         ? ""
         : "Internal server error during comment creating",
       extensions: [],
-      data: result ? result._id.toString() : null,
+      data: result ? comment.id : null,
     };
   }
 

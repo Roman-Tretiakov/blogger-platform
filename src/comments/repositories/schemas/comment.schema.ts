@@ -21,9 +21,13 @@ const CommentSchema = new Schema<IComment>({
   },
   createdAt: { type: String, required: true },
   likesInfo: {
-    likesCount: { type: Number },
-    dislikesCount: { type: Number },
-    myStatus: { type: String, enum: ["None", "Like", "Dislike"] },
+    likesCount: { type: Number, default: 0 },
+    dislikesCount: { type: Number, default: 0 },
+    myStatus: {
+      type: String,
+      enum: ["None", "Like", "Dislike"],
+      default: "None",
+    },
   },
 });
 

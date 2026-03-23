@@ -19,6 +19,7 @@ import { matchedData } from "express-validator";
 import { setDefaultSortAndPaginationIfNotExist } from "../../core/utils/sort-and-pagination.utils";
 import { PostQueryInput } from "./inputTypes/post-query-input";
 import { inject, injectable } from "inversify";
+import { mapToCommentViewModel } from "../../comments/mappers/map-to-comment-view-model";
 
 @injectable()
 export class PostsController {
@@ -67,7 +68,9 @@ export class PostsController {
       return;
     }
 
-    res.status(HttpStatus.Created).send(commentResult.data);
+    res
+      .status(HttpStatus.Created)
+      .send(mapToCommentViewModel(commentResult.data!));
   }
 
   async createPost(

@@ -7,7 +7,6 @@ import { CommentsQueryRepository } from "../repositories/comments.query-reposito
 import { CommentInputModel } from "../routers/inputTypes/comment-input-model";
 import { inject, injectable } from "inversify";
 import { LikesStatus } from "../enums/like-status";
-import { CommentViewModel } from "../routers/outputTypes/comment-view-model";
 
 @injectable()
 export class CommentsService {
@@ -45,11 +44,6 @@ export class CommentsService {
         userLogin: login,
       },
       createdAt: new Date().toISOString(),
-      likesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: LikesStatus.None,
-      },
     };
 
     return await this.commentsRepository.create(comment);
@@ -112,15 +106,39 @@ export class CommentsService {
     commentId: string,
     userId: string,
     status: LikesStatus,
-  ): Promise<Result<CommentViewModel | null>> {
-    //TODO: get comment by Id;
-    //TODO: get q-ty of likes-dislikes and user status
-    //TODO: update comment with like-dislike count
-    //TODO: set user like status for comment
+  ): Promise<Result> {
+    const result = await this.commentsQueryRepository.getById(commentId);
+    if (result.status === ResultStatus.Success) {
+      const existedComment = result.data!;
+
+      switch (status) {
+        case LikesStatus.None:
+          if (existedComment.commentatorInfo.userId === userId)
+            existedComment.likesInfo.myStatus === LikesStatus.Like
+              ? existedComment.likesInfo.likesCount > 0
+                ? existedComment.likesInfo.likesCount--
+                : 0
+              : existedComment.likesInfo.dislikesCount > 0
+                ? existedComment.likesInfo.dislikesCount--
+                : 0;
+          break;
+        case LikesStatus.Like:
+          if (existedComment.likesInfo.myStatus !== LikesStatus.Like)
+            existedComment.likesInfo.likesCount++;
+          break;
+        case LikesStatus.Dislike:
+          if (existedComment.likesInfo.myStatus !== LikesStatus.Dislike)
+            existedComment.likesInfo.dislikesCount++;
+          break;
+      }
+
+      existedComment.likesInfo.myStatus = status;
+      await this.commentsRepository.update(commentId, existedComment);
+    }
     return {
-      status: ResultStatus.Success,
-      errorMessage: "",
-      extensions: [],
+      status: result.status,
+      errorMessage: result.errorMessage,
+      extensions: result.extensions,
       data: null,
     };
   }

@@ -8,5 +8,5 @@ export type CommentMongoModel = {
     userLogin: string;
   };
   createdAt: string;
-  likesInfo: LikesInfoViewModel;
+  likesInfo?: LikesInfoViewModel;
 };

@@ -34,7 +34,7 @@ commentsRouter
     commentsController.update.bind(commentsController),
   )
   .put(
-    EndpointList.COMMENTS_PATH + EndpointList.REACTIONS_FOR_COMMENTS,
+    EndpointList.REACTIONS_FOR_COMMENTS,
     accessTokenGuard,
     paramIdValidationMiddleware,
     reactionCommentsBodyValidationMiddleware,

@@ -1,6 +1,5 @@
 import { Result } from "../../core/types/result-object-type";
 import { ResultStatus } from "../../core/enums/result-statuses";
-import { CommentViewModel } from "../routers/outputTypes/comment-view-model";
 import { mapToCommentViewModel } from "../mappers/map-to-comment-view-model";
 import { CommentListWithPagination } from "../routers/outputTypes/comment-list-with-pagination";
 import { CommentsQueryInput } from "../routers/inputTypes/comments-query-input";
@@ -9,7 +8,7 @@ import { CommentModel, LeanComment } from "./schemas/comment.schema";
 
 @injectable()
 export class CommentsQueryRepository {
-  async getById(commentId: string): Promise<Result<CommentViewModel | null>> {
+  async getById(commentId: string): Promise<Result<LeanComment | null>> {
     const comment = await CommentModel.findById(commentId).lean<LeanComment>();
     return {
       status: comment ? ResultStatus.Success : ResultStatus.NotFound,
@@ -22,7 +21,7 @@ export class CommentsQueryRepository {
               message: "Comment not found by this id",
             },
           ],
-      data: comment ? mapToCommentViewModel(comment) : null,
+      data: comment ? comment : null,
     };
   }
 

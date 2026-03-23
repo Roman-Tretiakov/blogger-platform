@@ -7,5 +7,6 @@ export function mapToCommentViewModel(comment: LeanComment): CommentViewModel {
     content: comment.content,
     commentatorInfo: comment.commentatorInfo,
     createdAt: comment.createdAt,
+    likesInfo: comment.likesInfo,
   };
 }
