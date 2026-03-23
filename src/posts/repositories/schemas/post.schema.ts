@@ -18,5 +18,5 @@ const PostSchema = new Schema<IPost>({
   createdAt: { type: String, required: true },
 });
 
-export const PostModel = mongoose.model<IPost>("Post", PostSchema);
+export const PostModel = mongoose.model<IPost>("Post", PostSchema, "posts");
 export type LeanPost = IPost & { _id: Types.ObjectId };

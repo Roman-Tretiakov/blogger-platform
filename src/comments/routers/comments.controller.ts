@@ -4,12 +4,15 @@ import { CommentsQueryRepository } from "../repositories/comments.query-reposito
 import {
   RequestWithParams,
   RequestWithParamsAndBody,
+  RequestWithParamsAndBodyAndUserId,
 } from "../../core/types/request-types";
 import { ResultStatus } from "../../core/enums/result-statuses";
 import { resultStatusToHttpStatusMapper } from "../../core/utils/result-code-to-http-status.mapper";
 import { HttpStatus } from "../../core/enums/http-status";
 import { CommentInputModel } from "./inputTypes/comment-input-model";
 import { inject, injectable } from "inversify";
+import { LikeInputModel } from "./inputTypes/like-input-model";
+import { IdType } from "../../core/types/id-type";
 
 @injectable()
 export class CommentsController {
@@ -74,5 +77,24 @@ export class CommentsController {
     }
 
     res.status(HttpStatus.NoContent).send();
+  }
+
+  async updateCommentWithReaction(
+    req: RequestWithParamsAndBodyAndUserId<
+      { id: string },
+      LikeInputModel,
+      IdType
+    >,
+    res: Response,
+  ): Promise<void> {
+    const commentId = req.params.id;
+    const userId = req.userData!.userId;
+    const status = req.body.likeStatus;
+
+    const result = this.commentsService.updateCommentByStatus(
+      commentId,
+      userId,
+      status,
+    );
   }
 }

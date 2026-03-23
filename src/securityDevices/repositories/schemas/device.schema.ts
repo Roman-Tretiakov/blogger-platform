@@ -31,5 +31,6 @@ DeviceSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 export const AuthDeviceModel = mongoose.model<IAuthDeviceSession>(
   "AuthDevice",
   DeviceSchema,
+  "authDevices",
 );
 export type LeanAuthDevice = IAuthDeviceSession & { _id: Types.ObjectId };

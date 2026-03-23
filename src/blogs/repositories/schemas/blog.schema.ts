@@ -16,5 +16,5 @@ const BlogSchema = new Schema<IBlog>({
   isMembership: { type: Boolean, default: false },
 });
 
-export const BlogModel = mongoose.model<IBlog>("Blog", BlogSchema);
+export const BlogModel = mongoose.model<IBlog>("Blog", BlogSchema, "blogs");
 export type LeanBlog = IBlog & { _id: Types.ObjectId };

@@ -52,4 +52,5 @@ export enum ErrorNames {
   EMAIL_FORMAT_ERROR = "Email has incorrect format",
 
   FIELD_NOT_STRING = "Field must be string",
+  FIELD_EMPTY_ERROR = "Field must be not empty",
 }

@@ -19,4 +19,5 @@ RateLimiterSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 export const RateLimiterModel = mongoose.model<IRateLimiter>(
   "RateLimit",
   RateLimiterSchema,
+  "rateLimits",
 );

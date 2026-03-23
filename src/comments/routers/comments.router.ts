@@ -6,6 +6,7 @@ import { accessTokenGuard } from "../../auth/middlewares/guards/access-token.gua
 import { createCommentsBodyValidationMiddleware } from "../../posts/middlewares/create-comments-body-validation.middleware";
 import { iocContainer } from "../../composition-root";
 import { CommentsController } from "./comments.controller";
+import { reactionCommentsBodyValidationMiddleware } from "../middleware/reaction-comments-body-validation-middleware";
 
 const commentsController = iocContainer.resolve(CommentsController);
 export const commentsRouter = Router({});
@@ -31,4 +32,12 @@ commentsRouter
     createCommentsBodyValidationMiddleware,
     inputValidationResultMiddleware,
     commentsController.update.bind(commentsController),
+  )
+  .put(
+    EndpointList.COMMENTS_PATH + EndpointList.REACTIONS_FOR_COMMENTS,
+    accessTokenGuard,
+    paramIdValidationMiddleware,
+    reactionCommentsBodyValidationMiddleware,
+    inputValidationResultMiddleware,
+    commentsController.updateCommentWithReaction.bind(commentsController),
   );

@@ -6,6 +6,8 @@ import { CommentMongoModel } from "../repositories/types/comment-mongo-model";
 import { CommentsQueryRepository } from "../repositories/comments.query-repository";
 import { CommentInputModel } from "../routers/inputTypes/comment-input-model";
 import { inject, injectable } from "inversify";
+import { LikesStatus } from "../enums/like-status";
+import { CommentViewModel } from "../routers/outputTypes/comment-view-model";
 
 @injectable()
 export class CommentsService {
@@ -43,6 +45,11 @@ export class CommentsService {
         userLogin: login,
       },
       createdAt: new Date().toISOString(),
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: LikesStatus.None,
+      },
     };
 
     return await this.commentsRepository.create(comment);
@@ -96,6 +103,23 @@ export class CommentsService {
     return {
       status: resultStatus,
       errorMessage: errMessage ?? comment.errorMessage,
+      extensions: [],
+      data: null,
+    };
+  }
+
+  async updateCommentByStatus(
+    commentId: string,
+    userId: string,
+    status: LikesStatus,
+  ): Promise<Result<CommentViewModel | null>> {
+    //TODO: get comment by Id;
+    //TODO: get q-ty of likes-dislikes and user status
+    //TODO: update comment with like-dislike count
+    //TODO: set user like status for comment
+    return {
+      status: ResultStatus.Success,
+      errorMessage: "",
       extensions: [],
       data: null,
     };

@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Types } from "mongoose";
+import { Schema, Document, Types, model } from "mongoose";
 import { LikesInfoViewModel } from "../types/likes-info-view-model";
 
 export interface IComment extends Document {
@@ -9,7 +9,7 @@ export interface IComment extends Document {
     userLogin: string;
   };
   createdAt: string;
-  likesInfo?: LikesInfoViewModel;
+  likesInfo: LikesInfoViewModel;
 }
 
 const CommentSchema = new Schema<IComment>({
@@ -27,5 +27,9 @@ const CommentSchema = new Schema<IComment>({
   },
 });
 
-export const CommentModel = mongoose.model<IComment>("Comment", CommentSchema);
+export const CommentModel = model<IComment>(
+  "Comment",
+  CommentSchema,
+  "comments",
+);
 export type LeanComment = IComment & { _id: Types.ObjectId };

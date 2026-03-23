@@ -28,7 +28,6 @@ export const accessTokenGuard = (
     return res.sendStatus(HttpStatus.Unauthorized);
   }
 
-  //@ts-ignore
   req.userData = { userId: verifiedData.userId }; // Сохраняем данные пользователя в объекте запроса
   next();
 };

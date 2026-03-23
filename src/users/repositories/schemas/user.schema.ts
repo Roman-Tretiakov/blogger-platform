@@ -32,5 +32,5 @@ const UserSchema: Schema = new Schema<IUser>({
   },
 });
 
-export const UserModel = mongoose.model<IUser>("User", UserSchema);
+export const UserModel = mongoose.model<IUser>("User", UserSchema, "users");
 export type LeanUser = IUser & { _id: Types.ObjectId };
