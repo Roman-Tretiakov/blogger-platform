@@ -3,31 +3,56 @@ import { ResultStatus } from "../../core/enums/result-statuses";
 import { mapToCommentViewModel } from "../mappers/map-to-comment-view-model";
 import { CommentListWithPagination } from "../routers/outputTypes/comment-list-with-pagination";
 import { CommentsQueryInput } from "../routers/inputTypes/comments-query-input";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { CommentModel, LeanComment } from "./schemas/comment.schema";
+import { CommentReactionQueryRepository } from "../../commentReaction/repositories/comment-reaction.query-repository";
+import { CommentWithStatus } from "./types/comment-with-status";
 
 @injectable()
 export class CommentsQueryRepository {
-  async getById(commentId: string): Promise<Result<LeanComment | null>> {
+  constructor(
+    @inject(CommentReactionQueryRepository)
+    private reactionsQueryRepository: CommentReactionQueryRepository,
+  ) {}
+  async getById(
+    commentId: string,
+    userId?: string,
+  ): Promise<Result<CommentWithStatus | null>> {
     const comment = await CommentModel.findById(commentId).lean<LeanComment>();
+    if (!comment) {
+      return {
+        status: ResultStatus.Failure,
+        errorMessage: "Comment not found",
+        extensions: [
+          {
+            field: "commentId",
+            message: "Comment not found by this id",
+          },
+        ],
+        data: null,
+      };
+    }
+
+    const myStatus = await this.reactionsQueryRepository.getUserStatus(
+      commentId,
+      userId,
+    );
+
     return {
-      status: comment ? ResultStatus.Success : ResultStatus.NotFound,
-      errorMessage: comment ? "" : "Comment not found by this id",
-      extensions: comment
-        ? []
-        : [
-            {
-              field: "commentId",
-              message: "Comment not found by this id",
-            },
-          ],
-      data: comment ? comment : null,
+      status: ResultStatus.Success,
+      errorMessage: "",
+      extensions: [],
+      data: {
+        comment,
+        myStatus,
+      },
     };
   }
 
   async getCommentsByPost(
     postId: string,
     queryInput: CommentsQueryInput,
+    userId?: string,
   ): Promise<Result<CommentListWithPagination | null>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = queryInput;
     const skip: number = (pageNumber - 1) * pageSize;
@@ -39,15 +64,28 @@ export class CommentsQueryRepository {
       .sort({ [sortBy]: sortDirection })
       .skip(skip)
       .limit(pageSize)
-      .lean();
+      .lean<LeanComment[]>();
+
     const totalCount = await CommentModel.countDocuments(filter);
 
+    // Для каждого комментария получаем myStatus текущего пользователя
+    // Promise.all — запускаем все запросы параллельно, не последовательно
+    const itemsWithStatuses = await Promise.all(
+      items.map(async (comment) => {
+        const myStatus = await this.reactionsQueryRepository.getUserStatus(
+          comment._id.toString(),
+          userId ?? undefined,
+        );
+        return mapToCommentViewModel(comment, myStatus);
+      }),
+    );
+
     const commentList = {
-      page: queryInput.pageNumber,
-      pageSize: queryInput.pageSize,
+      page: pageNumber,
+      pageSize: pageSize,
       pagesCount: Math.ceil(totalCount / queryInput.pageSize),
       totalCount: totalCount,
-      items: items.map(mapToCommentViewModel),
+      items: itemsWithStatuses,
     };
 
     return {

@@ -32,12 +32,9 @@ export class CommentsRepository {
     };
   }
 
-  async update(
-    commentId: string,
-    inputModel: CommentInputModel,
-  ): Promise<Result> {
+  async update(commentId: string, content: CommentInputModel): Promise<Result> {
     const result = await CommentModel.findByIdAndUpdate(commentId, {
-      $set: inputModel,
+      $set: content,
     }).lean<LeanComment>();
     return {
       status: !result ? ResultStatus.NotFound : ResultStatus.Success,
@@ -45,6 +42,23 @@ export class CommentsRepository {
       extensions: [],
       data: null,
     };
+  }
+
+  // Атомарное изменение счётчиков
+  async updateLikesCount(
+    commentId: string,
+    likesIncrement: number, // +1, -1 или 0
+    dislikesIncrement: number,
+  ): Promise<void> {
+    await CommentModel.updateOne(
+      { _id: commentId },
+      {
+        $inc: {
+          "likesInfo.likesCount": likesIncrement,
+          "likesInfo.dislikesCount": dislikesIncrement,
+        },
+      },
+    );
   }
 
   async clear(): Promise<void> {

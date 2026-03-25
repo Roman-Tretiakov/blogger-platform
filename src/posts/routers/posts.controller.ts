@@ -62,15 +62,18 @@ export class PostsController {
 
     const commentResult = await this.commentsQueryRepository.getById(
       postResult.data!,
+      userId,
     );
     if (commentResult.status !== ResultStatus.Success) {
-      res.status(HttpStatus.NotFound).send(postResult.errorMessage);
+      res.status(HttpStatus.NotFound).send(commentResult.errorMessage);
       return;
     }
 
+    const { comment, myStatus } = commentResult.data!;
+
     res
       .status(HttpStatus.Created)
-      .send(mapToCommentViewModel(commentResult.data!));
+      .send(mapToCommentViewModel(comment, myStatus));
   }
 
   async createPost(
@@ -141,6 +144,7 @@ export class PostsController {
     const result = await this.commentsQueryRepository.getCommentsByPost(
       postId,
       queryInput,
+      req.userData?.userId,
     );
     res.status(resultStatusToHttpStatusMapper(result.status)).send(result.data);
   }

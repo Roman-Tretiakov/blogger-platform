@@ -27,6 +27,8 @@ import { TestingController } from "./testing/routers/testing.controller";
 import { JwtService } from "./auth/adapters/jwt.service";
 import { RateLimiter } from "./core/coreClasses/rateLimiter";
 import { emailServiceToken } from "./auth/adapters/emailSendler/email-service.token";
+import { CommentReactionRepository } from "./commentReaction/repositories/comment-reaction.repository";
+import { CommentReactionQueryRepository } from "./commentReaction/repositories/comment-reaction.query-repository";
 
 export const iocContainer = new Container();
 
@@ -76,6 +78,16 @@ iocContainer
   .inSingletonScope();
 iocContainer.bind(CommentsService).to(CommentsService).inSingletonScope();
 iocContainer.bind(CommentsController).to(CommentsController).inSingletonScope();
+
+iocContainer
+  .bind(CommentReactionRepository)
+  .to(CommentReactionRepository)
+  .inSingletonScope();
+
+iocContainer
+  .bind(CommentReactionQueryRepository)
+  .to(CommentReactionQueryRepository)
+  .inSingletonScope();
 
 iocContainer.bind(PostsRepository).to(PostsRepository).inSingletonScope();
 iocContainer

@@ -1,5 +1,4 @@
 import { Schema, Document, Types, model } from "mongoose";
-import { LikesInfoViewModel } from "../types/likes-info-view-model";
 
 export interface IComment extends Document {
   content: string;
@@ -9,7 +8,10 @@ export interface IComment extends Document {
     userLogin: string;
   };
   createdAt: string;
-  likesInfo: LikesInfoViewModel;
+  likesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+  };
 }
 
 const CommentSchema = new Schema<IComment>({
@@ -23,11 +25,6 @@ const CommentSchema = new Schema<IComment>({
   likesInfo: {
     likesCount: { type: Number, default: 0 },
     dislikesCount: { type: Number, default: 0 },
-    myStatus: {
-      type: String,
-      enum: ["None", "Like", "Dislike"],
-      default: "None",
-    },
   },
 });
 

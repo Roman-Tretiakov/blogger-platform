@@ -7,10 +7,16 @@ import { CommentsQueryRepository } from "../repositories/comments.query-reposito
 import { CommentInputModel } from "../routers/inputTypes/comment-input-model";
 import { inject, injectable } from "inversify";
 import { LikesStatus } from "../enums/like-status";
+import { CommentReactionQueryRepository } from "../../commentReaction/repositories/comment-reaction.query-repository";
+import { CommentReactionRepository } from "../../commentReaction/repositories/comment-reaction.repository";
 
 @injectable()
 export class CommentsService {
   constructor(
+    @inject(CommentReactionQueryRepository)
+    private commentReactionQueryRepository: CommentReactionQueryRepository,
+    @inject(CommentReactionRepository)
+    private commentReactionRepository: CommentReactionRepository,
     @inject(CommentsRepository)
     private commentsRepository: CommentsRepository,
     @inject(CommentsQueryRepository)
@@ -54,91 +60,124 @@ export class CommentsService {
     userId: string,
     content: CommentInputModel,
   ): Promise<Result> {
-    let resultStatus: ResultStatus;
-    let errMessage: string | null = null;
+    const result = await this.commentsQueryRepository.getById(
+      commentId,
+      userId,
+    );
 
-    const comment = await this.commentsQueryRepository.getById(commentId);
-    if (comment.status === ResultStatus.Success) {
-      if (comment.data!.commentatorInfo.userId === userId) {
-        const updateResult = await this.commentsRepository.update(
-          commentId,
-          content,
-        );
-        resultStatus = updateResult.status;
-      } else {
-        resultStatus = ResultStatus.Forbidden;
-        errMessage = "Try to update the comment that is not your own";
-      }
-    } else resultStatus = ResultStatus.NotFound;
+    if (result.status !== ResultStatus.Success) {
+      return {
+        status: ResultStatus.NotFound,
+        errorMessage: result.errorMessage,
+        extensions: [],
+        data: null,
+      };
+    }
 
-    return {
-      status: resultStatus,
-      errorMessage: errMessage ?? comment.errorMessage,
-      extensions: [],
-      data: null,
-    };
+    const { comment } = result.data!;
+
+    if (comment.commentatorInfo.userId !== userId) {
+      return {
+        status: ResultStatus.Forbidden,
+        errorMessage: "Try to update the comment that is not your own",
+        extensions: [],
+        data: null,
+      };
+    }
+
+    return await this.commentsRepository.update(commentId, content);
   }
 
   async deleteCommentById(commentId: string, userId: string): Promise<Result> {
-    let resultStatus: ResultStatus;
-    let errMessage: string | null = null;
+    const result = await this.commentsQueryRepository.getById(
+      commentId,
+      userId,
+    );
 
-    const comment = await this.commentsQueryRepository.getById(commentId);
-    if (comment.status === ResultStatus.Success) {
-      if (comment.data!.commentatorInfo.userId === userId) {
-        const deleteResult = await this.commentsRepository.delete(commentId);
-        resultStatus = deleteResult.status;
-      } else {
-        resultStatus = ResultStatus.Forbidden;
-        errMessage = "Try to delete the comment that is not your own";
-      }
-    } else resultStatus = ResultStatus.NotFound;
+    if (result.status !== ResultStatus.Success) {
+      return {
+        status: ResultStatus.NotFound,
+        errorMessage: result.errorMessage,
+        extensions: [],
+        data: null,
+      };
+    }
 
-    return {
-      status: resultStatus,
-      errorMessage: errMessage ?? comment.errorMessage,
-      extensions: [],
-      data: null,
-    };
+    const { comment } = result.data!;
+
+    if (comment.commentatorInfo.userId !== userId) {
+      return {
+        status: ResultStatus.Forbidden,
+        errorMessage: "Try to delete the comment that is not your own",
+        extensions: [],
+        data: null,
+      };
+    }
+
+    return await this.commentsRepository.delete(commentId);
   }
 
   async updateCommentByStatus(
     commentId: string,
     userId: string,
-    status: LikesStatus,
+    newStatus: LikesStatus,
   ): Promise<Result> {
-    const result = await this.commentsQueryRepository.getById(commentId);
-    if (result.status === ResultStatus.Success) {
-      const existedComment = result.data!;
-
-      switch (status) {
-        case LikesStatus.None:
-          if (existedComment.commentatorInfo.userId === userId)
-            existedComment.likesInfo.myStatus === LikesStatus.Like
-              ? existedComment.likesInfo.likesCount > 0
-                ? existedComment.likesInfo.likesCount--
-                : 0
-              : existedComment.likesInfo.dislikesCount > 0
-                ? existedComment.likesInfo.dislikesCount--
-                : 0;
-          break;
-        case LikesStatus.Like:
-          if (existedComment.likesInfo.myStatus !== LikesStatus.Like)
-            existedComment.likesInfo.likesCount++;
-          break;
-        case LikesStatus.Dislike:
-          if (existedComment.likesInfo.myStatus !== LikesStatus.Dislike)
-            existedComment.likesInfo.dislikesCount++;
-          break;
-      }
-
-      existedComment.likesInfo.myStatus = status;
-      await this.commentsRepository.update(commentId, existedComment);
+    // 1. Проверяем, существует ли комментарий
+    const comment = await this.commentsQueryRepository.getById(
+      commentId,
+      userId,
+    );
+    if (comment.status !== ResultStatus.Success) {
+      return {
+        status: ResultStatus.NotFound,
+        errorMessage: "Comment not found",
+        extensions: [],
+        data: null,
+      };
     }
+
+    // 2. Смотрим текущую реакцию пользователя
+    const existingReaction =
+      await this.commentReactionQueryRepository.findReaction(commentId, userId);
+
+    const currentStatus = existingReaction?.status ?? LikesStatus.None;
+    // 3. Если статус не изменился — ничего не делаем
+    if (currentStatus === newStatus) {
+      return {
+        status: ResultStatus.Success,
+        errorMessage: "",
+        extensions: [],
+        data: null,
+      };
+    }
+
+    // 4. Вычисляем дельты счётчиков
+    let likesIncrement = 0;
+    let dislikesIncrement = 0;
+
+    // Сначала "отменяем" старую реакцию
+    if (currentStatus === LikesStatus.Like) likesIncrement--;
+    if (currentStatus === LikesStatus.Dislike) dislikesIncrement--;
+
+    // Затем "применяем" новую реакцию
+    if (newStatus === LikesStatus.Like) likesIncrement++;
+    if (newStatus === LikesStatus.Dislike) dislikesIncrement++;
+
+    // 6. Сохраняем или удаляем реакцию пользователя
+    if (newStatus === LikesStatus.None) {
+      await this.commentReactionRepository.deleteReaction(commentId, userId);
+    } else {
+      await this.commentReactionRepository.upsertReaction(
+        commentId,
+        userId,
+        newStatus,
+      );
+    }
+
     return {
-      status: result.status,
-      errorMessage: result.errorMessage,
-      extensions: result.extensions,
+      status: ResultStatus.Success,
+      errorMessage: "",
+      extensions: [],
       data: null,
     };
   }

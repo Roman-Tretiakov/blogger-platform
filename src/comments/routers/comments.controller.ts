@@ -56,9 +56,10 @@ export class CommentsController {
       return;
     }
 
+    const { comment, myStatus } = result.data!;
     res
       .status(resultStatusToHttpStatusMapper(result.status))
-      .send(mapToCommentViewModel(result.data!));
+      .send(mapToCommentViewModel(comment, myStatus));
   }
 
   async update(
