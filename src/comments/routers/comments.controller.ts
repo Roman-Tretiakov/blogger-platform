@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { CommentsService } from "../BLL/comments.service";
 import { CommentsQueryRepository } from "../repositories/comments.query-repository";
 import {
@@ -44,10 +44,7 @@ export class CommentsController {
     res.status(HttpStatus.NoContent).send();
   }
 
-  async get(
-    req: RequestWithParams<{ id: string }>,
-    res: Response,
-  ): Promise<void> {
+  async get(req: Request, res: Response): Promise<void> {
     const commentId = req.params.id;
     const result = await this.commentsQueryRepository.getById(
       commentId,
