@@ -174,6 +174,12 @@ export class CommentsService {
       );
     }
 
+    await this.commentsRepository.updateLikesCount(
+      commentId,
+      likesIncrement,
+      dislikesIncrement,
+    );
+
     return {
       status: ResultStatus.Success,
       errorMessage: "",

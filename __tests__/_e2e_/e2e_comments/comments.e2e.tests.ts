@@ -10,6 +10,7 @@ import { PostsRepository } from "../../../src/posts/repositories/posts.repositor
 import { BlogsRepository } from "../../../src/blogs/repositories/blogs.repository";
 import { iocContainer } from "../../../src/composition-root";
 import { CommentModel } from "../../../src/comments/repositories/schemas/comment.schema";
+import { CommentReactionRepository } from "../../../src/commentReaction/repositories/comment-reaction.repository";
 
 let app: any;
 let testUserLogin = "testuser";
@@ -25,6 +26,10 @@ const usersService = iocContainer.resolve(UsersService);
 const commentsRepository = iocContainer.resolve(CommentsRepository);
 const postsRepository = iocContainer.resolve(PostsRepository);
 const blogsRepository = iocContainer.resolve(BlogsRepository);
+// Репозиторий для очистки реакций между тестами
+const commentReactionRepository = iocContainer.resolve(
+  CommentReactionRepository,
+);
 
 beforeAll(async () => {
   await runDB(
@@ -33,14 +38,12 @@ beforeAll(async () => {
   app = express();
   setupApp(app);
 
-  // Создаем тестового пользователя
   testUserId = await usersService.create({
     login: testUserLogin,
     email: testUserEmail,
     password: testUserPassword,
   });
 
-  // получаем токен для тестового пользователя
   const response = await request(app)
     .post(EndpointList.AUTH_PATH + EndpointList.LOGIN_PATH)
     .send({
@@ -51,12 +54,12 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  // Очищаем коллекцию пользователей
   await commentsRepository.clear();
   await postsRepository.clear();
   await blogsRepository.clear();
+  // Реакции живут отдельно от комментариев — чистим независимо
+  await commentReactionRepository.clear();
 
-  // Создаем тестовый блог
   testBlogId = await blogsRepository.create({
     name: "Test Blog",
     description: "Test Blog Description",
@@ -65,7 +68,6 @@ beforeEach(async () => {
     isMembership: false,
   });
 
-  // Создаем тестовый пост
   testPostId = await postsRepository.create({
     title: "Test Post",
     shortDescription: "Test Post Description",
@@ -75,7 +77,6 @@ beforeEach(async () => {
     createdAt: new Date().toISOString(),
   });
 
-  // Создаем тестовый комментарий
   testCommentId = await commentsRepository
     .create({
       content: "Original test comment content with more than 20 characters",
@@ -94,10 +95,10 @@ afterAll(async () => {
     await closeDBConnection();
   } catch (error) {
     console.error("Error closing DB connection:", error);
-    // Можно не бросать ошибку дальше, чтобы не влиять на результат тестов
   }
 });
 
+// ========== PUT /api/comments/{commentId} ==========
 describe("PUT /api/comments/{commentId}", () => {
   const validUpdateData = {
     content: "Updated comment content with more than 20 characters for testing",
@@ -112,221 +113,424 @@ describe("PUT /api/comments/{commentId}", () => {
 
       expect(response.status).toBe(204);
     });
-
-    describe("Negative scenarios", () => {
-      test("Should return 401 without authorization", async () => {
-        const response = await request(app)
-          .put(`/api/comments/${testCommentId}`)
-          .send(validUpdateData);
-
-        expect(response.status).toBe(401);
-      });
-
-      test("Should return 403 when trying to update another user comment", async () => {
-        // Создаем другого пользователя
-        await usersService.create({
-          login: "new" + testUserLogin,
-          email: "new" + testUserEmail,
-          password: testUserPassword,
-        });
-
-        // получаем токен для тестового пользователя
-        const loginResponse = await request(app)
-          .post(EndpointList.AUTH_PATH + EndpointList.LOGIN_PATH)
-          .send({
-            loginOrEmail: "new" + testUserLogin,
-            password: "new" + testUserPassword,
-          });
-        const newAccessToken = loginResponse.body.accessToken;
-
-        const response = await request(app)
-          .put(`/api/comments/${testCommentId}`)
-          .set("Authorization", `Bearer ${newAccessToken}`)
-          .send(validUpdateData);
-
-        expect(response.status).toBe(403);
-      });
-
-      test("Should return 400 for invalid content length (less than 20)", async () => {
-        const response = await request(app)
-          .put(`/api/comments/${testCommentId}`)
-          .set("Authorization", `Bearer ${accessToken}`)
-          .send({
-            content: "Too short",
-          });
-
-        expect(response.status).toBe(400);
-        expect(response.body.errorsMessages).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              field: "content",
-              message: expect.stringContaining("20"),
-            }),
-          ]),
-        );
-      });
-
-      test("Should return 400 for invalid content length (more than 300)", async () => {
-        const longContent = "a".repeat(301);
-
-        const response = await request(app)
-          .put(`/api/comments/${testCommentId}`)
-          .set("Authorization", `Bearer ${accessToken}`)
-          .send({
-            content: longContent,
-          });
-
-        expect(response.status).toBe(400);
-        expect(response.body.errorsMessages).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              field: "content",
-              message: expect.stringContaining("300"),
-            }),
-          ]),
-        );
-      });
-
-      test("Should return 400 for missing content field", async () => {
-        const response = await request(app)
-          .put(`/api/comments/${testCommentId}`)
-          .set("Authorization", `Bearer ${accessToken}`)
-          .send({});
-
-        expect(response.status).toBe(400);
-      });
-
-      test("Should return 404 for non-existent comment", async () => {
-        const nonExistentId = new ObjectId().toString();
-
-        const response = await request(app)
-          .put(`/api/comments/${nonExistentId}`)
-          .set("Authorization", `Bearer ${accessToken}`)
-          .send(validUpdateData);
-
-        expect(response.status).toBe(404);
-      });
-
-      test("Should return 400 for invalid commentId format", async () => {
-        const response = await request(app)
-          .put("/api/comments/invalid-id-format")
-          .set("Authorization", `Bearer ${accessToken}`)
-          .send(validUpdateData);
-
-        expect(response.status).toBe(400);
-      });
-    });
   });
 
-  describe("DELETE /api/comments/{commentId}", () => {
-    describe("Positive scenarios", () => {
-      test("Should delete own comment", async () => {
-        const response = await request(app)
-          .delete(`/api/comments/${testCommentId}`)
-          .set("Authorization", `Bearer ${accessToken}`);
+  describe("Negative scenarios", () => {
+    test("Should return 401 without authorization", async () => {
+      const response = await request(app)
+        .put(`/api/comments/${testCommentId}`)
+        .send(validUpdateData);
 
-        expect(response.status).toBe(204);
-      });
+      expect(response.status).toBe(401);
     });
 
-    describe("Negative scenarios", () => {
-      test("Should return 401 without authorization", async () => {
-        const response = await request(app).delete(
-          `/api/comments/${testCommentId}`,
-        );
-
-        expect(response.status).toBe(401);
+    test("Should return 403 when trying to update another user comment", async () => {
+      await usersService.create({
+        login: "new" + testUserLogin,
+        email: "new" + testUserEmail,
+        password: testUserPassword,
       });
 
-      test("Should return 403 when trying to delete another user comment", async () => {
-        // Создаем другого пользователя
-        await usersService.create({
-          login: "new" + testUserLogin,
-          email: "new" + testUserEmail,
+      const loginResponse = await request(app)
+        .post(EndpointList.AUTH_PATH + EndpointList.LOGIN_PATH)
+        .send({
+          loginOrEmail: "new" + testUserLogin,
           password: testUserPassword,
         });
+      const newAccessToken = loginResponse.body.accessToken;
 
-        // получаем токен для тестового пользователя
-        const loginResponse = await request(app)
-          .post(EndpointList.AUTH_PATH + EndpointList.LOGIN_PATH)
-          .send({
-            loginOrEmail: "new" + testUserLogin,
-            password: "new" + testUserPassword,
-          });
-        const newAccessToken = loginResponse.body.accessToken;
+      const response = await request(app)
+        .put(`/api/comments/${testCommentId}`)
+        .set("Authorization", `Bearer ${newAccessToken}`)
+        .send(validUpdateData);
 
-        const response = await request(app)
-          .delete(`/api/comments/${testCommentId}`)
-          .set("Authorization", `Bearer ${newAccessToken}`);
-
-        expect(response.status).toBe(403);
-      });
-
-      test("Should return 404 for non-existent comment", async () => {
-        const nonExistentId = new ObjectId().toString();
-
-        const response = await request(app)
-          .delete(`/api/comments/${nonExistentId}`)
-          .set("Authorization", `Bearer ${accessToken}`);
-
-        expect(response.status).toBe(404);
-      });
-
-      test("Should return 400 for invalid commentId format", async () => {
-        const response = await request(app)
-          .delete("/api/comments/invalid-id-format")
-          .set("Authorization", `Bearer ${accessToken}`);
-
-        expect(response.status).toBe(400);
-      });
-    });
-  });
-
-  describe("GET /api/comments/{id}", () => {
-    describe("Positive scenarios", () => {
-      test("Should return comment by id without authorization", async () => {
-        const response = await request(app).get(
-          `/api/comments/${testCommentId}`,
-        );
-
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual({
-          id: testCommentId,
-          content: expect.any(String),
-          commentatorInfo: {
-            userId: testUserId,
-            userLogin: testUserLogin,
-          },
-          createdAt: expect.any(String),
-        });
-      });
+      expect(response.status).toBe(403);
     });
 
-    describe("Negative scenarios", () => {
-      test("Should return 404 for non-existent comment", async () => {
-        const nonExistentId = new ObjectId().toString();
+    test("Should return 400 for invalid content length (less than 20)", async () => {
+      const response = await request(app)
+        .put(`/api/comments/${testCommentId}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ content: "Too short" });
 
-        const response = await request(app).get(
-          `/api/comments/${nonExistentId}`,
-        );
+      expect(response.status).toBe(400);
+      expect(response.body.errorsMessages).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            field: "content",
+            message: expect.stringContaining(
+              "Content must be within acceptable values",
+            ),
+          }),
+        ]),
+      );
+    });
 
-        expect(response.status).toBe(404);
-      });
+    test("Should return 400 for invalid content length (more than 300)", async () => {
+      const response = await request(app)
+        .put(`/api/comments/${testCommentId}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ content: "a".repeat(301) });
 
-      test("Should return 400 for invalid commentId format", async () => {
-        const response = await request(app).get(
-          "/api/comments/invalid-id-format",
-        );
-        expect(response.status).toBe(400);
-      });
+      expect(response.status).toBe(400);
+    });
+
+    test("Should return 400 for missing content field", async () => {
+      const response = await request(app)
+        .put(`/api/comments/${testCommentId}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({});
+
+      expect(response.status).toBe(400);
+    });
+
+    test("Should return 404 for non-existent comment", async () => {
+      const response = await request(app)
+        .put(`/api/comments/${new ObjectId().toString()}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send(validUpdateData);
+
+      expect(response.status).toBe(404);
+    });
+
+    test("Should return 400 for invalid commentId format", async () => {
+      const response = await request(app)
+        .put("/api/comments/invalid-id-format")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send(validUpdateData);
+
+      expect(response.status).toBe(400);
     });
   });
 });
 
-// ========== POSTS COMMENTS TESTS ==========
+// ========== DELETE /api/comments/{commentId} ==========
+describe("DELETE /api/comments/{commentId}", () => {
+  describe("Positive scenarios", () => {
+    test("Should delete own comment", async () => {
+      const response = await request(app)
+        .delete(`/api/comments/${testCommentId}`)
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(response.status).toBe(204);
+    });
+  });
+
+  describe("Negative scenarios", () => {
+    test("Should return 401 without authorization", async () => {
+      const response = await request(app).delete(
+        `/api/comments/${testCommentId}`,
+      );
+      expect(response.status).toBe(401);
+    });
+
+    test("Should return 403 when trying to delete another user comment", async () => {
+      await usersService.create({
+        login: "newone" + testUserLogin,
+        email: "newone" + testUserEmail,
+        password: testUserPassword,
+      });
+
+      const loginResponse = await request(app)
+        .post(EndpointList.AUTH_PATH + EndpointList.LOGIN_PATH)
+        .send({
+          loginOrEmail: "newone" + testUserLogin,
+          password: testUserPassword,
+        });
+
+      const response = await request(app)
+        .delete(`/api/comments/${testCommentId}`)
+        .set("Authorization", `Bearer ${loginResponse.body.accessToken}`);
+
+      expect(response.status).toBe(403);
+    });
+
+    test("Should return 404 for non-existent comment", async () => {
+      const response = await request(app)
+        .delete(`/api/comments/${new ObjectId().toString()}`)
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(response.status).toBe(404);
+    });
+
+    test("Should return 400 for invalid commentId format", async () => {
+      const response = await request(app)
+        .delete("/api/comments/invalid-id-format")
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(response.status).toBe(400);
+    });
+  });
+});
+
+// ========== GET /api/comments/{id} ==========
+describe("GET /api/comments/{id}", () => {
+  describe("Positive scenarios", () => {
+    // Гость (неавторизованный) получает myStatus = None
+    test("Should return comment with likesInfo for anonymous user", async () => {
+      const response = await request(app).get(`/api/comments/${testCommentId}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        id: testCommentId,
+        content: expect.any(String),
+        commentatorInfo: {
+          userId: testUserId,
+          userLogin: testUserLogin,
+        },
+        createdAt: expect.any(String),
+        // likesInfo обязателен согласно swagger
+        likesInfo: {
+          likesCount: 0,
+          dislikesCount: 0,
+          myStatus: "None",
+        },
+      });
+    });
+
+    // Авторизованный пользователь получает свой статус реакции
+    test("Should return myStatus=Like after user liked the comment", async () => {
+      // Ставим лайк
+      await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "Like" });
+
+      const response = await request(app)
+        .get(`/api/comments/${testCommentId}`)
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.likesInfo).toEqual({
+        likesCount: 1,
+        dislikesCount: 0,
+        myStatus: "Like",
+      });
+    });
+  });
+
+  describe("Negative scenarios", () => {
+    test("Should return 404 for non-existent comment", async () => {
+      const response = await request(app).get(
+        `/api/comments/${new ObjectId().toString()}`,
+      );
+      expect(response.status).toBe(404);
+    });
+
+    test("Should return 400 for invalid commentId format", async () => {
+      const response = await request(app).get(
+        "/api/comments/invalid-id-format",
+      );
+      expect(response.status).toBe(400);
+    });
+  });
+});
+
+// ========== PUT /api/comments/{commentId}/like-status ==========
+describe("PUT /api/comments/{commentId}/like-status", () => {
+  // Каждый тест стартует с чистыми реакциями (см. beforeEach выше)
+
+  describe("Positive scenarios", () => {
+    test("Should set Like status and increment likesCount", async () => {
+      const response = await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "Like" });
+
+      expect(response.status).toBe(204);
+
+      // Проверяем счётчик через GET
+      const comment = await request(app).get(`/api/comments/${testCommentId}`);
+      expect(comment.body.likesInfo.likesCount).toBe(1);
+      expect(comment.body.likesInfo.dislikesCount).toBe(0);
+    });
+
+    test("Should set Dislike status and increment dislikesCount", async () => {
+      const response = await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "Dislike" });
+
+      expect(response.status).toBe(204);
+
+      const comment = await request(app).get(`/api/comments/${testCommentId}`);
+      expect(comment.body.likesInfo.likesCount).toBe(0);
+      expect(comment.body.likesInfo.dislikesCount).toBe(1);
+    });
+
+    test("Should set None status (unlike) and reset count back to 0", async () => {
+      // Сначала ставим лайк
+      await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "Like" });
+
+      // Затем убираем его через None
+      const response = await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "None" });
+
+      expect(response.status).toBe(204);
+
+      const comment = await request(app).get(`/api/comments/${testCommentId}`);
+      expect(comment.body.likesInfo.likesCount).toBe(0);
+      expect(comment.body.likesInfo.myStatus).toBe("None");
+    });
+
+    test("Should switch from Like to Dislike correctly (counts update atomically)", async () => {
+      // Like
+      await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "Like" });
+
+      // Switch to Dislike
+      await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "Dislike" });
+
+      const comment = await request(app).get(`/api/comments/${testCommentId}`);
+      // likes должен вернуться в 0, dislikes стать 1
+      expect(comment.body.likesInfo.likesCount).toBe(0);
+      expect(comment.body.likesInfo.dislikesCount).toBe(1);
+    });
+
+    test("Sending same status twice should be idempotent (no double-counting)", async () => {
+      await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "Like" });
+
+      await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "Like" });
+
+      const comment = await request(app).get(`/api/comments/${testCommentId}`);
+      // Второй лайк от того же юзера не должен увеличить счётчик
+      expect(comment.body.likesInfo.likesCount).toBe(1);
+    });
+
+    test("Two different users liking the same comment — both counted", async () => {
+      // Создаём второго пользователя
+      const secondUserId = await usersService.create({
+        login: "second",
+        email: "second@example.com",
+        password: "password123",
+      });
+      const {
+        body: { accessToken: secondToken },
+      } = await request(app)
+        .post(EndpointList.AUTH_PATH + EndpointList.LOGIN_PATH)
+        .send({ loginOrEmail: "second", password: "password123" });
+
+      await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "Like" });
+
+      await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${secondToken}`)
+        .send({ likeStatus: "Like" });
+
+      const comment = await request(app).get(`/api/comments/${testCommentId}`);
+      expect(comment.body.likesInfo.likesCount).toBe(2);
+    });
+
+    test("myStatus should differ per user (user1=Like, user2=Dislike)", async () => {
+      const secondUserId = await usersService.create({
+        login: "secondone",
+        email: "secondone@example.com",
+        password: "password123",
+      });
+      const {
+        body: { accessToken: secondToken },
+      } = await request(app)
+        .post(EndpointList.AUTH_PATH + EndpointList.LOGIN_PATH)
+        .send({ loginOrEmail: "secondone", password: "password123" });
+
+      await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "Like" });
+
+      await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${secondToken}`)
+        .send({ likeStatus: "Dislike" });
+
+      // Проверяем myStatus для каждого пользователя отдельно
+      const forUser1 = await request(app)
+        .get(`/api/comments/${testCommentId}`)
+        .set("Authorization", `Bearer ${accessToken}`);
+      expect(forUser1.body.likesInfo.myStatus).toBe("Like");
+
+      const forUser2 = await request(app)
+        .get(`/api/comments/${testCommentId}`)
+        .set("Authorization", `Bearer ${secondToken}`);
+      expect(forUser2.body.likesInfo.myStatus).toBe("Dislike");
+    });
+  });
+
+  describe("Negative scenarios", () => {
+    test("Should return 401 without authorization", async () => {
+      const response = await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .send({ likeStatus: "Like" });
+
+      expect(response.status).toBe(401);
+    });
+
+    test("Should return 404 for non-existent comment", async () => {
+      const response = await request(app)
+        .put(`/api/comments/${new ObjectId().toString()}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "Like" });
+
+      expect(response.status).toBe(404);
+    });
+
+    test("Should return 400 for invalid commentId format", async () => {
+      const response = await request(app)
+        .put("/api/comments/invalid-id/like-status")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "Like" });
+
+      expect(response.status).toBe(400);
+    });
+
+    test("Should return 400 for invalid likeStatus value", async () => {
+      const response = await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        // Значение не из enum None | Like | Dislike
+        .send({ likeStatus: "InvalidStatus" });
+
+      expect(response.status).toBe(400);
+      expect(response.body.errorsMessages).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ field: "likeStatus" }),
+        ]),
+      );
+    });
+
+    test("Should return 400 when likeStatus field is missing", async () => {
+      const response = await request(app)
+        .put(`/api/comments/${testCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({});
+
+      expect(response.status).toBe(400);
+    });
+  });
+});
+
+// ========== GET /api/posts/{postId}/comments ==========
 describe("GET /api/posts/{postId}/comments", () => {
   beforeEach(async () => {
-    // Создаем несколько комментариев для теста пагинации
     for (let i = 1; i <= 15; i++) {
       await commentsRepository.create({
         content: `Test comment ${i} with enough characters for validation`,
@@ -335,13 +539,13 @@ describe("GET /api/posts/{postId}/comments", () => {
           userLogin: testUserLogin,
         },
         postId: testPostId,
-        createdAt: new Date(Date.now() - i * 1000).toISOString(), // Разное время для сортировки
+        createdAt: new Date(Date.now() - i * 1000).toISOString(),
       });
     }
   });
 
   describe("Positive scenarios", () => {
-    test("Should return comments with default pagination", async () => {
+    test("Should return comments with default pagination and likesInfo", async () => {
       const response = await request(app).get(
         `/api/posts/${testPostId}/comments`,
       );
@@ -351,7 +555,17 @@ describe("GET /api/posts/{postId}/comments", () => {
       expect(response.body).toHaveProperty("page", 1);
       expect(response.body).toHaveProperty("pageSize", 10);
       expect(response.body).toHaveProperty("totalCount");
-      expect(response.body.items).toHaveLength(10); // pageSize по умолчанию
+      expect(response.body.items).toHaveLength(10);
+
+      // Каждый комментарий должен содержать likesInfo
+      response.body.items.forEach((item: any) => {
+        expect(item).toHaveProperty("likesInfo");
+        expect(item.likesInfo).toMatchObject({
+          likesCount: expect.any(Number),
+          dislikesCount: expect.any(Number),
+          myStatus: "None", // анонимный запрос — всегда None
+        });
+      });
     });
 
     test("Should return page 2 with custom pageSize", async () => {
@@ -371,11 +585,10 @@ describe("GET /api/posts/{postId}/comments", () => {
       );
 
       const items = response.body.items;
-      // Проверяем сортировку по убыванию (новые первыми)
       for (let i = 0; i < items.length - 1; i++) {
-        const currentDate = new Date(items[i].createdAt).getTime();
-        const nextDate = new Date(items[i + 1].createdAt).getTime();
-        expect(currentDate).toBeGreaterThanOrEqual(nextDate);
+        expect(new Date(items[i].createdAt).getTime()).toBeGreaterThanOrEqual(
+          new Date(items[i + 1].createdAt).getTime(),
+        );
       }
     });
 
@@ -385,23 +598,43 @@ describe("GET /api/posts/{postId}/comments", () => {
         .query({ sortDirection: "asc" });
 
       const items = response.body.items;
-      // Проверяем сортировку по возрастанию (старые первыми)
       for (let i = 0; i < items.length - 1; i++) {
-        const currentDate = new Date(items[i].createdAt).getTime();
-        const nextDate = new Date(items[i + 1].createdAt).getTime();
-        expect(currentDate).toBeLessThanOrEqual(nextDate);
+        expect(new Date(items[i].createdAt).getTime()).toBeLessThanOrEqual(
+          new Date(items[i + 1].createdAt).getTime(),
+        );
       }
+    });
+
+    // myStatus в списке тоже должен отражать реакцию авторизованного пользователя
+    test("Should return myStatus=Like for authenticated user who liked a comment", async () => {
+      // Берём первый комментарий из списка
+      const listResponse = await request(app).get(
+        `/api/posts/${testPostId}/comments`,
+      );
+      const firstCommentId = listResponse.body.items[0].id;
+
+      await request(app)
+        .put(`/api/comments/${firstCommentId}/like-status`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ likeStatus: "Like" });
+
+      const response = await request(app)
+        .get(`/api/posts/${testPostId}/comments`)
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      const likedItem = response.body.items.find(
+        (item: any) => item.id === firstCommentId,
+      );
+      expect(likedItem.likesInfo.myStatus).toBe("Like");
+      expect(likedItem.likesInfo.likesCount).toBe(1);
     });
   });
 
   describe("Negative scenarios", () => {
     test("Should return 404 for non-existent post", async () => {
-      const nonExistentId = new ObjectId().toString();
-
       const response = await request(app).get(
-        `/api/posts/${nonExistentId}/comments`,
+        `/api/posts/${new ObjectId().toString()}/comments`,
       );
-
       expect(response.status).toBe(404);
     });
 
@@ -409,7 +642,6 @@ describe("GET /api/posts/{postId}/comments", () => {
       const response = await request(app).get(
         "/api/posts/invalid-id-format/comments",
       );
-
       expect(response.status).toBe(400);
     });
 
@@ -447,13 +679,14 @@ describe("GET /api/posts/{postId}/comments", () => {
   });
 });
 
+// ========== POST /api/posts/{postId}/comments ==========
 describe("POST /api/posts/{postId}/comments", () => {
   const validCommentData = {
     content: "New comment content with more than 20 characters for testing",
   };
 
   describe("Positive scenarios", () => {
-    test("Should create new comment for post with valid data", async () => {
+    test("Should create new comment and return it with likesInfo", async () => {
       const response = await request(app)
         .post(`/api/posts/${testPostId}/comments`)
         .set("Authorization", `Bearer ${accessToken}`)
@@ -468,9 +701,14 @@ describe("POST /api/posts/{postId}/comments", () => {
           userLogin: testUserLogin,
         },
         createdAt: expect.any(String),
+        // Новый комментарий — счётчики нулевые, статус None
+        likesInfo: {
+          likesCount: 0,
+          dislikesCount: 0,
+          myStatus: "None",
+        },
       });
 
-      // Проверяем, что комментарий создан в БД
       const createdComment = await CommentModel.findOne({
         content: validCommentData.content,
       });
@@ -489,36 +727,28 @@ describe("POST /api/posts/{postId}/comments", () => {
     });
 
     test("Should return 404 for non-existent post", async () => {
-      const nonExistentId = new ObjectId().toString();
-
       const response = await request(app)
-        .post(`/api/posts/${nonExistentId}/comments`)
+        .post(`/api/posts/${new ObjectId().toString()}/comments`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send(validCommentData);
 
       expect(response.status).toBe(404);
     });
 
-    test("Should return 400 for invalid content length (less than 20)", async () => {
+    test("Should return 400 for content shorter than 20 chars", async () => {
       const response = await request(app)
         .post(`/api/posts/${testPostId}/comments`)
         .set("Authorization", `Bearer ${accessToken}`)
-        .send({
-          content: "Too short",
-        });
+        .send({ content: "Too short" });
 
       expect(response.status).toBe(400);
     });
 
-    test("Should return 400 for invalid content length (more than 300)", async () => {
-      const longContent = "a".repeat(301);
-
+    test("Should return 400 for content longer than 300 chars", async () => {
       const response = await request(app)
         .post(`/api/posts/${testPostId}/comments`)
         .set("Authorization", `Bearer ${accessToken}`)
-        .send({
-          content: longContent,
-        });
+        .send({ content: "a".repeat(301) });
 
       expect(response.status).toBe(400);
     });

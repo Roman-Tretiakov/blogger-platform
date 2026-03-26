@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { RequestHandler, Router } from "express";
 import { superAdminGuard } from "../../auth/middlewares/guards/super-admin.guard";
 import { EndpointList } from "../../core/constants/endpoint-list";
 import { paramIdValidationMiddleware } from "../../core/middlewares/params-id-validation.middleware";
@@ -11,9 +11,12 @@ import { createCommentsBodyValidationMiddleware } from "../middlewares/create-co
 import { CommentsSortFields } from "../../comments/routers/inputTypes/comments-sort-fields";
 import { iocContainer } from "../../composition-root";
 import { PostsController } from "./posts.controller";
+import { accessTokenOptionGuard } from "../../auth/middlewares/guards/access-token.option-guard";
 
 const postsController = iocContainer.resolve(PostsController);
 export const postsRouter = Router({});
+
+postsRouter.use(EndpointList.COMMENTS_BY_POST_ID, accessTokenOptionGuard);
 
 postsRouter
   .post(
