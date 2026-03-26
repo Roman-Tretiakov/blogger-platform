@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { HttpStatus } from "../../../core/enums/http-status";
 import { JwtService } from "../../adapters/jwt.service";
 import { TokensTypes } from "../../adapters/enums/tokens-types";
 import { iocContainer } from "../../../composition-root";
 
-export const accessTokenGuard = (
+export const accessTokenGuard: RequestHandler = (
   req: Request,
   res: Response,
   next: NextFunction,
