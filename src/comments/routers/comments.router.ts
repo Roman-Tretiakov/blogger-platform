@@ -7,9 +7,12 @@ import { createCommentsBodyValidationMiddleware } from "../../posts/middlewares/
 import { iocContainer } from "../../composition-root";
 import { CommentsController } from "./comments.controller";
 import { reactionCommentsBodyValidationMiddleware } from "../middleware/reaction-comments-body-validation-middleware";
+import { accessTokenOptionGuard } from "../../auth/middlewares/guards/access-token.option-guard";
 
 const commentsController = iocContainer.resolve(CommentsController);
 export const commentsRouter = Router({});
+
+commentsRouter.use(EndpointList.BY_ID, accessTokenOptionGuard);
 
 commentsRouter
   .get(

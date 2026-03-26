@@ -11,6 +11,8 @@ import { BlogsRepository } from "../../../src/blogs/repositories/blogs.repositor
 import { iocContainer } from "../../../src/composition-root";
 import { CommentModel } from "../../../src/comments/repositories/schemas/comment.schema";
 import { CommentReactionRepository } from "../../../src/commentReaction/repositories/comment-reaction.repository";
+import { UsersRepository } from "../../../src/users/repositories/users.repository";
+import { AuthDevicesRepository } from "../../../src/securityDevices/repositories/authDevices.repository";
 
 let app: any;
 let testUserLogin = "testuser";
@@ -23,6 +25,7 @@ let testPostId: string;
 let testCommentId: string | null;
 
 const usersService = iocContainer.resolve(UsersService);
+const usersRepository = iocContainer.resolve(UsersRepository);
 const commentsRepository = iocContainer.resolve(CommentsRepository);
 const postsRepository = iocContainer.resolve(PostsRepository);
 const blogsRepository = iocContainer.resolve(BlogsRepository);
@@ -30,6 +33,7 @@ const blogsRepository = iocContainer.resolve(BlogsRepository);
 const commentReactionRepository = iocContainer.resolve(
   CommentReactionRepository,
 );
+const authDevicesRepository = iocContainer.resolve(AuthDevicesRepository);
 
 beforeAll(async () => {
   await runDB(
@@ -91,6 +95,14 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  await commentsRepository.clear();
+  await postsRepository.clear();
+  await blogsRepository.clear();
+  // Реакции живут отдельно от комментариев — чистим независимо
+  await commentReactionRepository.clear();
+  await usersRepository.clear();
+  await authDevicesRepository.clear();
+
   try {
     await closeDBConnection();
   } catch (error) {

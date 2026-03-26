@@ -21,7 +21,7 @@ export class CommentsQueryRepository {
     const comment = await CommentModel.findById(commentId).lean<LeanComment>();
     if (!comment) {
       return {
-        status: ResultStatus.Failure,
+        status: ResultStatus.NotFound,
         errorMessage: "Comment not found",
         extensions: [
           {

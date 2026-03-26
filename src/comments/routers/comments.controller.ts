@@ -49,7 +49,10 @@ export class CommentsController {
     res: Response,
   ): Promise<void> {
     const commentId = req.params.id;
-    const result = await this.commentsQueryRepository.getById(commentId);
+    const result = await this.commentsQueryRepository.getById(
+      commentId,
+      req.userData?.userId,
+    );
 
     if (result.status !== ResultStatus.Success) {
       res.status(resultStatusToHttpStatusMapper(result.status)).send();
