@@ -3,7 +3,7 @@ import express, { Express } from "express";
 import { setupApp } from "../../../src/setup-app";
 import { HttpStatus } from "../../../src/core/enums/http-status";
 import { EndpointList } from "../../../src/core/constants/endpoint-list";
-import { PostInputModel } from "../../../src/posts/BLL/dto/post-input-dto";
+import { PostInputModel } from "../../../src/posts/BLL/types/post-input-dto";
 //@ts-ignore
 import { getBasicAuthToken } from "../../utils/get-basic-auth-token";
 import { closeDBConnection, runDB } from "../../../src/db/mongo.db";

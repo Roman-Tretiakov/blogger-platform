@@ -1,0 +1,3 @@
+const postMethods = {};
+
+const postStaticMethods = {};

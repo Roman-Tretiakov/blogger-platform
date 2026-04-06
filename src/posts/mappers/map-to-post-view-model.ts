@@ -1,5 +1,5 @@
-import { PostViewModel } from "../BLL/dto/post-view-model-type";
-import { LeanPost } from "../repositories/schemas/post.schema";
+import { PostViewModel } from "../BLL/types/post-view-model-type";
+import { LeanPost } from "../../domain/posts/schema/post.schema";
 
 export function mapToPostViewModel(post: LeanPost): PostViewModel {
   return {

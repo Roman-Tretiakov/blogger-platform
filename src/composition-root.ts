@@ -32,10 +32,7 @@ import { CommentReactionQueryRepository } from "./commentReaction/repositories/c
 
 export const iocContainer = new Container();
 
-iocContainer
-  .bind<IEmailService>(emailServiceToken)
-  .to(NodemailerService)
-  .inSingletonScope();
+iocContainer.bind(emailServiceToken).to(NodemailerService).inSingletonScope();
 iocContainer.bind(JwtService).to(JwtService).inSingletonScope();
 iocContainer.bind(BcryptService).to(BcryptService).inSingletonScope();
 

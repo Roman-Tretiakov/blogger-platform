@@ -12,7 +12,10 @@ import { ResultStatus } from "../../core/enums/result-statuses";
 import { resultStatusToHttpStatusMapper } from "../../core/utils/result-code-to-http-status.mapper";
 import { CommentsQueryRepository } from "../../comments/repositories/comments.query-repository";
 import { HttpStatus } from "../../core/enums/http-status";
-import { BlogPostInputModel, PostInputModel } from "../BLL/dto/post-input-dto";
+import {
+  BlogPostInputModel,
+  PostInputModel,
+} from "../BLL/types/post-input-dto";
 import { errorsHandler } from "../../core/utils/errors-hundler";
 import { CommentsQueryInput } from "../../comments/routers/inputTypes/comments-query-input";
 import { matchedData } from "express-validator";

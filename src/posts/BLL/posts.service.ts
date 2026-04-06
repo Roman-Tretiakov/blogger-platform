@@ -1,4 +1,4 @@
-import { BlogPostInputModel, PostInputModel } from "./dto/post-input-dto";
+import { BlogPostInputModel, PostInputModel } from "./types/post-input-dto";
 import { PostsRepository } from "../repositories/posts.repository";
 import { mapToPostMongoModel } from "../mappers/map-to-post-mongo-model";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";

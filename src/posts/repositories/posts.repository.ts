@@ -1,9 +1,9 @@
-import { PostMongoModel } from "../BLL/dto/post-mongo-model";
-import { PostInputModel } from "../BLL/dto/post-input-dto";
+import { PostMongoModel } from "../BLL/types/post-mongo-model";
+import { PostInputModel } from "../BLL/types/post-input-dto";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { DomainError } from "../../core/errorClasses/DomainError";
 import { injectable } from "inversify";
-import { PostModel } from "./schemas/post.schema";
+import { PostModel } from "../../domain/posts/schema/post.schema";
 
 @injectable()
 export class PostsRepository {

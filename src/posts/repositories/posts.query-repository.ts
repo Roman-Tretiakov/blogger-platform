@@ -1,11 +1,11 @@
 import { PostQueryInput } from "../routers/inputTypes/post-query-input";
-import { PostViewModel } from "../BLL/dto/post-view-model-type";
+import { PostViewModel } from "../BLL/types/post-view-model-type";
 import { NotFoundError } from "../../core/errorClasses/NotFoundError";
 import { mapToPostViewModel } from "../mappers/map-to-post-view-model";
 import { BlogsQueryRepository } from "../../blogs/repositories/blogs.query-repository";
 import { PostListWithPagination } from "../routers/outputTypes/post-list-with-pagination";
 import { inject, injectable } from "inversify";
-import { LeanPost, PostModel } from "./schemas/post.schema";
+import { LeanPost, PostModel } from "../../domain/posts/schema/post.schema";
 
 @injectable()
 export class PostsQueryRepository {
